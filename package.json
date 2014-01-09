@@ -1,0 +1,41 @@
+{
+  "name": "gulp-ruby-sass",
+  "version": "0.0.0",
+  "description": "Compile Sass to CSS with Ruby Sass",
+  "license": "MIT",
+  "repository": "sindresorhus/gulp-ruby-sass",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "http://sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "gulpplugin",
+    "scss",
+    "sass",
+    "css",
+    "compile",
+    "preprocessor",
+    "style",
+    "ruby"
+  ],
+  "dependencies": {
+    "gulp-util": "~2.2.0",
+    "map-stream": "~0.1.0",
+    "win-spawn": "~2.0.0",
+    "dargs": "~0.1.0",
+    "temp-write": "~0.1.1"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  }
+}
