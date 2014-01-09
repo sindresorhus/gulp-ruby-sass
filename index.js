@@ -31,6 +31,7 @@ module.exports = function (options) {
 			}
 
 			var args = [
+				'sass',
 				tempFile,
 				tempFile,
 				'--load-path', path.dirname(file.path)
@@ -45,7 +46,7 @@ module.exports = function (options) {
 				args.push('--scss');
 			}
 
-			var cp = spawn('sass', args);
+			var cp = spawn(args.shift(), args);
 
 			cp.on('error', function (err) {
 				return cb(new gutil.PluginError('gulp-ruby-sass', err));
