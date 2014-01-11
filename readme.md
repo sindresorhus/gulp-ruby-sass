@@ -2,7 +2,7 @@
 
 > Compile Sass to CSS with [Ruby Sass](http://sass-lang.com/install)
 
-This is slower than [grunt-sass](https://github.com/dlmanning/gulp-sass), but more stable and feature-rich.
+This is slower than [gulp-sass](https://github.com/dlmanning/gulp-sass), but more stable and feature-rich.
 
 
 ## Install
