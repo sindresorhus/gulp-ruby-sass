@@ -53,8 +53,9 @@ module.exports = function (options) {
 			});
 
 			var errors = '';
+			cp.stderr.setEncoding('utf8');
 			cp.stderr.on('data', function (data) {
-				errors += data.toString();
+				errors += data;
 			});
 
 			cp.on('close', function (code) {
@@ -63,7 +64,7 @@ module.exports = function (options) {
 				}
 
 				if (errors) {
-					return cb(new gutil.PluginError('gulp-ruby-sass', gutil.linefeed + gutil.linefeed + errors.replace(tempFile, file.path)));
+					return cb(new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(tempFile, file.path).replace('Use --trace for backtrace.\n', '')));
 				}
 
 				if (code > 0) {
