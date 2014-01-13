@@ -52,9 +52,18 @@ module.exports = function (options) {
 				return cb(new gutil.PluginError('gulp-ruby-sass', err));
 			});
 
+			var errors = '';
+			cp.stderr.on('data', function (data) {
+				errors += data.toString();
+			});
+
 			cp.on('close', function (code) {
 				if (code === 127) {
 					return cb(new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.'));
+				}
+
+				if (errors) {
+					return cb(new gutil.PluginError('gulp-ruby-sass', gutil.linefeed + gutil.linefeed + errors.replace(tempFile, file.path)));
 				}
 
 				if (code > 0) {
