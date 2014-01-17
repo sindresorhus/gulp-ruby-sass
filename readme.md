@@ -98,7 +98,7 @@ Silence warnings and status messages during compilation.
 Type: `Boolean`  
 Default: `false`
 
-Make Compass imports available and load project configuration (`config.rb` located close to the `Gruntfile.js`).
+Make Compass imports available and load project configuration (`config.rb` located close to the `gulpfile.js`).
 
 
 ##### debugInfo
