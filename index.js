@@ -2,7 +2,7 @@
 var fs = require('fs');
 var path = require('path');
 var gutil = require('gulp-util');
-var map = require('map-stream');
+var through = require('through2');
 var spawn = require('win-spawn');
 var tempWrite = require('temp-write');
 var dargs = require('dargs');
@@ -12,22 +12,24 @@ module.exports = function (options) {
 	var passedArgs = dargs(options, ['bundleExec']);
 	var bundleExec = options.bundleExec;
 
-	return map(function (file, cb) {
-		if (file.isNull()) {
-			return cb(null, file);
+	return through.obj(function (file, enc, cb) {
+		var self = this;
+
+		if (file.isNull() || path.basename(file.path)[0] === '_') {
+			this.push(file);
+			return cb();
 		}
 
 		if (file.isStream()) {
-			return cb(new gutil.PluginError('gulp-ruby-sass', 'Streaming not supported'));
-		}
-
-		if (path.basename(file.path)[0] === '_') {
-			return cb(null, file);
+			this.emit('error', new gutil.PluginError('gulp-ruby-sass', 'Streaming not supported'));
+			return cb();
 		}
 
 		tempWrite(file.contents, path.extname(file.path), function (err, tempFile) {
 			if (err) {
-				return cb(new gutil.PluginError('gulp-ruby-sass', err));
+				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+				self.push(file);
+				return cb();
 			}
 
 			var args = [
@@ -49,7 +51,9 @@ module.exports = function (options) {
 			var cp = spawn(args.shift(), args);
 
 			cp.on('error', function (err) {
-				return cb(new gutil.PluginError('gulp-ruby-sass', err));
+				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+				self.push(file);
+				return cb();
 			});
 
 			var errors = '';
@@ -60,27 +64,36 @@ module.exports = function (options) {
 
 			cp.on('close', function (code) {
 				if (code === 127) {
-					return cb(new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.'));
+					self.emit('error', new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.'));
+					self.push(file);
+					return cb();
 				}
 
 				if (errors) {
-					return cb(new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(tempFile, file.path).replace('Use --trace for backtrace.\n', '')));
+					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(tempFile, file.path).replace('Use --trace for backtrace.\n', '')));
+					self.push(file);
+					return cb();
 				}
 
 				if (code > 0) {
-					return cb(new gutil.PluginError('gulp-ruby-sass', 'Exited with error code ' + code));
+					self.emit('error', new gutil.PluginError('gulp-ruby-sass', 'Exited with error code ' + code));
+					self.push(file);
+					return cb();
 				}
 
 				fs.readFile(tempFile, function (err, data) {
 					if (err) {
-						return cb(new gutil.PluginError('gulp-ruby-sass', err));
+						self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+						self.push(file);
+						return cb();
 					}
 
-					cb(null, new gutil.File({
+					self.push(new gutil.File({
 						base: path.dirname(file.path),
 						path: gutil.replaceExtension(file.path, '.css'),
 						contents: data
 					}));
+					cb();
 				});
 			});
 		});
