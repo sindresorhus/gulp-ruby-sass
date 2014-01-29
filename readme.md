@@ -13,6 +13,8 @@ Install with [npm](https://npmjs.org/package/gulp-ruby-sass)
 npm install --save-dev gulp-ruby-sass
 ```
 
+You also need to have [Ruby](http://www.ruby-lang.org/en/downloads/) and [Sass](http://sass-lang.com/download.html) installed. If you're on OS X or Linux you probably already have Ruby; test with `ruby -v` in your terminal. When you've confirmed you have Ruby, run `gem install sass` to install Sass.
+
 
 ## Example
 
@@ -30,6 +32,10 @@ gulp.task('default', function () {
 
 ## API
 
+Note that files starting with `_` are ignored even if they match the globbing pattern.  
+This is done to match the expected [Sass partial behaviour](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#partials).
+
+
 ### sass(options)
 
 #### options
@@ -42,7 +48,7 @@ Default: `false`
 
 Enable Source Maps.
 
-**Requires Sass 3.3.0, which can be installed with `gem install sass --pre`**
+**Requires Sass 3.3.0, which can be installed with `gem install --pre sass`**
 
 
 ##### trace
