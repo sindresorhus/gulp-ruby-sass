@@ -9,8 +9,9 @@ var dargs = require('dargs');
 
 module.exports = function (options) {
 	options = options || {};
-	var passedArgs = dargs(options, ['bundleExec']);
+	var passedArgs = dargs(options, ['bundleExec', 'encoding']);
 	var bundleExec = options.bundleExec;
+	var encoding = options.encoding;
 
 	return through.obj(function (file, enc, cb) {
 		var self = this;
@@ -41,6 +42,10 @@ module.exports = function (options) {
 
 			if (bundleExec) {
 				args.unshift('bundle', 'exec');
+			}
+
+			if (encoding) {
+				args.push('-E', encoding);
 			}
 
 			// if we're compiling SCSS or CSS files

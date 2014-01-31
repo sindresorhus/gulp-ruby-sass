@@ -161,6 +161,13 @@ Default: `false`
 Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`.
 
 
+##### encoding
+
+Type: `Boolean`
+
+Specify the default encoding for Sass files.
+
+
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)
