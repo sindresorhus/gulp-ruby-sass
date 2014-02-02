@@ -10,8 +10,9 @@ var which = require('which');
 
 module.exports = function (options) {
 	options = options || {};
-	var passedArgs = dargs(options, ['bundleExec']);
+	var passedArgs = dargs(options, ['bundleExec', 'encoding']);
 	var bundleExec = options.bundleExec;
+	var encoding = options.encoding;
 
 	try {
 		which.sync('sass');
@@ -48,6 +49,10 @@ module.exports = function (options) {
 
 			if (bundleExec) {
 				args.unshift('bundle', 'exec');
+			}
+
+			if (encoding) {
+				args.push('-E', encoding);
 			}
 
 			// if we're compiling SCSS or CSS files
