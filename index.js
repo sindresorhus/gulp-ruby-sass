@@ -32,7 +32,7 @@ module.exports = function (options) {
 			return cb();
 		}
 
-		tempWrite(file.contents, path.extname(file.path), function (err, tempFile) {
+		tempWrite(file.contents, path.basename(file.path), function (err, tempFile) {
 			if (err) {
 				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 				self.push(file);
@@ -94,7 +94,25 @@ module.exports = function (options) {
 						path: gutil.replaceExtension(file.path, '.css'),
 						contents: data
 					}));
-					cb();
+
+					if (!options.sourcemap) {
+						return cb();
+					}
+
+					fs.readFile(tempFile + '.map', function (err, data) {
+						if (err) {
+							self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+							return cb();
+						}
+
+						self.push(new gutil.File({
+							base: path.dirname(file.path),
+							path: file.path + '.map',
+							contents: data
+						}));
+
+						cb();
+					});
 				});
 			});
 		});

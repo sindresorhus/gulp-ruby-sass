@@ -24,7 +24,7 @@ var sass = require('gulp-ruby-sass');
 
 gulp.task('default', function () {
 	gulp.src('src/app.scss')
-		.pipe(sass({unixNewlines: true}))
+		.pipe(sass({sourcemap: true}))
 		.pipe(gulp.dest('dist'));
 });
 ```
@@ -46,7 +46,7 @@ This is done to match the expected [Sass partial behaviour](http://sass-lang.com
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Maps.
+Enable Source Map.
 
 **Requires Sass 3.3.0, which can be installed with `gem install --pre sass`**
 
