@@ -33,7 +33,8 @@
     "through2": "~0.4.0",
     "win-spawn": "~2.0.0",
     "dargs": "~0.1.0",
-    "temp-write": "~0.1.1"
+    "temp-write": "~0.1.1",
+    "which": "~1.0.5"
   },
   "devDependencies": {
     "mocha": "*"

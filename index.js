@@ -6,11 +6,18 @@ var through = require('through2');
 var spawn = require('win-spawn');
 var tempWrite = require('temp-write');
 var dargs = require('dargs');
+var which = require('which');
 
 module.exports = function (options) {
 	options = options || {};
 	var passedArgs = dargs(options, ['bundleExec']);
 	var bundleExec = options.bundleExec;
+
+	try {
+		which.sync('sass');
+	} catch (err) {
+		throw new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.');
+	}
 
 	return through.obj(function (file, enc, cb) {
 		var self = this;
@@ -63,12 +70,6 @@ module.exports = function (options) {
 			});
 
 			cp.on('close', function (code) {
-				if (code === 127) {
-					self.emit('error', new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.'));
-					self.push(file);
-					return cb();
-				}
-
 				if (errors) {
 					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(tempFile, file.path).replace('Use --trace for backtrace.\n', '')));
 					self.push(file);
