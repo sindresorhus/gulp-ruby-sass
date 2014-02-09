@@ -90,7 +90,7 @@ module.exports = function (options) {
 					}
 
 					self.push(new gutil.File({
-						base: path.dirname(file.path),
+						base: file.base,
 						path: gutil.replaceExtension(file.path, '.css'),
 						contents: data
 					}));
