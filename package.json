@@ -36,7 +36,8 @@
     "win-spawn": "~2.0.0",
     "dargs": "~0.1.0",
     "temp-write": "~0.2.0",
-    "which": "~1.0.5"
+    "which": "~1.0.5",
+    "chalk": "~0.4.0"
   },
   "devDependencies": {
     "mocha": "*"

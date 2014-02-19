@@ -7,6 +7,7 @@ var spawn = require('win-spawn');
 var tempWrite = require('temp-write');
 var dargs = require('dargs');
 var which = require('which');
+var chalk = require('chalk');
 
 module.exports = function (options) {
 	options = options || {};
@@ -55,7 +56,12 @@ module.exports = function (options) {
 				args.push('--scss');
 			}
 
-			var cp = spawn(args.shift(), args);
+			var cmd = args.shift();
+			var cp = spawn(cmd, args);
+
+			if (process.argv.indexOf('--verbose') !== -1) {
+				gutil.log('gulp-ruby-sass:', 'Running command:', cmd, chalk.blue(args.join(' ')));
+			}
 
 			cp.on('error', function (err) {
 				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
