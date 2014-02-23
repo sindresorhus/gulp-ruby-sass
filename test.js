@@ -13,12 +13,12 @@ it('should compile Sass', function (cb) {
 			assert.equal(file.relative, 'fixture.css');
 			assert.equal(
 				file.contents.toString(),
-				'.content-navigation {\n  border-color: #3bbfce; }\n\n/*# sourceMappingURL=fixture.scss.map */\n'
+				'.content-navigation {\n  border-color: #3bbfce; }\n\n/*# sourceMappingURL=fixture.css.map */\n'
 			);
 			return;
 		}
 
-		assert.equal(file.relative, 'fixture.scss.map');
+		assert.equal(file.relative, 'fixture.css.map');
 		assert.equal(JSON.parse(file.contents.toString()).version, 3);
 	});
 
