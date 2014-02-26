@@ -33,7 +33,7 @@ module.exports = function (options) {
 			return cb();
 		}
 
-		var fileDirname = path.dirname(file.path);
+		var fileDirname = file.base;
 
 		tempWrite(file.contents, path.basename(file.path), function (err, inputTempFile) {
 			if (err) {

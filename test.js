@@ -25,7 +25,8 @@ it('should compile Sass', function (cb) {
 	stream.on('end', cb);
 
 	stream.write(new gutil.File({
-		path: 'fixture.scss',
+		base: __dirname + '/fixture',
+		path: __dirname + '/fixture/fixture.scss',
 		contents: new Buffer('$blue:#3bbfce;.content-navigation{border-color:$blue;}')
 	}));
 
