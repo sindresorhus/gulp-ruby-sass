@@ -11,7 +11,7 @@ var chalk = require('chalk');
 
 module.exports = function (options) {
 	options = options || {};
-	var passedArgs = dargs(options, ['bundleExec']);
+	var passedArgs = dargs(options, ['bundleExec', 'sourcemappath']);
 	var bundleExec = options.bundleExec;
 
 	try {
@@ -40,10 +40,15 @@ module.exports = function (options) {
 				return cb();
 			}
 
+			var dest = tempFile;
+			if (options.sourcemappath) {
+				dest = options.sourcemappath + path.basename(file.path);
+			}
+
 			var args = [
 				'sass',
 				tempFile,
-				tempFile,
+				dest,
 				'--load-path', path.dirname(file.path)
 			].concat(passedArgs);
 
@@ -77,7 +82,7 @@ module.exports = function (options) {
 
 			cp.on('close', function (code) {
 				if (errors) {
-					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(tempFile, file.path).replace('Use --trace for backtrace.\n', '')));
+					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(dest, file.path).replace('Use --trace for backtrace.\n', '')));
 					self.push(file);
 					return cb();
 				}
@@ -88,7 +93,7 @@ module.exports = function (options) {
 					return cb();
 				}
 
-				fs.readFile(tempFile, function (err, data) {
+				fs.readFile(dest, function (err, data) {
 					if (err) {
 						self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 						self.push(file);
@@ -105,7 +110,7 @@ module.exports = function (options) {
 						return cb();
 					}
 
-					fs.readFile(tempFile + '.map', function (err, data) {
+					fs.readFile(dest + '.map', function (err, data) {
 						if (err) {
 							self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 							return cb();
