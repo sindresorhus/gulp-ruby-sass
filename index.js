@@ -33,18 +33,21 @@ module.exports = function (options) {
 			return cb();
 		}
 
-		tempWrite(file.contents, path.basename(file.path), function (err, tempFile) {
+		var fileDirname = path.dirname(file.path);
+
+		tempWrite(file.contents, path.basename(file.path), function (err, inputTempFile) {
 			if (err) {
 				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 				self.push(file);
 				return cb();
 			}
 
+			var outputTempFile = gutil.replaceExtension(inputTempFile, '.css');
 			var args = [
 				'sass',
-				tempFile,
-				tempFile,
-				'--load-path', path.dirname(file.path)
+				inputTempFile,
+				outputTempFile,
+				'--load-path', fileDirname
 			].concat(passedArgs);
 
 			if (bundleExec) {
@@ -77,7 +80,7 @@ module.exports = function (options) {
 
 			cp.on('close', function (code) {
 				if (errors) {
-					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(tempFile, file.path).replace('Use --trace for backtrace.\n', '')));
+					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', '')));
 					self.push(file);
 					return cb();
 				}
@@ -88,16 +91,18 @@ module.exports = function (options) {
 					return cb();
 				}
 
-				fs.readFile(tempFile, function (err, data) {
+				fs.readFile(outputTempFile, function (err, data) {
 					if (err) {
 						self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 						self.push(file);
 						return cb();
 					}
 
+					var outputFilePath = gutil.replaceExtension(file.path, '.css');
+
 					self.push(new gutil.File({
-						base: path.dirname(file.path),
-						path: gutil.replaceExtension(file.path, '.css'),
+						base: fileDirname,
+						path: outputFilePath,
 						contents: data
 					}));
 
@@ -105,15 +110,15 @@ module.exports = function (options) {
 						return cb();
 					}
 
-					fs.readFile(tempFile + '.map', function (err, data) {
+					fs.readFile(outputTempFile + '.map', function (err, data) {
 						if (err) {
 							self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 							return cb();
 						}
 
 						self.push(new gutil.File({
-							base: path.dirname(file.path),
-							path: file.path + '.map',
+							base: fileDirname,
+							path: outputFilePath + '.map',
 							contents: data
 						}));
 
