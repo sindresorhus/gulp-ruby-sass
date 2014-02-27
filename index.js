@@ -23,7 +23,11 @@ module.exports = function (options) {
 	return through.obj(function (file, enc, cb) {
 		var self = this;
 
-		if (file.isNull() || path.basename(file.path)[0] === '_') {
+		if (path.basename(file.path)[0] === '_') {
+			return cb();
+		}
+
+		if (file.isNull()) {
 			this.push(file);
 			return cb();
 		}
