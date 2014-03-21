@@ -11,7 +11,7 @@ var chalk = require('chalk');
 
 module.exports = function (options) {
 	options = options || {};
-	var passedArgs = dargs(options, ['bundleExec']);
+	var passedArgs = dargs(options, ['bundleExec', 'errLogToConsole']);
 	var bundleExec = options.bundleExec;
 
 	try {
@@ -83,9 +83,16 @@ module.exports = function (options) {
 			});
 
 			cp.on('close', function (code) {
+				var errorString = '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', '');
 				if (errors) {
-					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', '')));
-					self.push(file);
+					
+					if (options.errLogToConsole) {
+						gutil.log('[gulp-ruby-sass] ' + errorString);
+					} else {
+						self.emit('error', new gutil.PluginError('gulp-ruby-sass', errorString));
+						self.push(file);
+					}
+					
 					return cb();
 				}
 
