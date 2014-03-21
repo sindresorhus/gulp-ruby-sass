@@ -71,6 +71,9 @@ module.exports = function (options) {
 			}
 
 			cp.on('error', function (err) {
+				// TODO: remove when gulp has fixed error handling
+				gutil.log('[gulp-ruby-sass] ' + err);
+
 				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 				self.push(file);
 				return cb();
@@ -84,6 +87,9 @@ module.exports = function (options) {
 
 			cp.on('close', function (code) {
 				if (errors) {
+					// TODO: remove when gulp has fixed error handling
+					gutil.log('[gulp-ruby-sass]', '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', ''));
+
 					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', '')));
 					self.push(file);
 					return cb();
