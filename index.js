@@ -82,6 +82,11 @@ module.exports = function (options) {
 			var errors = '';
 			cp.stderr.setEncoding('utf8');
 			cp.stderr.on('data', function (data) {
+				// ignore deprecation warnings
+				if (/DEPRECATION WARNING/.test(data)) {
+					return;
+				}
+
 				errors += data;
 			});
 
