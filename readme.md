@@ -1,4 +1,4 @@
-# [gulp](https://github.com/wearefractal/gulp)-ruby-sass [![Build Status](https://secure.travis-ci.org/sindresorhus/gulp-ruby-sass.png?branch=master)](http://travis-ci.org/sindresorhus/gulp-ruby-sass)
+# gulp-ruby-sass [![Build Status](https://travis-ci.org/sindresorhus/gulp-ruby-sass.svg?branch=master)](https://travis-ci.org/sindresorhus/gulp-ruby-sass)
 
 > Compile Sass to CSS with [Ruby Sass](http://sass-lang.com/install)
 
@@ -9,16 +9,14 @@ This is slower than [gulp-sass](https://github.com/dlmanning/gulp-sass), but mor
 
 ## Install
 
-Install with [npm](https://npmjs.org/package/gulp-ruby-sass)
-
-```
-npm install --save-dev gulp-ruby-sass
+```bash
+$ npm install --save-dev gulp-ruby-sass
 ```
 
 You also need to have [Ruby](http://www.ruby-lang.org/en/downloads/) and [Sass](http://sass-lang.com/download.html) installed. If you're on OS X or Linux you probably already have Ruby; test with `ruby -v` in your terminal. When you've confirmed you have Ruby, run `gem install sass` to install Sass.
 
 
-## Example
+## Usage
 
 ```js
 var gulp = require('gulp');
@@ -165,4 +163,4 @@ Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bu
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+[MIT](http://opensource.org/licenses/MIT) © [Sindre Sorhus](http://sindresorhus.com)
