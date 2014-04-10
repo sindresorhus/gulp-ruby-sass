@@ -14,11 +14,13 @@ module.exports = function (options) {
 	var passedArgs = dargs(options, ['bundleExec']);
 	var bundleExec = options.bundleExec;
 
-	try {
-		which.sync('sass');
-	} catch (err) {
-		throw new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.');
-	}
+  if (!bundleExec) {
+	  try {
+		  which.sync('sass');
+	  } catch (err) {
+		  throw new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.');
+	  }
+  }
 
 	return through.obj(function (file, enc, cb) {
 		var self = this;
