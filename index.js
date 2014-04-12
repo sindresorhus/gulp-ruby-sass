@@ -85,7 +85,7 @@ module.exports = function (options) {
 			cp.stderr.setEncoding('utf8');
 			cp.stderr.on('data', function (data) {
 				// ignore deprecation and empty warnings
-				if (/DEPRECATION WARNING/.test(data) || '' == data.trim()) {
+				if (/DEPRECATION WARNING/.test(data) || data.trim() === '') {
 					return;
 				}
 
