@@ -23,7 +23,7 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('default', function () {
-	gulp.src('src/app.scss')
+	return gulp.src('src/app.scss')
 		.pipe(sass({sourcemap: true}))
 		.pipe(gulp.dest('dist'));
 });
