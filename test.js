@@ -2,6 +2,7 @@
 var assert = require('assert');
 var gutil = require('gulp-util');
 var sass = require('./index');
+var EOL = require('os').EOL;
 
 it('should compile Sass', function (cb) {
 	var stream = sass({
@@ -12,8 +13,8 @@ it('should compile Sass', function (cb) {
 		if (/\.css$/.test(file.path)) {
 			assert.equal(file.relative, 'fixture.css');
 			assert.equal(
-				file.contents.toString(),
-				'.content-navigation {\n  border-color: #3bbfce; }\n\n/*# sourceMappingURL=fixture.css.map */\n'
+				file.contents.toString('utf-8'),
+				'.content-navigation {' + EOL + '  border-color: #3bbfce; }' + EOL + EOL + '/*# sourceMappingURL=fixture.css.map */' + EOL
 			);
 			return;
 		}
