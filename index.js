@@ -11,8 +11,9 @@ var chalk = require('chalk');
 
 module.exports = function (options) {
 	options = options || {};
-	var passedArgs = dargs(options, ['bundleExec']);
+	var passedArgs = dargs(options, ['bundleExec', 'recursiveImports']);
 	var bundleExec = options.bundleExec;
+	var recursiveImports = options.recursiveImports;
 
 	if (!bundleExec) {
 		try {
@@ -58,6 +59,19 @@ module.exports = function (options) {
 
 			if (bundleExec) {
 				args.unshift('bundle', 'exec');
+			}
+
+			if (recursiveImports) {
+				var files = fs.readdirSync(fileDirname)
+				files.forEach(function(file) {
+					var filePath = fileDirname + file;
+					var stat = fs.statSync(filePath);
+
+					if(stat.isDirectory()) {
+						args.push('--load-path');
+						args.push(filePath);
+					}
+				});
 			}
 
 			// if we're compiling SCSS or CSS files
