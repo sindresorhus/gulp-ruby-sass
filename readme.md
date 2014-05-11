@@ -48,7 +48,7 @@ Default: `false`
 
 Enable Source Map.
 
-**Requires Sass 3.3.0, which can be installed with `gem install --pre sass`**
+**Requires Sass 3.3.0**
 
 
 ##### trace
