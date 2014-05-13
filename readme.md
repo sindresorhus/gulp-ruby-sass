@@ -9,7 +9,7 @@ This is slower than [gulp-sass](https://github.com/dlmanning/gulp-sass), but mor
 
 ## Install
 
-```bash
+```sh
 $ npm install --save-dev gulp-ruby-sass
 ```
 
@@ -163,4 +163,4 @@ Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bu
 
 ## License
 
-[MIT](http://opensource.org/licenses/MIT) © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](http://sindresorhus.com)
