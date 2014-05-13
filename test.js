@@ -19,13 +19,17 @@ it('should compile Sass', function (cb) {
 			return;
 		}
 
+		var sm = JSON.parse(file.contents.toString());
 		assert.equal(file.relative, 'fixture.css.map');
-		assert.equal(JSON.parse(file.contents.toString()).version, 3);
+		assert.equal(sm.version, 3);
+		assert.equal(sm.file, 'fixture.css');
+		assert.equal(sm.sources[0], 'fixture.scss');
 	});
 
 	stream.on('end', cb);
 
 	stream.write(new gutil.File({
+		cwd: __dirname,
 		base: __dirname + '/fixture',
 		path: __dirname + '/fixture/fixture.scss',
 		contents: new Buffer('$blue:#3bbfce;.content-navigation{border-color:$blue;}')
