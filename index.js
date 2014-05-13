@@ -44,7 +44,6 @@ module.exports = function (options) {
 		tempWrite(file.contents, path.basename(file.path), function (err, inputTempFile) {
 			if (err) {
 				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
-				self.push(file);
 				return cb();
 			}
 
@@ -77,7 +76,6 @@ module.exports = function (options) {
 				gutil.log('[gulp-ruby-sass] ' + err);
 
 				self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
-				self.push(file);
 				return cb();
 			});
 
@@ -98,20 +96,17 @@ module.exports = function (options) {
 					gutil.log('[gulp-ruby-sass]', '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', ''));
 
 					self.emit('error', new gutil.PluginError('gulp-ruby-sass', '\n' + errors.replace(inputTempFile, file.path).replace('Use --trace for backtrace.\n', '')));
-					self.push(file);
 					return cb();
 				}
 
 				if (code > 0) {
 					self.emit('error', new gutil.PluginError('gulp-ruby-sass', 'Exited with error code ' + code));
-					self.push(file);
 					return cb();
 				}
 
 				fs.readFile(outputTempFile, function (err, data) {
 					if (err) {
 						self.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
-						self.push(file);
 						return cb();
 					}
 
