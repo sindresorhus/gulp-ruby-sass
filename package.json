@@ -35,11 +35,13 @@
     "dargs": "^0.1.0",
     "gulp-util": "^2.2.0",
     "temp-write": "^0.3.0",
-    "through2": "^0.4.0",
+    "through2": "^0.5.1",
     "which": "^1.0.5",
     "win-spawn": "^2.0.0"
   },
   "devDependencies": {
+    "gulp": "^3.7.0",
+    "gulp-add": "0.0.1",
     "mocha": "*"
   }
 }
