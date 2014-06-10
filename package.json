@@ -31,7 +31,6 @@
     "sourcemap"
   ],
   "dependencies": {
-    "chalk": "^0.4.0",
     "dargs": "^0.1.0",
     "gulp-util": "^2.2.0",
     "temp-write": "^0.3.0",
