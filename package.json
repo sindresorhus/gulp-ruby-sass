@@ -32,9 +32,9 @@
   ],
   "dependencies": {
     "dargs": "^0.1.0",
+    "gulp-intermediate": "^0.1.1",
     "gulp-util": "^2.2.0",
-    "temp-write": "^0.3.0",
-    "through2": "^0.5.1",
+    "uuid": "^1.4.1",
     "which": "^1.0.5",
     "win-spawn": "^2.0.0"
   },
