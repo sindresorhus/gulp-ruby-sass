@@ -6,7 +6,8 @@ var EOL = require('os').EOL;
 
 it('should compile Sass', function (cb) {
 	var stream = sass({
-		sourcemap: true
+		sourcemap: true,
+		quiet: true
 	});
 
 	stream.on('data', function (file) {
