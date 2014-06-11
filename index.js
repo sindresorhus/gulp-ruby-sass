@@ -1,9 +1,9 @@
 'use strict';
 var uuid = require('uuid');
 var dargs = require('dargs');
-var which = require('which');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
+var execSync = require('execSync');
 var intermediate = require('gulp-intermediate');
 
 module.exports = function (options) {
@@ -11,25 +11,22 @@ module.exports = function (options) {
 	var args = dargs(options, ['bundleExec']);
 	var compileDir = '_' + uuid.v4();
 	var command;
-
-	try {
-		if (options.bundleExec) {
-			// TODO: Test Sass availability under bundle exec.
-		}
-		else {
-			which.sync('sass');
-		}
-	}
-  catch (err) {
-		throw new gutil.PluginError('gulp-ruby-sass', 'You need to have Ruby and Sass installed and in your PATH for this task to work.');
-	}
+	var existsCommand;
 
 	if (options.bundleExec) {
 		command = 'bundle';
 		args.unshift('exec', 'sass');
+		existsCommand = 'bundle exec sass -v';
 	}
 	else {
 		command = 'sass';
+		existsCommand = 'sass -v';
+	}
+
+	var result = execSync.exec(existsCommand);
+
+	if (result.code !== 0) {
+		throw new gutil.PluginError('gulp-ruby-sass', result.stdout);
 	}
 
 	args.push('--update', '.:' + compileDir);

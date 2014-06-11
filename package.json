@@ -35,8 +35,8 @@
     "gulp-intermediate": "^0.1.1",
     "gulp-util": "^2.2.0",
     "uuid": "^1.4.1",
-    "which": "^1.0.5",
-    "win-spawn": "^2.0.0"
+    "win-spawn": "^2.0.0",
+    "execSync": "^1.0.1-pre"
   },
   "devDependencies": {
     "gulp": "^3.7.0",

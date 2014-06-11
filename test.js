@@ -5,6 +5,8 @@ var sass = require('./index');
 var EOL = require('os').EOL;
 
 it('should compile Sass', function (cb) {
+	this.timeout(5000);
+
 	var stream = sass({
 		sourcemap: true,
 		quiet: true
