@@ -12,6 +12,7 @@ module.exports = function (options) {
 	var compileDir = '_' + uuid.v4();
 	var command;
 	var existsCommand;
+	args.push('--update', '.:' + compileDir);
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -28,8 +29,6 @@ module.exports = function (options) {
 	if (result.code !== 0) {
 		throw new gutil.PluginError('gulp-ruby-sass', result.stdout);
 	}
-
-	args.push('--update', '.:' + compileDir);
 
 	// TODO: Add persistant temp directory and caching.
 
