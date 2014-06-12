@@ -3,7 +3,6 @@ var path = require('path');
 var dargs = require('dargs');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
-var execSync = require('execSync');
 var intermediate = require('gulp-intermediate');
 
 module.exports = function (options) {
@@ -13,22 +12,13 @@ module.exports = function (options) {
 	options.update = '.:' + compileDir;
 	var args = dargs(options, ['bundleExec']);
 	var command;
-	var existsCommand;
 
 	if (options.bundleExec) {
 		command = 'bundle';
 		args.unshift('exec', 'sass');
-		existsCommand = 'bundle exec sass -v';
 	}
 	else {
 		command = 'sass';
-		existsCommand = 'sass -v';
-	}
-
-	var result = execSync.exec(existsCommand);
-
-	if (result.code !== 0) {
-		throw new gutil.PluginError('gulp-ruby-sass', result.stdout);
 	}
 
 	return intermediate(compileDir, function(tempDir, cb) {
@@ -38,6 +28,14 @@ module.exports = function (options) {
 		}
 
 		var sass = spawn(command, args, {cwd: tempDir});
+
+		sass.on('error', function (err) {
+			gutil.log('gulp-ruby-sass:', gutil.colors.red('Error running Sass: \n') +
+				'Something went wrong while trying to run the Sass command.\n' +
+				'Make sure you have Ruby and Sass installed and available.\n' +
+				'Original error: ' + err);
+			cb();
+		});
 
 		sass.stdout.on('data', function (data) {
 			gutil.log('gulp-ruby-sass:', data.toString()

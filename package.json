@@ -32,7 +32,6 @@
   ],
   "dependencies": {
     "dargs": "^0.1.0",
-    "execSync": "^1.0.1-pre",
     "gulp-intermediate": "^0.1.5",
     "gulp-util": "^2.2.0",
     "win-spawn": "^2.0.0"
