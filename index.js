@@ -40,8 +40,8 @@ module.exports = function (options) {
 
 		sass.stdout.on('data', function (data) {
 			gutil.log('gulp-ruby-sass:', data.toString()
-				.replace(new RegExp(compileDir), '') // Remove tmp directory
-				.replace(/\s+$/g, ''));							 // Remove extra newlines
+				// Remove tmp directory references and extra newlines
+				.replace(new RegExp(compileDir), '') .trim());
 		});
 
 		sass.stderr.on('data', function (data) {
