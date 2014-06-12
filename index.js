@@ -1,5 +1,6 @@
 'use strict';
 var path = require('path');
+var chalk = require('chalk');
 var dargs = require('dargs');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
@@ -24,13 +25,13 @@ module.exports = function (options) {
 	return intermediate(compileDir, function(tempDir, cb) {
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
-				gutil.colors.blue(command, args.join(' ')));
+				chalk.blue(command, args.join(' ')));
 		}
 
 		var sass = spawn(command, args, {cwd: tempDir});
 
 		sass.on('error', function (err) {
-			gutil.log('gulp-ruby-sass:', gutil.colors.red('Error running Sass: \n') +
+			gutil.log('gulp-ruby-sass:', chalk.red('Error running Sass: \n') +
 				'Something went wrong while trying to run the Sass command.\n' +
 				'Make sure you have Ruby and Sass installed and available.\n' +
 				'Original error: ' + err);
@@ -44,7 +45,7 @@ module.exports = function (options) {
 		});
 
 		sass.stderr.on('data', function (data) {
-			gutil.log('gulp-ruby-sass:', gutil.colors.red('Sass error: ') + data);
+			gutil.log('gulp-ruby-sass:', chalk.red('Sass error: ') + data);
 		});
 
 		sass.on('close', cb);
