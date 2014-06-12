@@ -1,5 +1,5 @@
 'use strict';
-var uuid = require('uuid');
+var path = require('path');
 var dargs = require('dargs');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
@@ -7,12 +7,13 @@ var execSync = require('execSync');
 var intermediate = require('gulp-intermediate');
 
 module.exports = function (options) {
+	var compileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	options = options || {};
+	options.cacheLocation = options.cacheLocation || path.join(__dirname, '.sass-cache');
+	options.update = '.:' + compileDir;
 	var args = dargs(options, ['bundleExec']);
-	var compileDir = '_' + uuid.v4();
 	var command;
 	var existsCommand;
-	args.push('--update', '.:' + compileDir);
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -29,8 +30,6 @@ module.exports = function (options) {
 	if (result.code !== 0) {
 		throw new gutil.PluginError('gulp-ruby-sass', result.stdout);
 	}
-
-	// TODO: Add persistant temp directory and caching.
 
 	return intermediate(compileDir, function(tempDir, cb) {
 		if (process.argv.indexOf('--verbose') !== -1) {
@@ -51,6 +50,6 @@ module.exports = function (options) {
 		});
 
 		sass.on('close', cb);
-	});
+	}, { customDir: 'gulp-ruby-sass' });
 };
 

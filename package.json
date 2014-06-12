@@ -32,11 +32,10 @@
   ],
   "dependencies": {
     "dargs": "^0.1.0",
-    "gulp-intermediate": "^0.1.1",
+    "execSync": "^1.0.1-pre",
+    "gulp-intermediate": "^0.1.5",
     "gulp-util": "^2.2.0",
-    "uuid": "^1.4.1",
-    "win-spawn": "^2.0.0",
-    "execSync": "^1.0.1-pre"
+    "win-spawn": "^2.0.0"
   },
   "devDependencies": {
     "gulp": "^3.7.0",
