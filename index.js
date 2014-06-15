@@ -12,8 +12,12 @@ module.exports = function (options) {
 	options.cacheLocation = options.cacheLocation || path.join(__dirname, '.sass-cache');
 	options.update = '.:' + compileDir;
 	var args = dargs(options, ['bundleExec']);
-	var bundleError = 'Gemfile version of Sass not found. Install missing gems with `bundle install`.';
 	var command;
+
+	// Error handling
+	var noLogMatcher = /execvp\(\): No such file or directory|spawn ENOENT/;
+	var bundleErrMatcher = /bundler: command not found|Could not find gem/;
+	var bundleErr = chalk.red('Gemfile version of Sass not found. Install missing gems with `bundle install`.');
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -32,33 +36,31 @@ module.exports = function (options) {
 		var sass = spawn(command, args, {cwd: tempDir});
 
 		sass.stdout.on('data', function (data) {
-			var msg = data.toString();
+			var msg = data.toString().trim();
 
-			if (msg.indexOf('bundler: command not found: sass') !== -1) {
-				gutil.log('gulp-ruby-sass:', chalk.red(bundleError));
+			if (bundleErrMatcher.test(msg)) {
+				gutil.log('gulp-ruby-sass:', bundleErr);
 			}
 			else {
-				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir), '').trim());
+				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir), ''));
 			}
 		});
 
 		sass.stderr.on('data', function (data) {
-			var msg = data.toString();
+			var msg = data.toString().trim();
 
-			if (msg.indexOf('Could not find gem') !== -1) {
-				gutil.log('gulp-ruby-sass:', chalk.red(bundleError));
+			if (bundleErrMatcher.test(msg)) {
+				gutil.log('gulp-ruby-sass:', bundleErr);
 			}
-			// Handle missing executable errors on close
-			else if (msg.indexOf('execvp(): No such file or directory') === -1) {
-				gutil.log('gulp-ruby-sass:', msg.trim());
+			else if (!noLogMatcher.test(msg)) {
+				gutil.log('gulp-ruby-sass:', msg);
 			}
 		});
 
 		sass.on('error', function (err) {
-			var msg = err.toString();
+			var msg = err.toString().trim();
 
-			// Handle missing executable errors on close
-			if (msg.indexOf('spawn ENOENT') === -1) {
+			if (!noLogMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', chalk.red(msg));
 			}
 		});
@@ -67,7 +69,7 @@ module.exports = function (options) {
 			var dependencies = options.bundleExec ? 'Ruby, Bundler, and Sass' : 'Ruby and Sass';
 
 			if (code === -1) {
-				gutil.log('gulp-ruby-sass:', chalk.red('This task requires that ' + dependencies + ' are installed and available.'));
+				gutil.log('gulp-ruby-sass:', chalk.red('Missing dependencies. ' + dependencies + ' must be installed and available.'));
 			}
 
 			cb();
