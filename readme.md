@@ -158,7 +158,7 @@ Don't cache to sassc files.
 Type: `Boolean`  
 Default: `false`
 
-Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`.
+Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`. For bundler to work correctly you must add the Gemfile and Gemfile.lock to your `gulp.src()` glob.
 
 
 ## License

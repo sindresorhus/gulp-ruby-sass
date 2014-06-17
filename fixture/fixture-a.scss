@@ -9,6 +9,8 @@ $base-line-height: 24px !default;
   line-height: 20px;
 }
 
+@debug 'This is a debug statement';
+@warn 'This is a warn statement';
 
 html {
   font-size: $base-font-size;
