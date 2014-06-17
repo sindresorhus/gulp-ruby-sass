@@ -4,11 +4,18 @@
   "description": "Compile Sass to CSS with Ruby Sass",
   "license": "MIT",
   "repository": "sindresorhus/gulp-ruby-sass",
-  "author": {
-    "name": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "http://sindresorhus.com"
-  },
+  "maintainers": [
+    {
+      "name": "Sindre Sorhus",
+      "email": "sindresorhus@gmail.com",
+      "url": "http://sindresorhus.com"
+    },
+    {
+      "name": "Rob Wierzbowski",
+      "email": "robwierzbowski@gmail.com",
+      "web": "http://robwierzbowski.com"
+    }
+  ],
   "engines": {
     "node": ">=0.10.0"
   },
