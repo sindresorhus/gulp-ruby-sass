@@ -42,7 +42,7 @@ module.exports = function (options) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
 			}
 			else {
-				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir), ''));
+				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir, 'g'), ''));
 			}
 		});
 
