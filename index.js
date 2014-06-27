@@ -27,7 +27,7 @@ module.exports = function (options) {
 		command = 'sass';
 	}
 
-	return intermediate(compileDir, function(tempDir, cb) {
+	return intermediate({ output: compileDir, container: 'gulp-ruby-sass' }, function(tempDir, cb) {
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
 				chalk.blue(command, args.join(' ')));
@@ -74,6 +74,6 @@ module.exports = function (options) {
 
 			cb();
 		});
-	}, { customDir: 'gulp-ruby-sass' });
+	});
 };
 
