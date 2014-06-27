@@ -40,7 +40,7 @@
   "dependencies": {
     "chalk": "^0.4.0",
     "dargs": "^0.1.0",
-    "gulp-intermediate": "^0.1.5",
+    "gulp-intermediate": "^1.0.0",
     "gulp-util": "^2.2.0",
     "win-spawn": "^2.0.0"
   },
