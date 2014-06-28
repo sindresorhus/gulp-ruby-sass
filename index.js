@@ -13,23 +13,25 @@ function rewriteSourcemapPaths (tempDir, origBase, cb) {
 
 	glob(path.join(tempDir, '**/*.map'), function (err, files) {
 		if (err) {
-			return cb(err);
+			cb(err);
+			return;
 		}
 
-		eachAsync(files, function (file, index, done) {
+		eachAsync(files, function (file, i, next) {
 			fs.readFile(file, function (err, data) {
 				if (err) {
-					return done(err);
+					next(err);
+					return;
 				}
 
 				var sourceMap = JSON.parse(data);
 
-				// Rewrite sourcemaps to point to the original source files.
+				// rewrite sourcemaps to point to the original source files
 				sourceMap.sources = sourceMap.sources.map(function (source) {
 					return path.join(origBase, source.replace(/\.\.\//g, ''));
 				});
 
-				fs.writeFile(file, JSON.stringify(sourceMap), done);
+				fs.writeFile(file, JSON.stringify(sourceMap), next);
 			});
 		}, cb);
 	});
@@ -51,12 +53,14 @@ module.exports = function (options) {
 	if (options.bundleExec) {
 		command = 'bundle';
 		args.unshift('exec', 'sass');
-	}
-	else {
+	} else {
 		command = 'sass';
 	}
 
-	return intermediate({ output: compileDir, container: 'gulp-ruby-sass' }, function(tempDir, cb, fileProps) {
+	return intermediate({
+		output: compileDir,
+		container: 'gulp-ruby-sass'
+	}, function (tempDir, cb, fileProps) {
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
 				chalk.blue(command, args.join(' ')));
@@ -64,30 +68,31 @@ module.exports = function (options) {
 
 		var sass = spawn(command, args, {cwd: tempDir});
 
+		sass.stdout.setEncoding('utf8');
+		sass.stderr.setEncoding('utf8');
+
 		sass.stdout.on('data', function (data) {
-			var msg = data.toString().trim();
+			var msg = data.trim();
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
-			}
-			else {
+			} else {
 				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir, 'g'), ''));
 			}
 		});
 
 		sass.stderr.on('data', function (data) {
-			var msg = data.toString().trim();
+			var msg = data.trim();
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
-			}
-			else if (!noLogMatcher.test(msg)) {
+			} else if (!noLogMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', msg);
 			}
 		});
 
 		sass.on('error', function (err) {
-			var msg = err.toString().trim();
+			var msg = err.trim();
 
 			if (!noLogMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', chalk.red(msg));
@@ -110,8 +115,7 @@ module.exports = function (options) {
 
 					cb();
 				}.bind(this));
-			}
-			else {
+			} else {
 				cb();
 			}
 		});
