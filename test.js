@@ -3,6 +3,12 @@ var assert = require('assert');
 var gutil = require('gulp-util');
 var sass = require('./index');
 var EOL = require('os').EOL;
+var testFile = new gutil.File({
+	cwd: __dirname,
+	base: __dirname + '/fixture',
+	path: __dirname + '/fixture/nested/fixture.scss',
+	contents: new Buffer('$blue:#3bbfce;.content-navigation{border-color:$blue;}')
+});
 
 it('should compile Sass with sourcemaps', function (cb) {
 	this.timeout(20000);
@@ -23,23 +29,18 @@ it('should compile Sass with sourcemaps', function (cb) {
 			return;
 		}
 
-		// Test sourcemaps
-		var sourcemap = JSON.parse(file.contents.toString());
-		assert.equal(file.relative, 'nested/fixture.css.map');
-		assert.equal(sourcemap.version, 3);
-		assert.equal(sourcemap.file, 'fixture.css');
-
-		assert.equal(sourcemap.sources[0], __dirname + '/fixture/nested/fixture.scss');
+		// Test sourcemap
+		if (/\.map$/.test(file.path)) {
+			var sourcemap = JSON.parse(file.contents.toString());
+			assert.equal(file.relative, 'nested/fixture.css.map');
+			assert.equal(sourcemap.version, 3);
+			assert.equal(sourcemap.file, 'fixture.css');
+			assert.equal(sourcemap.sources[0], testFile.path);
+		}
 	});
 
 	stream.on('end', cb);
 
-	stream.write(new gutil.File({
-		cwd: __dirname,
-		base: __dirname + '/fixture',
-		path: __dirname + '/fixture/nested/fixture.scss',
-		contents: new Buffer('$blue:#3bbfce;.content-navigation{border-color:$blue;}')
-	}));
-
+	stream.write(testFile);
 	stream.end();
 });
