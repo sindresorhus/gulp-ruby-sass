@@ -4,7 +4,7 @@
 
 This is slower than [gulp-sass](https://github.com/dlmanning/gulp-sass), but more stable and feature-rich.
 
-*Issues with the output should be reported on the Sass [issue tracker](https://github.com/nex3/sass/issues).*
+*Issues with the output should be reported on the Sass [issue tracker](https://github.com/sass/sass/issues).*
 
 
 ## Install
