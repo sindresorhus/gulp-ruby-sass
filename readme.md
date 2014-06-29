@@ -32,6 +32,9 @@ gulp.task('default', function () {
 
 ## API
 
+Note: gulp-ruby-sass only compiles Sass; it won't watch your files. If you want to compile on file change use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb).
+
+
 ### sass(options)
 
 #### options
