@@ -3,15 +3,16 @@ var fs = require('fs');
 var path = require('path');
 var chalk = require('chalk');
 var dargs = require('dargs');
+var slash = require('slash');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
 var eachAsync = require('each-async');
 var intermediate = require('gulp-intermediate');
 
-function rewriteSourcemapPaths (tempDir, origBase, cb) {
+function rewriteSourcemapPaths (cssDir, relPath, cb) {
 	var glob = require('glob');
 
-	glob(path.join(tempDir, '**/*.map'), function (err, files) {
+	glob(path.join(cssDir, '**/*.map'), function (err, files) {
 		if (err) {
 			cb(err);
 			return;
@@ -25,10 +26,14 @@ function rewriteSourcemapPaths (tempDir, origBase, cb) {
 				}
 
 				var sourceMap = JSON.parse(data);
+				var stepUp = path.relative(path.dirname(file), cssDir);
 
 				// rewrite sourcemaps to point to the original source files
 				sourceMap.sources = sourceMap.sources.map(function (source) {
-					return path.join(origBase, source.replace(/\.\.\//g, ''));
+					var sourceBase = source.replace(/\.\.\//g, '');
+
+					// normalize to browser style paths if we're on windows
+					return slash(path.join(stepUp, relPath, sourceBase));
 				});
 
 				fs.writeFile(file, JSON.stringify(sourceMap), next);
@@ -43,7 +48,7 @@ module.exports = function (options) {
 	options = options || {};
 	options.cacheLocation = options.cacheLocation || path.join(procDir, '.sass-cache');
 	options.update = '.:' + compileDir;
-	var args = dargs(options, ['bundleExec', 'watch', 'poll']);
+	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
 	var command;
 
 	// Error handling
@@ -108,8 +113,10 @@ module.exports = function (options) {
 				return cb();
 			}
 
-			if (options.sourcemap) {
-				rewriteSourcemapPaths(tempDir, fileProps.base, function (err) {
+			if (options.sourcemap && options.sourcemapPath) {
+				var cssDir = path.join(tempDir, compileDir);
+
+				rewriteSourcemapPaths(cssDir, options.sourcemapPath, function (err) {
 					if (err) {
 						this.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 					}
