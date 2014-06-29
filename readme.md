@@ -45,9 +45,7 @@ Note: gulp-ruby-sass only compiles Sass; it won't watch your files. If you want 
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Map.
-
-**Requires Sass 3.3.0**
+Enable Source Map. **Requires Sass 3.3.0**
 
 
 ##### trace
