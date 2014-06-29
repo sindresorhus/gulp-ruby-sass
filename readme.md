@@ -4,7 +4,7 @@
 
 This is slower than [gulp-sass](https://github.com/dlmanning/gulp-sass), but more stable and feature-rich.
 
-*Issues with the output should be reported on the Sass [issue tracker](https://github.com/nex3/sass/issues).*
+*Issues with the output should be reported on the Sass [issue tracker](https://github.com/sass/sass/issues).*
 
 
 ## Install
@@ -32,6 +32,9 @@ gulp.task('default', function () {
 
 ## API
 
+Note: gulp-ruby-sass only compiles Sass; it won't watch your files. If you want to compile on file change use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb).
+
+
 ### sass(options)
 
 #### options
@@ -42,9 +45,7 @@ gulp.task('default', function () {
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Map.
-
-**Requires Sass 3.3.0**
+Enable Source Map. **Requires Sass 3.3.0**
 
 
 ##### trace

@@ -42,7 +42,7 @@ module.exports = function (options) {
 	options = options || {};
 	options.cacheLocation = options.cacheLocation || path.join(__dirname, '.sass-cache');
 	options.update = '.:' + compileDir;
-	var args = dargs(options, ['bundleExec']);
+	var args = dargs(options, ['bundleExec', 'watch', 'poll']);
 	var command;
 
 	// Error handling
