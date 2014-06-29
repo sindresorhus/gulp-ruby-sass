@@ -32,10 +32,6 @@ gulp.task('default', function () {
 
 ## API
 
-Note that files starting with `_` are ignored even if they match the globbing pattern.  
-This is done to match the expected [Sass partial behaviour](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#partials).
-
-
 ### sass(options)
 
 #### options
@@ -64,7 +60,7 @@ Show a full traceback on error.
 Type: `Boolean`  
 Default: `false` on Windows, otherwise `true`
 
-Force Unix newlines in written files.
+Use Unix-style newlines in written files.
 
 
 ##### check
@@ -112,7 +108,7 @@ Make Compass imports available and load project configuration (`config.rb` locat
 Type: `Boolean`  
 Default: `false`
 
-Emit extra information in the generated CSS that can be used by the FireSass Firebug plugin.
+Emit output that can be used by the FireSass Firebug plugin.
 
 
 ##### lineNumbers
@@ -127,14 +123,14 @@ Emit comments in the generated CSS indicating the corresponding source line.
 
 Type: `String|Array`
 
-Add a (or multiple) Sass import path.
+Add one or more Sass import paths.
 
 
 ##### require
 
 Type: `String|Array`
 
-Require a (or multiple) Ruby library before running Sass.
+Require one or more Ruby libraries before running Sass.
 
 
 ##### cacheLocation
