@@ -23,9 +23,9 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('default', function () {
-	return gulp.src('src/app.scss')
-		.pipe(sass({sourcemap: true}))
-		.pipe(gulp.dest('dist'));
+	return gulp.src('src/scss/app.scss')
+		.pipe(sass({sourcemap: true, sourcemapPath: '../scss'}))
+		.pipe(gulp.dest('dist/css'));
 });
 ```
 
@@ -45,7 +45,19 @@ Note: gulp-ruby-sass only compiles Sass; it won't watch your files. If you want 
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Map. **Requires Sass 3.3.0**
+Enable Source Map. **Requires Sass >= 3.3.0 and the [`dest` option](#dest).**
+
+
+##### sourcemapPath
+
+Type: `string`  
+
+A relative path from the output CSS directory to the Sass source directory as seen by your web server.
+
+Because gulp-ruby-sass can't know your CSS destination directory or your server setup you have to give a little extra information to help the browser find sourcemaps. Examples:
+
+- If source is `site/scss`, destination is `site/css`, and you're serving from `site`: `{ sourcemapPath: '../scss' }`.
+- If source is `app/styles`, destination is `.tmp/styles`, and you're serving both `.tmp` and `app`: `{ sourcemapPath: '.' }`.
 
 
 ##### trace
