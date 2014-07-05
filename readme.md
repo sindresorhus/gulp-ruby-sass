@@ -52,7 +52,12 @@ Enable Source Map. **Requires Sass >= 3.3.0 and the [`dest` option](#dest).**
 
 Type: `string`  
 
-The relative path between the output CSS directory and the Sass directory as visible to the browser. Must be within the webroot. Required to write the correct paths in sourcemaps.
+A relative path from the output CSS directory to the Sass source directory as seen by your web server.
+
+Because gulp-ruby-sass can't know your CSS destination directory or your server setup you have to give a little extra information to help the browser find sourcemaps. Examples:
+
+- If source is `site/scss`, destination is `site/css`, and you're serving from `site`: `{ sourcemapPath: '../scss' }`.
+- If source is `app/styles`, destination is `.tmp/styles`, and you're serving both `.tmp` and `app`: `{ sourcemapPath: '.' }`.
 
 
 ##### trace
