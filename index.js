@@ -39,8 +39,9 @@ function rewriteSourcemapPaths (tempDir, origBase, cb) {
 
 module.exports = function (options) {
 	var compileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
+	var procDir = process.cwd();
 	options = options || {};
-	options.cacheLocation = options.cacheLocation || path.join(__dirname, '.sass-cache');
+	options.cacheLocation = options.cacheLocation || path.join(procDir, '.sass-cache');
 	options.update = '.:' + compileDir;
 	var args = dargs(options, ['bundleExec', 'watch', 'poll']);
 	var command;
