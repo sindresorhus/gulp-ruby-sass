@@ -29,11 +29,14 @@ gulp.task('default', function () {
 });
 ```
 
+Include all the files Sass needs to compile CSS in your `gulp.src()` glob, including the Gemfile and Gemfile.lock if necessary.
+
+Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to watch and recompile your files.
+
+**Note to users upgrading from < 0.6.0 versions**: 0.6.0  removes a loophole that implicitly loaded all files in the same directory as the file being processed. Edit your `gulp.src()` globs to include every file you need to make available to the Sass command.
+
 
 ## API
-
-Note: gulp-ruby-sass only compiles Sass; it won't watch your files. If you want to compile on file change use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb).
-
 
 ### sass(options)
 
