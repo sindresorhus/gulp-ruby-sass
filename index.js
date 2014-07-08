@@ -8,8 +8,6 @@ var gutil = require('gulp-util');
 var spawn = require('win-spawn');
 var eachAsync = require('each-async');
 var intermediate = require('gulp-intermediate');
-var isString = require('lodash.isstring');
-var isArray = require('lodash.isstring');
 
 function rewriteSourcemapPaths (cssDir, relPath, cb) {
 	var glob = require('glob');
@@ -48,8 +46,8 @@ module.exports = function (options) {
 	var compileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
 	options = options || {};
-	options.loadPath = isString(options.loadPath) ? [options.loadPath] : options.loadPath;
-	options.loadPath = isArray(options.loadPath) ? options.loadPath.map(function(loadPath){
+	options.loadPath = typeof options.loadPath === 'string' ? [options.loadPath] : options.loadPath;
+	options.loadPath = Array.isArray(options.loadPath) ? options.loadPath.map(function(loadPath){
 		return path.join(procDir, loadPath);
 	}) : [];
 	options.loadPath.push(procDir);
