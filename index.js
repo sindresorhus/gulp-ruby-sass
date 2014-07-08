@@ -63,10 +63,11 @@ module.exports = function (options) {
 		command = 'sass';
 	}
 
-	return intermediate({
+	var stream = intermediate({
 		output: compileDir,
 		container: 'gulp-ruby-sass'
 	}, function (tempDir, cb, fileProps) {
+		var errors = [];
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
 				chalk.blue(command, args.join(' ')));
@@ -81,9 +82,9 @@ module.exports = function (options) {
 			var msg = data.trim();
 
 			if (bundleErrMatcher.test(msg)) {
-				gutil.log('gulp-ruby-sass:', bundleErr);
+				errors.push(bundleErr);
 			} else {
-				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir, 'g'), ''));
+				errors.push(msg.replace(new RegExp(compileDir, 'g'), ''));
 			}
 		});
 
@@ -91,9 +92,9 @@ module.exports = function (options) {
 			var msg = data.trim();
 
 			if (bundleErrMatcher.test(msg)) {
-				gutil.log('gulp-ruby-sass:', bundleErr);
+				errors.push(bundleErr);
 			} else if (!noLogMatcher.test(msg)) {
-				gutil.log('gulp-ruby-sass:', msg);
+				errors.push(msg);
 			}
 		});
 
@@ -101,7 +102,7 @@ module.exports = function (options) {
 			var msg = err.trim();
 
 			if (!noLogMatcher.test(msg)) {
-				gutil.log('gulp-ruby-sass:', chalk.red(msg));
+				errors.push(msg)
 			}
 		});
 
@@ -109,16 +110,25 @@ module.exports = function (options) {
 			var dependencies = options.bundleExec ? 'Ruby, Bundler, and Sass' : 'Ruby and Sass';
 
 			if (code === -1) {
-				gutil.log('gulp-ruby-sass:', chalk.red('Missing dependencies. ' + dependencies + ' must be installed and available.'));
+				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', 'Missing dependencies. ' + dependencies + ' must be installed and available.'));
 				return cb();
 			}
+
+			if (code === 1) {
+				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', errors.join('\n')));
+				return cb();
+			}
+
+			errors.forEach(function (error) {
+				gutil.log('gulp-ruby-sass:', chalk.red(error));
+			});
 
 			if (options.sourcemap && options.sourcemapPath) {
 				var cssDir = path.join(tempDir, compileDir);
 
 				rewriteSourcemapPaths(cssDir, options.sourcemapPath, function (err) {
 					if (err) {
-						this.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+						this.emit('error', err);
 					}
 
 					cb();
@@ -128,4 +138,5 @@ module.exports = function (options) {
 			}
 		});
 	});
+	return stream;
 };
