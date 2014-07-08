@@ -47,7 +47,7 @@ module.exports = function (options) {
 	var procDir = process.cwd();
 	options = options || {};
 	options.loadPath = typeof options.loadPath === 'string' ? [options.loadPath] : options.loadPath;
-	options.loadPath = Array.isArray(options.loadPath) ? options.loadPath.map(function(loadPath){
+	options.loadPath = Array.isArray(options.loadPath) ? options.loadPath.map(function (loadPath) {
 		return path.join(procDir, loadPath);
 	}) : [];
 	options.loadPath.push(procDir);
