@@ -45,6 +45,10 @@ it('should compile Sass with sourcemaps', function (cb) {
 		}
 	});
 
+	stream.on('error', function (err) {
+		console.log("err", err);
+	});
+
 	stream.on('end', cb);
 
 	stream.write(testFile);
