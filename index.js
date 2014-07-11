@@ -64,8 +64,7 @@ module.exports = function (options) {
 	}
 
 	return intermediate({
-		output: compileDir,
-		container: 'gulp-ruby-sass'
+		output: compileDir
 	}, function (tempDir, cb, fileProps) {
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
