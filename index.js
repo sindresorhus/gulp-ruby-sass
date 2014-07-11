@@ -68,7 +68,8 @@ module.exports = function (options) {
 	var noSassErrMsg = 'spawn ENOENT: Missing the Sass executable. Please install and make available on your PATH.';
 
 	var stream = intermediate({
-		output: relativeCompileDir
+		output: relativeCompileDir,
+		container: options.container || 'gulp-ruby-sass'
 	}, function (tempDir, cb, vinylFiles) {
 
 		// all paths passed to sass must have unix path separators
@@ -88,7 +89,7 @@ module.exports = function (options) {
 			}
 		});
 
-		var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
+		var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath', 'container']);
 
 		// temporary logging until gulp adds its own
 		if (process.argv.indexOf('--verbose') !== -1) {
