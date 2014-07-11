@@ -176,6 +176,14 @@ Default: `false`
 Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`.
 
 
+##### container
+
+Type: `String`
+Default: `gulp-ruby-sass`
+
+Name of the container used to copy the files before processing. Useful when you want to use sass on several locations.
+
+
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)
