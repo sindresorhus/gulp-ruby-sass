@@ -52,7 +52,7 @@ module.exports = function (options) {
 	var command;
 
 	// Error handling
-	var noLogMatcher = /execvp\(\): No such file or directory|spawn ENOENT/;
+	var noLogMatcher = /execvp\(\): No such file or directory/;
 	var bundleErrMatcher = /bundler: command not found|Could not find gem/;
 	var bundleErr = chalk.red('Gemfile version of Sass not found. Install missing gems with `bundle install`.');
 
@@ -98,7 +98,7 @@ module.exports = function (options) {
 		});
 
 		sass.on('error', function (err) {
-			var msg = err.trim();
+			var msg = err.message ? err.message.trim() : err.trim();
 
 			if (!noLogMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', chalk.red(msg));
