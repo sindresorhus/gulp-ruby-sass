@@ -46,6 +46,13 @@ module.exports = function (options) {
 	var compileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
 	options = options || {};
+
+	if (options.loadPath) {
+		options.loadPath = [].concat(options.loadPath).map(function (loadPath) {
+			return path.join(procDir, loadPath);
+		});
+	}
+
 	options.cacheLocation = options.cacheLocation || path.join(procDir, '.sass-cache');
 	options.update = '.:' + compileDir;
 	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
