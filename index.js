@@ -50,7 +50,6 @@ module.exports = function (options) {
 	options.loadPath = Array.isArray(options.loadPath) ? options.loadPath.map(function (loadPath) {
 		return path.join(procDir, loadPath);
 	}) : [];
-	options.loadPath.push(procDir);
 	options.cacheLocation = options.cacheLocation || path.join(procDir, '.sass-cache');
 	options.update = '.:' + compileDir;
 	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
