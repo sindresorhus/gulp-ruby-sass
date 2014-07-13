@@ -48,7 +48,7 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Map. **Requires Sass >= 3.3.0 and the [`dest` option](#dest).**
+Enable Source Map. **Requires Sass >= 3.3.0 and the [`sourcemapPath` option](#sourcemapPath).**
 
 
 ##### sourcemapPath
@@ -139,7 +139,7 @@ Emit comments in the generated CSS indicating the corresponding source line.
 
 Type: `String|Array`
 
-Add one or more Sass import paths.
+One or more Sass import paths, relative to the gulpfile.
 
 
 ##### require
