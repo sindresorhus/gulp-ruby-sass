@@ -10,6 +10,7 @@ var testFile = new gutil.File({
 	path: __dirname + '/styles/nested/fixture.scss',
 	contents: new Buffer('$blue:#3bbfce;.content-navigation{border-color:$blue;}')
 });
+var files = [];
 
 it('should compile Sass with sourcemaps', function (cb) {
 	this.timeout(20000);
@@ -25,6 +26,8 @@ it('should compile Sass with sourcemaps', function (cb) {
 	});
 
 	stream.on('data', function (file) {
+		files.push(file.relative);
+
 		// Test compiled CSS
 		if (/\.css$/.test(file.path)) {
 			assert.equal(file.relative, 'nested/fixture.css');
@@ -45,7 +48,11 @@ it('should compile Sass with sourcemaps', function (cb) {
 		}
 	});
 
-	stream.on('end', cb);
+	stream.on('end', function () {
+		// make sure we've generated the expected files, and only those files
+		assert.deepEqual(files, [ 'nested/fixture.css', 'nested/fixture.css.map' ]);
+		cb();
+	});
 
 	stream.write(testFile);
 	stream.end();
