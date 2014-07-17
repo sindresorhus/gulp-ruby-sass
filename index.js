@@ -45,41 +45,35 @@ function rewriteSourcemapPaths (cssDir, relPath, cb) {
 module.exports = function (options) {
 	var compileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
-	options = options || {};
-
-	if (options.loadPath) {
-		options.loadPath = [].concat(options.loadPath).map(function (loadPath) {
-			return path.join(procDir, loadPath);
-		});
-	}
-
-	options.cacheLocation = options.cacheLocation || path.join(procDir, '.sass-cache');
-	options.update = '.:' + compileDir;
-	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
-	var command;
 
 	// error handling
 	var noLogMatcher = /execvp\(\): No such file or directory/;
 	var bundleErrMatcher = /bundler: command not found|Could not find gem/;
 	var bundleErr = chalk.red('Gemfile version of Sass not found. Install missing gems with `bundle install`.');
 
-	if (options.bundleExec) {
-		command = 'bundle';
-		args.unshift('exec', 'sass');
-	} else {
-		command = 'sass';
-	}
-
 	return intermediate({
 		output: compileDir,
 		container: 'gulp-ruby-sass'
 	}, function (tempDir, cb, fileProps) {
+		options = options || {};
+		options.update = tempDir + ':' + path.join(tempDir, compileDir);
+
+		var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
+		var command;
+
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
 				chalk.blue(command, args.join(' ')));
 		}
 
-		var sass = spawn(command, args, {cwd: tempDir});
+		if (options.bundleExec) {
+			command = 'bundle';
+			args.unshift('exec', 'sass');
+		} else {
+			command = 'sass';
+		}
+
+		var sass = spawn(command, args);
 
 		sass.stdout.setEncoding('utf8');
 		sass.stderr.setEncoding('utf8');
