@@ -89,17 +89,19 @@ module.exports = function (options) {
 		sass.stderr.setEncoding('utf8');
 
 		sass.stdout.on('data', function (data) {
-			var msg = data.trim();
+			var compileDirMatcher = new RegExp(slash(path.join(tempDir, compileDir)) + '/?', 'g');
+			var msg = data.trim().replace(compileDirMatcher, '');
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
 			} else {
-				gutil.log('gulp-ruby-sass:', msg.replace(new RegExp(compileDir, 'g'), ''));
+				gutil.log('gulp-ruby-sass:', msg);
 			}
 		});
 
 		sass.stderr.on('data', function (data) {
-			var msg = data.trim();
+			var intermediateDirMatcher = new RegExp(slash(tempDir) + '/?', 'g');
+			var msg = data.trim().replace(intermediateDirMatcher, '');
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
