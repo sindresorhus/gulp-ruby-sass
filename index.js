@@ -54,9 +54,19 @@ module.exports = function (options) {
 	return intermediate({
 		output: compileDir,
 		container: 'gulp-ruby-sass'
-	}, function (tempDir, cb, fileProps) {
+	}, function (tempDir, cb, vinylFiles) {
 		options = options || {};
 		options.update = tempDir + ':' + path.join(tempDir, compileDir);
+		options.loadPath = typeof options.loadPath === 'undefined' ? [] : [].concat(options.loadPath);
+
+		// add loadPaths for each temp file
+		vinylFiles.forEach(function (file) {
+			var relativeLoadPath = path.dirname(path.relative(procDir, file.path));
+
+			if (options.loadPath.indexOf(relativeLoadPath) === -1) {
+				options.loadPath.push(relativeLoadPath);
+			}
+		});
 
 		var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
 		var command;
