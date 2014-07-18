@@ -58,7 +58,7 @@ module.exports = function (options) {
 	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
 	var command;
 
-	// Error handling
+	// error handling
 	var noLogMatcher = /execvp\(\): No such file or directory/;
 	var bundleErrMatcher = /bundler: command not found|Could not find gem/;
 	var bundleErr = chalk.red('Gemfile version of Sass not found. Install missing gems with `bundle install`.');
