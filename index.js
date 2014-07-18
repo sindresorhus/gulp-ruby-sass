@@ -36,7 +36,7 @@ function rewriteSourcemapPaths (cssDir, relPath, cb) {
 					return slash(path.join(stepUp, relPath, sourceBase));
 				});
 
-				fs.writeFile(file, JSON.stringify(sourceMap), next);
+				fs.writeFile(file, JSON.stringify(sourceMap, null, '  '), next);
 			});
 		}, cb);
 	});
