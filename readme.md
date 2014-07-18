@@ -29,11 +29,11 @@ gulp.task('default', function () {
 });
 ```
 
-Include all the files Sass needs to compile CSS in your `gulp.src()` glob, including the Gemfile and Gemfile.lock if necessary.
+Add the files you want to compile to `gulp.src()`.
 
-Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to watch and recompile your files.
+Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to automatically recompile your files when you edit them.
 
-**Note to users upgrading from < 0.6.0 versions**: 0.6.0  removes a loophole that implicitly loaded all files in the same directory as the file being processed. Edit your `gulp.src()` globs to include every file you need to make available to the Sass command.
+**Note to Windows users:** All Sass options expect unix style path separators (`/`). If you're setting paths dynamically, use [slash](https://github.com/sindresorhus/slash) to normalize them.
 
 
 ## API
@@ -170,7 +170,7 @@ Don't cache to sassc files.
 Type: `Boolean`  
 Default: `false`
 
-Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`. For bundler to work correctly you must add the Gemfile and Gemfile.lock to your `gulp.src()` glob.
+Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`.
 
 
 ## License
