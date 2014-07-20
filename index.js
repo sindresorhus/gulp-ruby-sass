@@ -56,12 +56,12 @@ module.exports = function (options) {
 		container: 'gulp-ruby-sass'
 	}, function (tempDir, cb, vinylFiles) {
 		options = options || {};
-		options.update = tempDir + ':' + path.join(tempDir, compileDir);
+		options.update = slash(tempDir) + ':' + slash(path.join(tempDir, compileDir));
 		options.loadPath = typeof options.loadPath === 'undefined' ? [] : [].concat(options.loadPath);
 
 		// add loadPaths for each temp file
 		vinylFiles.forEach(function (file) {
-			var relativeLoadPath = path.dirname(path.relative(procDir, file.path));
+			var relativeLoadPath = slash(path.dirname(path.relative(procDir, file.path)));
 
 			if (options.loadPath.indexOf(relativeLoadPath) === -1) {
 				options.loadPath.push(relativeLoadPath);
