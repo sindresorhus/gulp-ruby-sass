@@ -55,7 +55,7 @@ module.exports = function (options) {
 
 	options.cacheLocation = options.cacheLocation || path.join(procDir, '.sass-cache');
 	options.update = '.:' + compileDir;
-	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
+	var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath', 'container']);
 	var command;
 
 	// error handling
@@ -71,8 +71,8 @@ module.exports = function (options) {
 	}
 
 	return intermediate({
-		output: compileDir,
-		container: 'gulp-ruby-sass'
+	    output: compileDir,
+	    container: options.container || 'gulp-ruby-sass'
 	}, function (tempDir, cb, fileProps) {
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:',
