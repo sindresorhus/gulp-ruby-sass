@@ -105,7 +105,7 @@ module.exports = function (options) {
 		});
 
 		sass.on('error', function (err) {
-			var msg = err.message ? err.message.trim() : err.trim();
+			var msg = err.message.trim();
 
 			if (!noLogMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', chalk.red(msg));
