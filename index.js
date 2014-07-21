@@ -6,13 +6,13 @@ var dargs = require('dargs');
 var slash = require('slash');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
-var eachAsync = require('each-async');
 var intermediate = require('gulp-intermediate');
 
-function rewriteSourcemapPaths (cssDir, relPath, cb) {
+function rewriteSourcemapPaths (compileDir, relativePath, cb) {
+	var eachAsync = require('each-async');
 	var glob = require('glob');
 
-	glob(path.join(cssDir, '**/*.map'), function (err, files) {
+	glob(path.join(compileDir, '**/*.map'), function (err, files) {
 		if (err) {
 			cb(err);
 			return;
@@ -26,14 +26,14 @@ function rewriteSourcemapPaths (cssDir, relPath, cb) {
 				}
 
 				var sourceMap = JSON.parse(data);
-				var stepUp = path.relative(path.dirname(file), cssDir);
+				var stepUp = path.relative(path.dirname(file), compileDir);
 
 				// rewrite sourcemaps to point to the original source files
 				sourceMap.sources = sourceMap.sources.map(function (source) {
 					var sourceBase = source.replace(/\.\.\//g, '');
 
 					// normalize to browser style paths if we're on windows
-					return slash(path.join(stepUp, relPath, sourceBase));
+					return slash(path.join(stepUp, relativePath, sourceBase));
 				});
 
 				fs.writeFile(file, JSON.stringify(sourceMap, null, '  '), next);
@@ -42,8 +42,12 @@ function rewriteSourcemapPaths (cssDir, relPath, cb) {
 	});
 }
 
+function removePath(source, path) {
+	return source.replace(new RegExp(path + '/?', 'g'), '');
+}
+
 module.exports = function (options) {
-	var compileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
+	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
 
 	// error handling
@@ -52,29 +56,35 @@ module.exports = function (options) {
 	var bundleErr = chalk.red('Gemfile version of Sass not found. Install missing gems with `bundle install`.');
 
 	return intermediate({
-		output: compileDir,
+		output: relativeCompileDir,
 		container: 'gulp-ruby-sass'
 	}, function (tempDir, cb, vinylFiles) {
+
+		// all paths passed to sass must have unix path separators
+		tempDir = slash(tempDir);
+		var compileDir = slash(path.join(tempDir, relativeCompileDir));
+
 		options = options || {};
-		options.update = slash(tempDir) + ':' + slash(path.join(tempDir, compileDir));
+		options.update = tempDir + ':' + compileDir;
 		options.loadPath = typeof options.loadPath === 'undefined' ? [] : [].concat(options.loadPath);
 
 		// add loadPaths for each temp file
 		vinylFiles.forEach(function (file) {
-			var relativeLoadPath = slash(path.dirname(path.relative(procDir, file.path)));
+			var loadPath = slash(path.dirname(path.relative(procDir, file.path)));
 
-			if (options.loadPath.indexOf(relativeLoadPath) === -1) {
-				options.loadPath.push(relativeLoadPath);
+			if (options.loadPath.indexOf(loadPath) === -1) {
+				options.loadPath.push(loadPath);
 			}
 		});
 
 		var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath']);
-		var command;
 
+		// temporary logging until gulp adds its own
 		if (process.argv.indexOf('--verbose') !== -1) {
-			gutil.log('gulp-ruby-sass:', 'Running command:',
-				chalk.blue(command, args.join(' ')));
+			gutil.log('gulp-ruby-sass:', 'Running command:', chalk.blue(command, args.join(' ')));
 		}
+
+		var command;
 
 		if (options.bundleExec) {
 			command = 'bundle';
@@ -89,8 +99,7 @@ module.exports = function (options) {
 		sass.stderr.setEncoding('utf8');
 
 		sass.stdout.on('data', function (data) {
-			var compileDirMatcher = new RegExp(slash(path.join(tempDir, compileDir)) + '/?', 'g');
-			var msg = data.trim().replace(compileDirMatcher, '');
+			var msg = removePath(data, compileDir).trim();
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
@@ -100,8 +109,7 @@ module.exports = function (options) {
 		});
 
 		sass.stderr.on('data', function (data) {
-			var intermediateDirMatcher = new RegExp(slash(tempDir) + '/?', 'g');
-			var msg = data.trim().replace(intermediateDirMatcher, '');
+			var msg = removePath(data, tempDir).trim();
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
@@ -127,9 +135,7 @@ module.exports = function (options) {
 			}
 
 			if (options.sourcemap && options.sourcemapPath) {
-				var cssDir = path.join(tempDir, compileDir);
-
-				rewriteSourcemapPaths(cssDir, options.sourcemapPath, function (err) {
+				rewriteSourcemapPaths(compileDir, options.sourcemapPath, function (err) {
 					if (err) {
 						this.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 					}
