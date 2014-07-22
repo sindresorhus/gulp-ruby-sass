@@ -48,7 +48,7 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Map. **Requires Sass >= 3.3.0 and the [`sourcemapPath` option](#sourcemapPath).**
+Enable Source Map. **Requires Sass >= 3.3.0 and the [`sourcemapPath` option](#sourcemappath).**
 
 
 ##### sourcemapPath
