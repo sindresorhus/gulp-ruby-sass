@@ -42,8 +42,12 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 	});
 }
 
-function removePath(source, path) {
-	return source.replace(new RegExp(path + '/?', 'g'), '');
+function removePaths(msg, paths) {
+	paths.forEach(function (path) {
+		msg = msg.replace(new RegExp(path + '/?', 'g'), '');
+	});
+
+	return msg;
 }
 
 module.exports = function (options) {
@@ -99,7 +103,7 @@ module.exports = function (options) {
 		sass.stderr.setEncoding('utf8');
 
 		sass.stdout.on('data', function (data) {
-			var msg = removePath(data, compileDir).trim();
+			var msg = removePaths(data, [tempDir, relativeCompileDir]).trim();
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
@@ -109,7 +113,7 @@ module.exports = function (options) {
 		});
 
 		sass.stderr.on('data', function (data) {
-			var msg = removePath(data, tempDir).trim();
+			var msg = removePaths(data, [tempDir, relativeCompileDir]).trim();
 
 			if (bundleErrMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:', bundleErr);
