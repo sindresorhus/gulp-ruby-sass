@@ -25,11 +25,14 @@ var sass = require('gulp-ruby-sass');
 gulp.task('default', function () {
 	return gulp.src('src/scss/app.scss')
 		.pipe(sass({sourcemap: true, sourcemapPath: '../scss'}))
+		.on('error', function (err) { console.log(err.message); })
 		.pipe(gulp.dest('dist/css'));
 });
 ```
 
 Add the files you want to compile to `gulp.src()`.
+
+Handle Sass errors with an `on('error', cb)` listener or a plugin like [plumber](https://github.com/floatdrop/gulp-plumber). gulp-ruby-sass throws errors like a gulp plugin, but also passes the erroring Sass files through the stream if you prefer to see the errors in your browser.
 
 Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to automatically recompile your files when you edit them.
 
@@ -108,7 +111,7 @@ How many digits of precision to use when outputting decimal numbers.
 Type: `Boolean`  
 Default: `false`
 
-Silence warnings and status messages during compilation.
+Silence warnings and status messages during compilation. **NOTE:** If you set `quiet` to `true` gulp will no longer emit most Sass and Bundler errors.
 
 
 ##### compass
