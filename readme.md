@@ -181,7 +181,7 @@ Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bu
 Type: `String`  
 Default: `gulp-ruby-sass`
 
-Name of the container used to copy the files before processing. Useful when you want to use sass on several locations.
+Name of the temporary directory used to process files. If you have multiple streams with gulp-ruby-sass running at once each will need a unique container name.
 
 
 ## License
