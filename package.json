@@ -38,12 +38,12 @@
     "sourcemap"
   ],
   "dependencies": {
-    "chalk": "^0.4.0",
+    "chalk": "^0.5.1",
     "dargs": "^0.1.0",
     "each-async": "^0.1.3",
     "glob": "^4.0.2",
     "gulp-intermediate": "3.0.0",
-    "gulp-util": "^2.2.0",
+    "gulp-util": "^3.0.0",
     "slash": "^0.1.3",
     "win-spawn": "^2.0.0"
   },
