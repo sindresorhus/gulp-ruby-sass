@@ -176,6 +176,14 @@ Default: `false`
 Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bundle exec sass`.
 
 
+##### container
+
+Type: `String`  
+Default: `gulp-ruby-sass`
+
+Name of the temporary directory used to process files. If you have multiple streams with gulp-ruby-sass running at once each will need a unique container name.
+
+
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)
