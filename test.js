@@ -86,3 +86,31 @@ it('should compile Sass with sourcemaps', function (done) {
 	stream.write(testFiles[1]);
 	stream.end();
 });
+
+it('should emit errors and stream files on Sass error', function (done) {
+	this.timeout(20000);
+
+	var errFile = new gutil.File({
+		cwd: __dirname,
+		base: __dirname + '/styles',
+		path: __dirname + '/styles/module/fixture-a.scss',
+		contents: new Buffer('@import \'unknown\';')
+	});
+	var errMsgMatcher = new RegExp('File to import not found or unreadable: unknown.');
+	var stream = sass({ quiet: false });
+
+	stream.on('error', function (err) {
+		// throws an error
+		assert(errMsgMatcher.test(err.message));
+	});
+
+	stream.on('data', function (file) {
+		// still pushes the compiled erroring css file through
+		assert(errMsgMatcher.test(file.contents.toString()));
+	});
+
+	stream.on('end', done);
+
+	stream.write(errFile);
+	stream.end();
+});
