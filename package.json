@@ -35,7 +35,9 @@
     "style",
     "ruby",
     "source-map",
-    "sourcemap"
+    "source-maps",
+    "sourcemap",
+    "sourcemaps"
   ],
   "dependencies": {
     "chalk": "^0.5.1",

@@ -1,7 +1,7 @@
 'use strict';
 var assert = require('assert');
 var gutil = require('gulp-util');
-var sass = require('./index');
+var sass = require('./');
 var EOL = require('os').EOL;
 
 var testFiles = [
@@ -34,7 +34,7 @@ it('should compile Sass', function (done) {
 	stream.on('end', function () {
 		// sass file
 		assert.equal(files[0].relative, 'module/fixture-a.css');
-		assert.equal(files[0].contents.toString('utf-8'), result);
+		assert.equal(files[0].contents.toString(), result);
 
 		// generates the correct number of files (does not output partials)
 		assert.equal(files.length, 1);
@@ -54,7 +54,11 @@ it('should compile Sass with sourcemaps', function (done) {
 	var result = 'aside {' + EOL +
     '  border-color: #3bbfce; }' + EOL + EOL +
     '/*# sourceMappingURL=fixture-a.css.map */' + EOL;
-	var stream = sass({ sourcemap: true, sourcemapPath: '../scss', quiet: true });
+	var stream = sass({
+		sourcemap: true,
+		sourcemapPath: '../scss',
+		quiet: true
+	});
 
 	stream.on('data', function (file) {
 		files.push(file);
@@ -63,7 +67,7 @@ it('should compile Sass with sourcemaps', function (done) {
 	stream.on('end', function () {
 		// sass file
 		assert.equal(files[0].relative, 'module/fixture-a.css');
-		assert.equal(files[0].contents.toString('utf-8'), result);
+		assert.equal(files[0].contents.toString(), result);
 
 		// sourcemap file
 		var sourcemap = JSON.parse(files[1].contents.toString());

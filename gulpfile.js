@@ -1,6 +1,6 @@
 'use strict';
 var gulp = require('gulp');
-var sass = require('./index.js');
+var sass = require('./');
 
 gulp.task('default', function () {
 	return gulp.src('fixture/**/*.scss')

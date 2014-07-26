@@ -6,12 +6,11 @@ var dargs = require('dargs');
 var slash = require('slash');
 var gutil = require('gulp-util');
 var spawn = require('win-spawn');
+var eachAsync = require('each-async');
+var glob = require('glob');
 var intermediate = require('gulp-intermediate');
 
 function rewriteSourcemapPaths (compileDir, relativePath, cb) {
-	var eachAsync = require('each-async');
-	var glob = require('glob');
-
 	glob(path.join(compileDir, '**/*.map'), function (err, files) {
 		if (err) {
 			cb(err);
@@ -71,7 +70,6 @@ module.exports = function (options) {
 		output: relativeCompileDir,
 		container: options.container || 'gulp-ruby-sass'
 	}, function (tempDir, cb, vinylFiles) {
-
 		// all paths passed to sass must have unix path separators
 		tempDir = slash(tempDir);
 		var compileDir = slash(path.join(tempDir, relativeCompileDir));
@@ -89,7 +87,13 @@ module.exports = function (options) {
 			}
 		});
 
-		var args = dargs(options, ['bundleExec', 'watch', 'poll', 'sourcemapPath', 'container']);
+		var args = dargs(options, [
+			'bundleExec',
+			'watch',
+			'poll',
+			'sourcemapPath',
+			'container'
+		]);
 
 		// temporary logging until gulp adds its own
 		if (process.argv.indexOf('--verbose') !== -1) {
@@ -115,11 +119,9 @@ module.exports = function (options) {
 
 			if (sassErrMatcher.test(msg) || noBundlerMatcher.test(msg) || noGemfileMatcher.test(msg)) {
 				stream.emit('error', createErr(msg, {showStack: false}));
-			}
-			else if (noBundleSassMatcher.test(msg)) {
+			} else if (noBundleSassMatcher.test(msg)) {
 				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
-			}
-			else {
+			} else {
 				gutil.log('gulp-ruby-sass:', msg);
 			}
 		});
@@ -130,7 +132,7 @@ module.exports = function (options) {
 			if (noBundleSassMatcher.test(msg)) {
 				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
 			} else if (!noSassMatcher.test(msg)) {
-				gutil.log('gulp-ruby-sass:, stderr', msg);
+				gutil.log('gulp-ruby-sass: stderr:', msg);
 			}
 		});
 
