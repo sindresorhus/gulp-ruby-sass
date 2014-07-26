@@ -50,8 +50,8 @@ function removePaths(msg, paths) {
 	return msg;
 }
 
-function gutilErr(err) {
-	return new gutil.PluginError('gulp-ruby-sass', err);
+function createErr(err, opts) {
+	return new gutil.PluginError('gulp-ruby-sass', err, opts);
 }
 
 module.exports = function (options) {
@@ -114,10 +114,10 @@ module.exports = function (options) {
 			var msg = removePaths(data, [tempDir, relativeCompileDir]).trim();
 
 			if (sassErrMatcher.test(msg) || noBundlerMatcher.test(msg) || noGemfileMatcher.test(msg)) {
-				stream.emit('error', gutilErr(msg));
+				stream.emit('error', createErr(msg, {showStack: false}));
 			}
 			else if (noBundleSassMatcher.test(msg)) {
-				stream.emit('error', gutilErr(bundleErrMsg));
+				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
 			}
 			else {
 				gutil.log('gulp-ruby-sass:', msg);
@@ -128,7 +128,7 @@ module.exports = function (options) {
 			var msg = removePaths(data, [tempDir, relativeCompileDir]).trim();
 
 			if (noBundleSassMatcher.test(msg)) {
-				stream.emit('error', gutilErr(bundleErrMsg));
+				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
 			} else if (!noSassMatcher.test(msg)) {
 				gutil.log('gulp-ruby-sass:, stderr', msg);
 			}
@@ -136,9 +136,9 @@ module.exports = function (options) {
 
 		sass.on('error', function (err) {
 			if (noSassMatcher.test(err.message)) {
-				stream.emit('error', gutilErr(noSassErrMsg));
+				stream.emit('error', createErr(noSassErrMsg, {showStack: false}));
 			} else {
-				stream.emit('error', gutilErr(err));
+				stream.emit('error', createErr(err));
 			}
 		});
 
@@ -146,7 +146,7 @@ module.exports = function (options) {
 			if (options.sourcemap && options.sourcemapPath) {
 				rewriteSourcemapPaths(compileDir, options.sourcemapPath, function (err) {
 					if (err) {
-						stream.emit('error', gutilErr(err));
+						stream.emit('error', createErr(err));
 					}
 
 					cb();
