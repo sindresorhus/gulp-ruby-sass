@@ -56,6 +56,7 @@ function createErr(err, opts) {
 module.exports = function (options) {
 	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
+	options = options || {};
 
 	// error handling
 	var sassErrMatcher = /^error/;
