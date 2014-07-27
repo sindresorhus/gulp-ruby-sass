@@ -87,6 +87,7 @@ module.exports = function (options) {
 			}
 		});
 
+		var command;
 		var args = dargs(options, [
 			'bundleExec',
 			'watch',
@@ -95,18 +96,16 @@ module.exports = function (options) {
 			'container'
 		]);
 
-		// temporary logging until gulp adds its own
-		if (process.argv.indexOf('--verbose') !== -1) {
-			gutil.log('gulp-ruby-sass:', 'Running command:', chalk.blue(command, args.join(' ')));
-		}
-
-		var command;
-
 		if (options.bundleExec) {
 			command = 'bundle';
 			args.unshift('exec', 'sass');
 		} else {
 			command = 'sass';
+		}
+
+		// temporary logging until gulp adds its own
+		if (process.argv.indexOf('--verbose') !== -1) {
+			gutil.log('gulp-ruby-sass:', 'Running command:', chalk.blue(command, args.join(' ')));
 		}
 
 		var sass = spawn(command, args);
