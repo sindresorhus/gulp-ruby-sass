@@ -23,10 +23,10 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('default', function () {
-	return gulp.src('src/scss/app.scss')
-		.pipe(sass({sourcemap: true, sourcemapPath: '../scss'}))
-		.on('error', function (err) { console.log(err.message); })
-		.pipe(gulp.dest('dist/css'));
+    return gulp.src('src/scss/app.scss')
+        .pipe(sass({sourcemapPath: '../scss'}))
+        .on('error', function (err) { console.log(err.message); })
+        .pipe(gulp.dest('dist/css'));
 });
 ```
 
@@ -45,18 +45,11 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 
 #### options
 
-
-##### sourcemap
-
-Type: `Boolean`  
-Default: `false`
-
-Enable Source Map. **Requires Sass >= 3.3.0 and the [`sourcemapPath` option](#sourcemappath).**
-
-
 ##### sourcemapPath
 
-Type: `string`  
+Type: `string`
+
+**Requires Sass >= 3.3.0 - The Sass gem now automatically outputs a sourcemap file.
 
 A relative path from the output CSS directory to the Sass source directory as seen by your web server.
 
