@@ -16,10 +16,12 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 			cb(err);
 			return;
 		}
-		//removing the parent directory operator strings ('../') at front of relativePath so that the path can be matched with the sourceMap path
-		var directoryPath = (relativePath.lastIndexOf('../') !== -1) ? relativePath.substr(relativePath.lastIndexOf('../') + 3) : relativePath;
-		var parentDirOperator = (relativePath.lastIndexOf('../') !== -1) ? relativePath.substr(0,relativePath.length - directoryPath.length) : '';
-		var parentDirOperatorCount = parentDirOperator.match(/\.\.\//g).length;
+		//removing the parent directory operator strings ('../') at front of relativePath 
+		//so that the path can be matched with the sourceMap path
+		var directoryPath = (relativePath.lastIndexOf('../') !== -1) 
+			? relativePath.substr(relativePath.lastIndexOf('../') + 3) : relativePath;
+		var parentDirOperator = (relativePath.lastIndexOf('../') !== -1) 
+			? relativePath.substr(0,relativePath.length - directoryPath.length) : '';
 		eachAsync(files, function (file, i, next) {
 			fs.readFile(file, function (err, data) {
 				if (err) {
@@ -28,7 +30,6 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 				}
 
 				var sourceMap = JSON.parse(data);
-				var stepUp = path.relative(path.dirname(file), compileDir);
 				// rewrite sourcemaps to point to the original source files
 				sourceMap.sources = sourceMap.sources.map(function (source) {
 					var sourceBase = source.replace(/\.\.\//g, '');
@@ -36,7 +37,9 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 					if (sourceBase.indexOf('/') === -1) {
 						sourceBase = relativePath + '/' + sourceBase
 					} else {
-						sourceBase = (sourceBase.indexOf(directoryPath) !== -1) ? parentDirOperator + sourceBase.substr(sourceBase.indexOf(directoryPath)) : relativePathOperators + sourceBase;
+						sourceBase = (sourceBase.indexOf(directoryPath) !== -1) 
+							? parentDirOperator + sourceBase.substr(sourceBase.indexOf(directoryPath)) 
+								: parentDirOperator + sourceBase;
 					}
 					// normalize to browser style paths if we're on windows
 					return slash(sourceBase);
