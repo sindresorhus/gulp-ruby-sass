@@ -1,120 +1,148 @@
 'use strict';
+
 var assert = require('assert');
-var gutil = require('gulp-util');
+var gulp = require('gulp');
 var sass = require('./');
 var EOL = require('os').EOL;
 
-var testFiles = [
-	new gutil.File({
-		cwd: __dirname,
-		base: __dirname + '/styles',
-		path: __dirname + '/styles/module/fixture-a.scss',
-		contents: new Buffer('@import \'../vars/fixture-b\'; aside {border-color:$blue;}')
-	}),
-	new gutil.File({
-		cwd: __dirname,
-		base: __dirname + '/styles',
-		path: __dirname + '/styles/vars/_fixture-b.scss',
-		contents: new Buffer('$blue:#3bbfce;')
-	})
+var addSourcemapComment = function (name, contents) {
+	return contents + EOL + '/*# sourceMappingURL=' + name + '.css.map */' + EOL;
+};
+
+var results = [
+	'h1 .link {' + EOL +
+	'  color: green; }' + EOL + EOL +
+	'html {'  + EOL +
+	'  font-size: 16px;'  + EOL +
+	'  line-height: 24px; }' + EOL + EOL +
+	'body {' + EOL +
+	'  color: black;' + EOL +
+	'  content: \'local imported mixin\';' + EOL +
+	'  content: \'component mixin\'; }' + EOL,
+
+	'h1 .link {' + EOL +
+	'  color: green; }' + EOL + EOL +
+	'h2 {' + EOL +
+	'  content: \'component mixin\'; }' + EOL
 ];
 
-it('should compile Sass', function (done) {
+it('compiles Sass', function (done) {
 	this.timeout(20000);
 
 	var files = [];
-	var result = 'aside {' + EOL +
-		'  border-color: #3bbfce; }' + EOL;
-	var stream = sass({ quiet: true });
 
-	stream.on('data', function (file) {
-		files.push(file);
-	});
+	gulp.src([
+		'fixture/fixture-a.scss',
+		'fixture/nested/fixture-b.scss'
+	], { base: '.' })
 
-	stream.on('end', function () {
-		// sass file
-		assert.equal(files[0].relative, 'module/fixture-a.css');
-		assert.equal(files[0].contents.toString(), result);
+	.pipe(sass({ quiet: true }))
 
-		// generates the correct number of files (does not output partials)
-		assert.equal(files.length, 1);
+	.on('data', function (data) {
+		files.push(data);
+	})
 
-		done();
-	});
+	.on('end', function () {
+		// file path
+		assert.equal(files[0].relative, 'fixture/fixture-a.css');
+		assert.equal(files[1].relative, 'fixture/nested/fixture-b.css');
 
-	stream.write(testFiles[0]);
-	stream.write(testFiles[1]);
-	stream.end();
-});
+		// css content
+		assert.equal(files[0].contents.toString(), results[0]);
+		assert.equal(files[1].contents.toString(), results[1]);
 
-it('should compile Sass with sourcemaps', function (done) {
-	this.timeout(20000);
-
-	var files = [];
-	var result = 'aside {' + EOL +
-    '  border-color: #3bbfce; }' + EOL + EOL +
-    '/*# sourceMappingURL=fixture-a.css.map */' + EOL;
-	var stream = sass({
-		sourcemap: true,
-		sourcemapPath: '../scss',
-		quiet: true
-	});
-
-	stream.on('data', function (file) {
-		files.push(file);
-	});
-
-	stream.on('end', function () {
-		// sass file
-		assert.equal(files[0].relative, 'module/fixture-a.css');
-		assert.equal(files[0].contents.toString(), result);
-
-		// sourcemap file
-		var sourcemap = JSON.parse(files[1].contents.toString());
-
-		assert.equal(files[1].relative, 'module/fixture-a.css.map');
-		assert.equal(sourcemap.version, 3);
-		assert.equal(sourcemap.file, 'fixture-a.css');
-		assert.deepEqual(sourcemap.sources,  [
-			'../../scss/module/fixture-a.scss',
-			'../../scss/vars/_fixture-b.scss'
-		]);
-
-		// generates the correct number of files
+		// ouptuts correct number of files
 		assert.equal(files.length, 2);
 
 		done();
 	});
-
-	stream.write(testFiles[0]);
-	stream.write(testFiles[1]);
-	stream.end();
 });
 
-it('should emit errors and stream files on Sass error', function (done) {
+it('compiles Sass with sourcemaps', function (done) {
 	this.timeout(20000);
 
-	var errFile = new gutil.File({
-		cwd: __dirname,
-		base: __dirname + '/styles',
-		path: __dirname + '/styles/module/fixture-a.scss',
-		contents: new Buffer('@import \'unknown\';')
-	});
-	var errMsgMatcher = new RegExp('File to import not found or unreadable: unknown.');
-	var stream = sass({ quiet: false });
+	var files = [];
 
-	stream.on('error', function (err) {
+	gulp.src([
+		'fixture/fixture-a.scss',
+		'fixture/nested/fixture-b.scss'
+	], { base: '.' })
+
+	.pipe(sass({
+		quiet: true,
+		sourcemap: true,
+		sourcemapPath: '../css'
+  }))
+
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		var maps = [
+			JSON.parse(files[1].contents.toString()),
+			JSON.parse(files[3].contents.toString())
+		];
+
+		// TODO: Fix import source paths, remove absolute path
+		// var sources = [
+		// 	[
+		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
+		// 		"../../css/fixture/fixture-a.scss",
+		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_obj-1.scss",
+		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
+		// 	],
+		// 	[
+		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
+		// 		"../../../css/fixture/nested/fixture-b.scss",
+		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
+		// 	]
+		// ]
+
+		// file path
+		assert.equal(files[1].relative, 'fixture/fixture-a.css.map');
+		assert.equal(files[3].relative, 'fixture/nested/fixture-b.css.map');
+
+		// css content
+		assert.equal(files[0].contents.toString(), addSourcemapComment('fixture-a', results[0]));
+		assert.equal(files[2].contents.toString(), addSourcemapComment('fixture-b', results[1]));
+
+		// map content
+		assert.equal(maps[0].version, 3);
+		assert.equal(maps[0].file, 'fixture-a.css');
+		assert.equal(maps[1].file, 'fixture-b.css');
+
+		// TODO: Fix import source paths
+		// assert.deepEqual(maps[0].sources, sources[0]);
+		// assert.deepEqual(maps[1].sources, sources[1]);
+
+		// ouptuts correct number of files
+		assert.equal(files.length, 4);
+
+		done();
+	});
+});
+
+it('emits errors but still streams file on Sass error', function (done) {
+	this.timeout(20000);
+
+	var errMsgMatcher = new RegExp('File to import not found or unreadable: i-dont-exist.');
+
+	gulp.src('fixture/fixture-error.scss')
+
+	.pipe(sass())
+
+	.on('error', function (err) {
 		// throws an error
 		assert(errMsgMatcher.test(err.message));
-	});
+	})
 
-	stream.on('data', function (file) {
+	.on('data', function (file) {
 		// still pushes the compiled erroring css file through
 		assert(errMsgMatcher.test(file.contents.toString()));
+	})
+
+	.on('end', function () {
+		done();
 	});
-
-	stream.on('end', done);
-
-	stream.write(errFile);
-	stream.end();
 });

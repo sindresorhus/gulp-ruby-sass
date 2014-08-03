@@ -1,0 +1,5 @@
+@import 'component/obj-2';
+
+@mixin bar() {
+	content: 'local imported mixin';
+}
