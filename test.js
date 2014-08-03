@@ -84,20 +84,19 @@ it('compiles Sass with sourcemaps', function (done) {
 			JSON.parse(files[3].contents.toString())
 		];
 
-		// TODO: Fix import source paths, remove absolute path
-		// var sources = [
-		// 	[
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-		// 		"../../css/fixture/fixture-a.scss",
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_obj-1.scss",
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-		// 	],
-		// 	[
-		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-		// 		"../../../css/fixture/nested/fixture-b.scss",
-		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-		// 	]
-		// ]
+		var sources = [
+			[
+				'../../css/fixture/_partial-1.scss',
+				'../../css/fixture/fixture-a.scss',
+				'../../css/fixture/_obj-1.scss',
+				'../../css/fixture/component/_obj-2.scss'
+			],
+			[
+				'../../../css/fixture/_partial-1.scss',
+				'../../../css/fixture/nested/fixture-b.scss',
+				'../../../css/fixture/component/_obj-2.scss'
+			]
+		];
 
 		// file path
 		assert.equal(files[1].relative, 'fixture/fixture-a.css.map');
@@ -112,9 +111,9 @@ it('compiles Sass with sourcemaps', function (done) {
 		assert.equal(maps[0].file, 'fixture-a.css');
 		assert.equal(maps[1].file, 'fixture-b.css');
 
-		// TODO: Fix import source paths
-		// assert.deepEqual(maps[0].sources, sources[0]);
-		// assert.deepEqual(maps[1].sources, sources[1]);
+		// sources point to the right files on disk
+		assert.deepEqual(maps[0].sources, sources[0]);
+		assert.deepEqual(maps[1].sources, sources[1]);
 
 		// ouptuts correct number of files
 		assert.equal(files.length, 4);
