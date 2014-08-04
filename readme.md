@@ -23,8 +23,12 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('default', function () {
-	return gulp.src('src/scss/app.scss')
-		.pipe(sass({sourcemap: true, sourcemapPath: '../scss'}))
+	return gulp.src('src/scss/app.scss', { base: 'src/scss' })
+		.pipe(sass({
+			sourcemap: true,
+			sourcemapPath: '../scss'
+			sourcemapBase: 'src/scss'
+		}))
 		.on('error', function (err) { console.log(err.message); })
 		.pipe(gulp.dest('dist/css'));
 });
@@ -51,7 +55,26 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 Type: `Boolean`  
 Default: `false`
 
-Enable Source Map. **Requires Sass >= 3.3.0 and the [`sourcemapPath` option](#sourcemappath).**
+Enable Sourcemaps. Requires Sass `3.3.x`.
+
+**Note:** In order to get functioning sourcemap paths you must add a base option to `gulp.src` to normalize the output file paths:
+
+```js
+gulp.src([
+  'app/styles/main.scss',
+  'app/styles/mobile/mobile.scss',
+  'app/styles/extra/enhancement.scss',
+], { base: 'app/styles' })
+```
+
+...and also add values for the [`sourcemapPath`](#sourcemappath) and [`sourcemapBase`](#sourcemapbase) options.
+
+
+##### sourcemapBase
+
+Type: `string`  
+
+The path you've added as the `base` option in `gulp.src`.
 
 
 ##### sourcemapPath
