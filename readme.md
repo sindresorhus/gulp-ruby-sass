@@ -67,7 +67,7 @@ gulp.src([
 ], { base: 'app/styles' })
 ```
 
-...and also add values for the [`sourcemapPath`](#sourcemappath) and [`sourcemapBase`](#sourcemapbase) options.
+...and also add values for the [`sourcemapBase`](#sourcemapbase) and [`sourcemapPath`](#sourcemappath) options.
 
 
 ##### sourcemapBase

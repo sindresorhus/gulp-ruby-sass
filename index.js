@@ -26,7 +26,6 @@ function rewriteSourcemapPaths (compileDir, smPath, smBase, cwd, cb) {
 
 				var sourceMap = JSON.parse(data);
 				var stepUp = path.relative(path.dirname(file), compileDir);
-				stepUp = stepUp === '' ? stepUp : stepUp + '/';
 
 				// rewrite sourcemaps to point to the original source files
 				sourceMap.sources = sourceMap.sources.map(function (source) {
@@ -63,7 +62,6 @@ module.exports = function (options) {
 	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var cwd = process.cwd();
 	options = options || {};
-
 
 	// error handling
 	var sassErrMatcher = /^error/;
