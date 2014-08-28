@@ -78,7 +78,7 @@ module.exports = function (options) {
 		var compileDir = slash(path.join(tempDir, relativeCompileDir));
 
 		options = options || {};
-		options.update = tempDir + ':' + compileDir;
+		options.update = true;
 		options.loadPath = typeof options.loadPath === 'undefined' ? [] : [].concat(options.loadPath);
 
 		// add loadPaths for each temp file
@@ -98,6 +98,8 @@ module.exports = function (options) {
 			'sourcemapPath',
 			'container'
 		]);
+
+		args.push(tempDir + ':' + compileDir);
 
 		if (options.bundleExec) {
 			command = 'bundle';
