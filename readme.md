@@ -181,7 +181,14 @@ Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bu
 Type: `String`  
 Default: `gulp-ruby-sass`
 
-Name of the temporary directory used to process files. If you have multiple streams with gulp-ruby-sass running at once each will need a unique container name.
+Name of the temporary directory within tempDir used to process files. If you have multiple streams with gulp-ruby-sass running at once each will need a unique container name.
+
+##### tempDir
+
+Type: `String`
+Default: OS default temp directory
+
+The directory to create container in. Defaults to the default temp directory for your OS.
 
 
 ## License
