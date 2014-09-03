@@ -69,7 +69,8 @@ module.exports = function (options) {
 
 	var stream = intermediate({
 		output: relativeCompileDir,
-		container: options.container || 'gulp-ruby-sass'
+		container: options.container || 'gulp-ruby-sass',
+		tempDir: options.tempDir || ''
 	}, function (tempDir, cb, vinylFiles) {
 		// all paths passed to sass must have unix path separators
 		tempDir = slash(tempDir);
@@ -94,7 +95,8 @@ module.exports = function (options) {
 			'watch',
 			'poll',
 			'sourcemapPath',
-			'container'
+			'container',
+			'tempDir'
 		]);
 
 		if (options.bundleExec) {
