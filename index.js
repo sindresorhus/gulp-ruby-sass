@@ -41,9 +41,14 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 	});
 }
 
+function escapeRegExp(string) {
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+}
+
 function removePaths(msg, paths) {
 	paths.forEach(function (path) {
-		msg = msg.replace(new RegExp(path + '/?', 'g'), '');
+
+		msg = msg.replace(new RegExp(escapeRegExp(path), 'g'), '');
 	});
 
 	return msg;
