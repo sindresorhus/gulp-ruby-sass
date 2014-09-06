@@ -48,7 +48,7 @@ function escapeRegExp(string) {
 function removePaths(msg, paths) {
 	paths.forEach(function (path) {
 
-		msg = msg.replace(new RegExp(escapeRegExp(path), 'g'), '');
+		msg = msg.replace(new RegExp(escapeRegExp(path) + '/?', 'g'), '');
 	});
 
 	return msg;
