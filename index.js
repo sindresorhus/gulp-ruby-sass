@@ -9,6 +9,8 @@ var spawn = require('win-spawn');
 var eachAsync = require('each-async');
 var glob = require('glob');
 var intermediate = require('gulp-intermediate');
+var escapeStringRegexp = require('escape-string-regexp');
+
 
 function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 	glob(path.join(compileDir, '**/*.map'), function (err, files) {
@@ -43,7 +45,8 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 
 function removePaths(msg, paths) {
 	paths.forEach(function (path) {
-		msg = msg.replace(new RegExp(path + '/?', 'g'), '');
+
+		msg = msg.replace(new RegExp(escapeStringRegexp(path) + '/?', 'g'), '');
 	});
 
 	return msg;
