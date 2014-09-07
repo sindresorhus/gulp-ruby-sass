@@ -32,9 +32,9 @@ it('compiles Sass', function (done) {
 	var files = [];
 
 	gulp.src([
-		'fixture/fixture-a.scss',
-		'fixture/nested/fixture-b.scss'
-	], { base: '.' })
+		'fixture/sass/fixture-a.scss',
+		'fixture/sass/nested/fixture-b.scss'
+	], { base: 'fixture' })
 
 	.pipe(sass({ quiet: true }))
 
@@ -44,8 +44,8 @@ it('compiles Sass', function (done) {
 
 	.on('end', function () {
 		// file path
-		assert.equal(files[0].relative, 'fixture/fixture-a.css');
-		assert.equal(files[1].relative, 'fixture/nested/fixture-b.css');
+		assert.equal(files[0].relative, 'sass/fixture-a.css');
+		assert.equal(files[1].relative, 'sass/nested/fixture-b.css');
 
 		// css content
 		assert.equal(files[0].contents.toString(), results[0]);
@@ -64,14 +64,16 @@ it('compiles Sass with sourcemaps', function (done) {
 	var files = [];
 
 	gulp.src([
-		'fixture/fixture-a.scss',
-		'fixture/nested/fixture-b.scss'
-	], { base: '.' })
+		'fixture/sass/fixture-a.scss',
+		'fixture/sass/nested/fixture-b.scss'
+	], { base: 'fixture/sass', verbose: true }
+	)
 
 	.pipe(sass({
 		quiet: true,
 		sourcemap: true,
-		sourcemapPath: '../css'
+		sourcemapBase: 'fixture/sass',
+		sourcemapPath: '../sass'
   }))
 
 	.on('data', function (data) {
@@ -84,24 +86,23 @@ it('compiles Sass with sourcemaps', function (done) {
 			JSON.parse(files[3].contents.toString())
 		];
 
-		// TODO: Fix import source paths, remove absolute path
-		// var sources = [
-		// 	[
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-		// 		"../../css/fixture/fixture-a.scss",
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_obj-1.scss",
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-		// 	],
-		// 	[
-		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-		// 		"../../../css/fixture/nested/fixture-b.scss",
-		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-		// 	]
-		// ]
+		var sources = [
+			[
+				'../sass/_partial-1.scss',
+				'../sass/fixture-a.scss',
+				'../sass/_obj-1.scss',
+				'../sass/component/_obj-2.scss'
+			],
+			[
+				'../../sass/_partial-1.scss',
+				'../../sass/nested/fixture-b.scss',
+				'../../sass/component/_obj-2.scss'
+			]
+		];
 
 		// file path
-		assert.equal(files[1].relative, 'fixture/fixture-a.css.map');
-		assert.equal(files[3].relative, 'fixture/nested/fixture-b.css.map');
+		assert.equal(files[1].relative, 'fixture-a.css.map');
+		assert.equal(files[3].relative, 'nested/fixture-b.css.map');
 
 		// css content
 		assert.equal(files[0].contents.toString(), addSourcemapComment('fixture-a', results[0]));
@@ -112,9 +113,9 @@ it('compiles Sass with sourcemaps', function (done) {
 		assert.equal(maps[0].file, 'fixture-a.css');
 		assert.equal(maps[1].file, 'fixture-b.css');
 
-		// TODO: Fix import source paths
-		// assert.deepEqual(maps[0].sources, sources[0]);
-		// assert.deepEqual(maps[1].sources, sources[1]);
+		// sources point to the right files on disk
+		assert.deepEqual(maps[0].sources, sources[0]);
+		assert.deepEqual(maps[1].sources, sources[1]);
 
 		// ouptuts correct number of files
 		assert.equal(files.length, 4);
@@ -128,7 +129,7 @@ it('emits errors but still streams file on Sass error', function (done) {
 
 	var errMsgMatcher = new RegExp('File to import not found or unreadable: i-dont-exist.');
 
-	gulp.src('fixture/fixture-error.scss')
+	gulp.src('fixture/sass/fixture-error.scss')
 
 	.pipe(sass())
 

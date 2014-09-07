@@ -12,7 +12,7 @@ var intermediate = require('gulp-intermediate');
 var escapeStringRegexp = require('escape-string-regexp');
 
 
-function rewriteSourcemapPaths (compileDir, relativePath, cb) {
+function rewriteSourcemapPaths (compileDir, smPath, smBase, cwd, cb) {
 	glob(path.join(compileDir, '**/*.map'), function (err, files) {
 		if (err) {
 			cb(err);
@@ -31,10 +31,15 @@ function rewriteSourcemapPaths (compileDir, relativePath, cb) {
 
 				// rewrite sourcemaps to point to the original source files
 				sourceMap.sources = sourceMap.sources.map(function (source) {
-					var sourceBase = source.replace(/\.\.\//g, '');
+
+					// strip path to local file
+					source = source.replace(cwd, '')
+					               .replace(/\.\.\//g, '')
+					               .replace(smBase, '')
+					               .replace(/^\//g, '');
 
 					// normalize to browser style paths if we're on windows
-					return slash(path.join(stepUp, relativePath, sourceBase));
+					return slash(path.join(stepUp, smPath, source));
 				});
 
 				fs.writeFile(file, JSON.stringify(sourceMap, null, '  '), next);
@@ -57,7 +62,7 @@ function createErr(err, opts) {
 
 module.exports = function (options) {
 	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
-	var procDir = process.cwd();
+	var cwd = process.cwd();
 	options = options || {};
 
 	// error handling
@@ -83,7 +88,7 @@ module.exports = function (options) {
 
 		// add loadPaths for each temp file
 		vinylFiles.forEach(function (file) {
-			var loadPath = slash(path.dirname(path.relative(procDir, file.path)));
+			var loadPath = slash(path.dirname(path.relative(cwd, file.path)));
 
 			if (options.loadPath.indexOf(loadPath) === -1) {
 				options.loadPath.push(loadPath);
@@ -96,6 +101,7 @@ module.exports = function (options) {
 			'watch',
 			'poll',
 			'sourcemapPath',
+			'sourcemapBase',
 			'container'
 		]);
 
@@ -147,8 +153,8 @@ module.exports = function (options) {
 		});
 
 		sass.on('close', function (code) {
-			if (options.sourcemap && options.sourcemapPath) {
-				rewriteSourcemapPaths(compileDir, options.sourcemapPath, function (err) {
+			if (options.sourcemap && options.sourcemapPath && options.sourcemapBase) {
+				rewriteSourcemapPaths(compileDir, options.sourcemapPath, options.sourcemapBase, cwd, function (err) {
 					if (err) {
 						stream.emit('error', createErr(err));
 					}
