@@ -146,3 +146,24 @@ it('emits errors but still streams file on Sass error', function (done) {
 		done();
 	});
 });
+
+it('can pass environment variables', function (done) {
+	this.timeout(20000);
+
+  var files = [];
+
+	var outputMatcher = new RegExp('test:.*set');
+
+	gulp.src('fixture/fixture-env.scss')
+	
+  .pipe(sass({require: "./fixture/ext/env.rb",
+              env: {TEST: "set"}}))
+	.on('data', function (data) {
+		files.push(data);
+	})
+	.on('end', function () {
+    assert(outputMatcher.test(files[0].contents.toString()));
+		done();
+	});
+
+});
