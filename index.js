@@ -10,6 +10,7 @@ var eachAsync = require('each-async');
 var glob = require('glob');
 var intermediate = require('gulp-intermediate');
 var escapeStringRegexp = require('escape-string-regexp');
+var _ = require('lodash');
 
 
 function rewriteSourcemapPaths (compileDir, relativePath, cb) {
@@ -108,12 +109,17 @@ module.exports = function (options) {
 			command = 'sass';
 		}
 
+    var spawn_options = {};
+    if (options.env) {
+      spawn_options.env = _.assign({}, process.env, options.env);
+    }
+
 		// temporary logging until gulp adds its own
 		if (process.argv.indexOf('--verbose') !== -1) {
 			gutil.log('gulp-ruby-sass:', 'Running command:', chalk.blue(command, args.join(' ')));
 		}
 
-		var sass = spawn(command, args);
+		var sass = spawn(command, args, spawn_options);
 
 		sass.stdout.setEncoding('utf8');
 		sass.stderr.setEncoding('utf8');

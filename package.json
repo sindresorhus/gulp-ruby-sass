@@ -48,7 +48,8 @@
     "gulp-intermediate": "3.0.1",
     "gulp-util": "^3.0.0",
     "slash": "^1.0.0",
-    "win-spawn": "^2.0.0"
+    "win-spawn": "^2.0.0",
+    "lodash": "^2.4.1"
   },
   "devDependencies": {
     "gulp": "^3.7.0",
