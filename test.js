@@ -4,6 +4,7 @@ var assert = require('assert');
 var gulp = require('gulp');
 var sass = require('./');
 var EOL = require('os').EOL;
+var path = require('path');
 
 var addSourcemapComment = function (name, contents) {
 	return contents + EOL + '/*# sourceMappingURL=' + name + '.css.map */' + EOL;
@@ -36,7 +37,7 @@ it('compiles Sass', function (done) {
 		'fixture/nested/fixture-b.scss'
 	], { base: '.' })
 
-	.pipe(sass({ quiet: true }))
+	.pipe(sass({ quiet: true, sourcemap: 'none' }))
 
 	.on('data', function (data) {
 		files.push(data);
@@ -44,8 +45,8 @@ it('compiles Sass', function (done) {
 
 	.on('end', function () {
 		// file path
-		assert.equal(files[0].relative, 'fixture/fixture-a.css');
-		assert.equal(files[1].relative, 'fixture/nested/fixture-b.css');
+		assert.equal(files[0].relative, path.join('fixture', 'fixture-a.css'));
+		assert.equal(files[1].relative, path.join('fixture', 'nested', 'fixture-b.css'));
 
 		// css content
 		assert.equal(files[0].contents.toString(), results[0]);
@@ -70,7 +71,6 @@ it('compiles Sass with sourcemaps', function (done) {
 
 	.pipe(sass({
 		quiet: true,
-		sourcemap: true,
 		sourcemapPath: '../css'
   }))
 
@@ -100,8 +100,8 @@ it('compiles Sass with sourcemaps', function (done) {
 		// ]
 
 		// file path
-		assert.equal(files[1].relative, 'fixture/fixture-a.css.map');
-		assert.equal(files[3].relative, 'fixture/nested/fixture-b.css.map');
+		assert.equal(files[1].relative, path.join('fixture', 'fixture-a.css.map'));
+		assert.equal(files[3].relative, path.join('fixture', 'nested', 'fixture-b.css.map'));
 
 		// css content
 		assert.equal(files[0].contents.toString(), addSourcemapComment('fixture-a', results[0]));

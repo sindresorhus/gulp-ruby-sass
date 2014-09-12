@@ -48,10 +48,17 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 
 ##### sourcemap
 
-Type: `Boolean`  
-Default: `false`
+Type: `String`  
+Default: `auto`
 
-Enable Source Map. **Requires Sass >= 3.3.0 and the [`sourcemapPath` option](#sourcemappath).**
+Values:
+
+- `auto` - relative paths where possible, file URIs elsewhere
+- `file` - always absolute file URIs
+- `inline` - include the source text in the sourcemap
+- `none`- no sourcemaps
+
+Enable Source Map. **Requires Sass >= 3.4.0 and the [`sourcemapPath` option](#sourcemappath).**
 
 
 ##### sourcemapPath
