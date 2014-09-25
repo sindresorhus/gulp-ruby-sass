@@ -5,6 +5,7 @@ var chalk = require('chalk');
 var dargs = require('dargs');
 var slash = require('slash');
 var gutil = require('gulp-util');
+var assign = require('object-assign');
 var spawn = require('win-spawn');
 var eachAsync = require('each-async');
 var glob = require('glob');
@@ -58,7 +59,7 @@ function createErr(err, opts) {
 module.exports = function (options) {
 	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
-	options = options || {};
+	options = assign({}, options);
 
 	// error handling
 	var sassErrMatcher = /^error/;
