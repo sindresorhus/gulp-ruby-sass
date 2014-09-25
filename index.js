@@ -11,6 +11,7 @@ var eachAsync = require('each-async');
 var glob = require('glob');
 var intermediate = require('gulp-intermediate');
 var escapeStringRegexp = require('escape-string-regexp');
+var sourcemaps = ['auto', 'file', 'inline', 'none'];
 
 
 function rewriteSourcemapPaths (compileDir, relativePath, cb) {
@@ -56,6 +57,13 @@ function createErr(err, opts) {
 	return new gutil.PluginError('gulp-ruby-sass', err, opts);
 }
 
+// Determines if a sourcemap is a valid sass sourcemap argument.
+function isValidSourcemap(sourcemap) {
+
+	return sourcemap && sourcemaps.indexOf(sourcemap) !== -1;
+
+}
+
 module.exports = function (options) {
 	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
 	var procDir = process.cwd();
@@ -96,11 +104,17 @@ module.exports = function (options) {
 			'bundleExec',
 			'watch',
 			'poll',
+			'sourcemap',
 			'sourcemapPath',
 			'container'
 		]);
 
 		args.push(tempDir + ':' + compileDir);
+
+		// temporary fix for sourcemap
+		if (isValidSourcemap(options.sourcemap)) {
+			args.unshift('--sourcemap=' + options.sourcemap);
+		}
 
 		if (options.bundleExec) {
 			command = 'bundle';
