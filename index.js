@@ -62,7 +62,7 @@ module.exports = function (options) {
 	options = assign({}, options);
 
 	// error handling
-	var sassErrMatcher = /^error/;
+	var sassErrMatcher = /^\s*error/m;
 	var noBundlerMatcher = /Gem bundler is not installed/;
 	var noGemfileMatcher = /Could not locate Gemfile/;
 	var noBundleSassMatcher = /bundler: command not found|Could not find gem/;
