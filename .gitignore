@@ -1,2 +1,8 @@
+# Managed packages
 node_modules
+
+# Temp files
 .sass-cache
+
+# Test artifacts
+fixture/maps
