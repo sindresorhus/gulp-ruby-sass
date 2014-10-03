@@ -120,26 +120,30 @@ it('compiles Sass', function (done) {
 // 	});
 // });
 
-// it('emits errors but still streams file on Sass error', function (done) {
-// 	this.timeout(20000);
+it('emits errors but streams file on Sass error', function (done) {
+	this.timeout(20000);
 
-// 	var errMsgMatcher = new RegExp('File to import not found or unreadable: i-dont-exist.');
+	var matchErrMsg = new RegExp('File to import not found or unreadable: i-dont-exist.');
+	var errFileExists;
 
-// 	gulp.src('fixture/fixture-error.scss')
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: 'none',
+		unixNewlines: true
+	})
 
-// 	.pipe(sass())
+	.on('error', function (err) {
+		// throws an error
+		assert(matchErrMsg.test(err.message));
+	})
 
-// 	.on('error', function (err) {
-// 		// throws an error
-// 		assert(errMsgMatcher.test(err.message));
-// 	})
+	.on('data', function (file) {
+		// streams the erroring css file
+		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString())
+	})
 
-// 	.on('data', function (file) {
-// 		// still pushes the compiled erroring css file through
-// 		assert(errMsgMatcher.test(file.contents.toString()));
-// 	})
-
-// 	.on('end', function () {
-// 		done();
-// 	});
-// });
+	.on('end', function () {
+		assert(errFileExists);
+		done();
+	});
+});
