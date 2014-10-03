@@ -47,6 +47,7 @@
     "glob": "^4.0.2",
     "gulp-util": "^3.0.0",
     "object-assign": "^1.0.0",
+    "rimraf": "^2.2.8",
     "slash": "^1.0.0",
     "vinyl-fs": "^0.3.7",
     "win-spawn": "^2.0.0",
