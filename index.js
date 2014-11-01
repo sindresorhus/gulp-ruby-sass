@@ -81,6 +81,8 @@ module.exports = function (options) {
 		options = options || {};
 		options.update = true;
 		options.loadPath = typeof options.loadPath === 'undefined' ? [] : [].concat(options.loadPath);
+		var quiteWarnings = options.quiteWarnings;
+		delete options.quiteWarnings;
 
 		// add loadPaths for each temp file
 		vinylFiles.forEach(function (file) {
@@ -136,7 +138,7 @@ module.exports = function (options) {
 
 			if (noBundleSassMatcher.test(msg)) {
 				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
-			} else if (!noSassMatcher.test(msg)) {
+			} else if (!noSassMatcher.test(msg) && !quiteWarnings) {
 				gutil.log('gulp-ruby-sass: stderr:', msg);
 			}
 		});
