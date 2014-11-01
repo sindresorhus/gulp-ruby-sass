@@ -126,7 +126,7 @@ module.exports = function (options) {
 				stream.emit('error', createErr(msg, {showStack: false}));
 			} else if (noBundleSassMatcher.test(msg)) {
 				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
-			} else {
+			} else if (!options.quiteWarnings){
 				gutil.log('gulp-ruby-sass:', msg);
 			}
 		});
@@ -136,7 +136,7 @@ module.exports = function (options) {
 
 			if (noBundleSassMatcher.test(msg)) {
 				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
-			} else if (!noSassMatcher.test(msg)) {
+			} else if (!noSassMatcher.test(msg) && !options.quiteWarnings) {
 				gutil.log('gulp-ruby-sass: stderr:', msg);
 			}
 		});

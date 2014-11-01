@@ -121,6 +121,14 @@ Default: `false`
 Silence warnings and status messages during compilation. **NOTE:** If you set `quiet` to `true` gulp will no longer emit most Sass and Bundler errors.
 
 
+##### quietWarnings
+
+Type: `Boolean`  
+Default: `false`
+
+Silence warnings messages during compilation. **NOTE:** If you set `quietWarnings` to `true` gulp **will** emit Sass and Bundler errors.
+
+
 ##### compass
 
 Type: `Boolean`  
