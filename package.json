@@ -41,6 +41,7 @@
   ],
   "dependencies": {
     "chalk": "^0.5.1",
+    "convert-source-map": "^0.4.1",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",
     "escape-string-regexp": "^1.0.1",
@@ -55,6 +56,7 @@
   },
   "devDependencies": {
     "gulp": "^3.7.0",
+    "gulp-sourcemaps": "^1.2.7",
     "mocha": "*"
   }
 }
