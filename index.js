@@ -6,6 +6,7 @@ var glob = require('glob');
 var chalk = require('chalk');
 var dargs = require('dargs');
 var slash = require('slash');
+var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
 var spawn = require('win-spawn');
 var gutil = require('gulp-util');
@@ -34,16 +35,17 @@ function newErr (err, opts) {
 module.exports = function (source, options) {
 	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
-	var base = path.join(cwd, source);
 	var command;
 	var args;
-	var dest;
+	var base;
+	var destDir;
+	var destFile;
+	var compileMappings;
 
 	// redundant but necessary
 	stream._read = function () {};
 
 	options = assign({}, options);
-	options.update = true;
 	options.container = options.container || 'gulp-ruby-sass';
 
 	// sourcemap can only be true or false; warn those trying to pass a Sass string option
@@ -53,21 +55,29 @@ module.exports = function (source, options) {
 
 	options.sourcemap = options.sourcemap ? 'file' : 'none';
 
-	// all options passed to sass must use unix style slashes
-	dest = slash(path.join(osTempDir, options.container));
-
-	// remove the previously generated files
-	// TODO: This kills caching. Keeping will push files through that are not in
-	// the current gulp.src. We need to decide whether to use a Sass style caching
-	// strategy, or a gulp style strategy, and what each would look like.
-	rimraf.sync(dest);
+	// directory source
+	if (path.extname(source) === '') {
+		base = path.join(cwd, source);
+		destDir = slash(path.join(osTempDir, options.container)); // sass options need unix style slashes
+		compileMappings = source + ':' + destDir;
+		options.update = true;
+	}
+	// single file source
+	else {
+		base = path.join(cwd, path.dirname(source));
+		destDir = path.join(osTempDir, options.container);
+		destFile = slash(path.join(destDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
+		compileMappings = [ source, destFile ];
+		mkdirp(destDir);
+	}
+	// TODO: implement glob file source
 
 	args = dargs(options, [
 		'bundleExec',
 		'watch',
 		'poll',
 		'container'
-	]).concat(source + ':' + dest);
+	]).concat(compileMappings);
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -97,7 +107,7 @@ module.exports = function (source, options) {
 	// sass stdout: successful compile messages
 	// bundler stdout: bundler not installed, no gemfile, correct version of sass not installed
 	sass.stdout.on('data', function (data) {
-		var msg = formatMsg(data, dest);
+		var msg = formatMsg(data, destDir);
 		var isError = [
 			matchSassErr,
 			matchNoBundler,
@@ -118,7 +128,7 @@ module.exports = function (source, options) {
 	// bundler stderr: no version of sass installed
 	// spawn stderr: no sass executable
 	sass.stderr.on('data', function (data) {
-		var msg = formatMsg(data, dest);
+		var msg = formatMsg(data, destDir);
 
 		if (matchNoBundledSass.test(msg)) {
 			stream.emit('error', newErr(msg));
@@ -139,7 +149,7 @@ module.exports = function (source, options) {
 	sass.on('close', function (code) {
 		// TODO: Here be dragons. Right now we grab all files in the directory. This
 		// will have to grab x files based on the task source glob.
-		glob(path.join(dest, '**', '*'), function (err, files) {
+		glob(path.join(destDir, '**', '*'), function (err, files) {
 			if (err) {
 				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 			}
@@ -162,7 +172,7 @@ module.exports = function (source, options) {
 					var vinylFile = new File({
 						cwd: cwd,
 						base: base,
-						path: file.replace(dest, base)
+						path: file.replace(destDir, base)
 					});
 					var sourcemap;
 
@@ -186,7 +196,13 @@ module.exports = function (source, options) {
 					return;
 				});
 			}, function () {
-				stream.push(null);
+				// cleanup previously generated files for next run
+				// TODO: This kills caching. Keeping will push files through that are not in
+				// the current gulp.src. We need to decide whether to use a Sass style caching
+				// strategy, or a gulp style strategy, and what each would look like.
+				rimraf(destDir, function () {
+					stream.push(null);
+				});
 			});
 		});
 	});

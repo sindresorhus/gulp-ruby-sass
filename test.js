@@ -12,6 +12,9 @@ var expectedSources = [
 	'_partial-1.scss,component/_obj-2.scss,nested/fixture-b.scss'
 ];
 
+var expectedFixtureAContents = fs.readFileSync('fixture/result/fixture-a.css', {encoding: 'utf8'});
+var expectedFixtureBContents = fs.readFileSync('fixture/result/nested/fixture-b.css', {encoding: 'utf8'});
+
 function getCssFiles (files) {
 	return files.filter(function (file) {
 		return path.extname(file.path) === '.css';
@@ -40,7 +43,35 @@ function rejectFromArray (baseArray, rejectArray) {
 	});
 }
 
-it('compiles Sass', function (done) {
+it('compiles Sass from file source', function (done) {
+	this.timeout(20000);
+
+	var files = [];
+
+	sass('fixture/source/fixture-a.scss', {
+		quiet: true,
+		unixNewlines: true
+	})
+
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		// number of files
+		assert.equal(files.length, 1);
+
+		// file paths
+		assert.equal(files[0].relative, 'fixture-a.css');
+
+		// file contents
+		assert.equal(files[0].contents.toString(), expectedFixtureAContents);
+
+		done();
+	});
+});
+
+it('compiles Sass from directory source', function (done) {
 	this.timeout(20000);
 
 	var files = [];
@@ -75,8 +106,8 @@ it('compiles Sass', function (done) {
 				validCssFiles[1].contents.toString(),
 			].sort(),
 			[
-				fs.readFileSync('fixture/result/fixture-a.css', {encoding: 'utf8'}),
-				fs.readFileSync('fixture/result/nested/fixture-b.css', {encoding: 'utf8'})
+				expectedFixtureAContents,
+				expectedFixtureBContents
 			].sort()
 		);
 
