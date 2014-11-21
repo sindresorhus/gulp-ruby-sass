@@ -4,10 +4,41 @@ var fs = require('fs');
 var sass = require('./');
 var path = require('path');
 var assert = require('assert');
+var convert = require('convert-source-map');
+var sourcemaps = require('gulp-sourcemaps');
 
-// var addSourcemapComment = function (name, contents) {
-// 	return contents + EOL + '/*# sourceMappingURL=' + name + '.css.map */' + EOL;
-// };
+var expectedSources = [
+	'_obj-1.scss,_partial-1.scss,component/_obj-2.scss,fixture-a.scss',
+	'_partial-1.scss,component/_obj-2.scss,nested/fixture-b.scss'
+];
+
+function getCssFiles (files) {
+	return files.filter(function (file) {
+		return path.extname(file.path) === '.css';
+	});
+}
+
+function getErrorFiles (files) {
+	return files.filter(function (file) {
+		return /Error: File to import not found or unreadable/.test(file.contents.toString());
+	});
+}
+
+function getSourceMapFiles (files) {
+	return files.filter(function (file) {
+		return path.extname(file.path) === '.map';
+	});
+}
+
+function getValidCssFiles (files) {
+	return rejectFromArray(getCssFiles(files), getErrorFiles(files));
+}
+
+function rejectFromArray (baseArray, rejectArray) {
+	return baseArray.filter(function (value) {
+		return rejectArray.indexOf(value) === -1
+	});
+}
 
 it('compiles Sass', function (done) {
 	this.timeout(20000);
@@ -16,7 +47,6 @@ it('compiles Sass', function (done) {
 
 	sass('fixture/source', {
 		quiet: true,
-		sourcemap: 'none',
 		unixNewlines: true
 	})
 
@@ -35,16 +65,14 @@ it('compiles Sass', function (done) {
 		);
 
 		// find the compile error file and remove it from the array
-		var noErrorFiles = files.filter(function (file) {
-			return !/Error: File to import not found or unreadable/.test(file.contents.toString());
-		})
-		assert.equal(noErrorFiles.length, 2);
+		var validCssFiles = getValidCssFiles(files);
+		assert.equal(validCssFiles.length, 2);
 
 		// correctly compiled file contents
 		assert.deepEqual(
 		  [
-				noErrorFiles[0].contents.toString(),
-				noErrorFiles[1].contents.toString(),
+				validCssFiles[0].contents.toString(),
+				validCssFiles[1].contents.toString(),
 			].sort(),
 			[
 				fs.readFileSync('fixture/result/fixture-a.css', {encoding: 'utf8'}),
@@ -56,69 +84,99 @@ it('compiles Sass', function (done) {
 	});
 });
 
-// it('compiles Sass with sourcemaps', function (done) {
-// 	this.timeout(20000);
+it('doesn\'t stream map files', function (done) {
+	this.timeout(20000);
 
-// 	var files = [];
+	var files = [];
 
-// 	gulp.src([
-// 		'fixture/fixture-a.scss',
-// 		'fixture/nested/fixture-b.scss'
-// 	], { base: '.' })
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: true
+	})
 
-// 	.pipe(sass({
-// 		quiet: true,
-// 		sourcemapPath: '../css'
-//   }))
+	.on('data', function (data) {
+		files.push(data);
+	})
 
-// 	.on('data', function (data) {
-// 		files.push(data);
-// 	})
+	.on('end', function () {
+		// number of files
+		assert.equal(files.length, 3);
+		done();
+	});
+});
 
-// 	.on('end', function () {
-// 		var maps = [
-// 			JSON.parse(files[1].contents.toString()),
-// 			JSON.parse(files[3].contents.toString())
-// 		];
+it('outputs sourcemap files', function (done) {
+	this.timeout(20000);
 
-// 		// TODO: Fix import source paths, remove absolute path
-// 		// var sources = [
-// 		// 	[
-// 		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-// 		// 		"../../css/fixture/fixture-a.scss",
-// 		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_obj-1.scss",
-// 		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-// 		// 	],
-// 		// 	[
-// 		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-// 		// 		"../../../css/fixture/nested/fixture-b.scss",
-// 		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-// 		// 	]
-// 		// ]
+	var files = [];
 
-// 		// file path
-// 		assert.equal(files[1].relative, path.join('fixture', 'fixture-a.css.map'));
-// 		assert.equal(files[3].relative, path.join('fixture', 'nested', 'fixture-b.css.map'));
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: true
+	})
 
-// 		// css content
-// 		assert.equal(files[0].contents.toString(), addSourcemapComment('fixture-a', results[0]));
-// 		assert.equal(files[2].contents.toString(), addSourcemapComment('fixture-b', results[1]));
+	.pipe(sourcemaps.write('../maps', {
+		includeContent: false,
+		sourceRoot: '/fixture/source'
+	}))
 
-// 		// map content
-// 		assert.equal(maps[0].version, 3);
-// 		assert.equal(maps[0].file, 'fixture-a.css');
-// 		assert.equal(maps[1].file, 'fixture-b.css');
+	.on('data', function (data) {
+		files.push(data);
+	})
 
-// 		// TODO: Fix import source paths
-// 		// assert.deepEqual(maps[0].sources, sources[0]);
-// 		// assert.deepEqual(maps[1].sources, sources[1]);
+	.on('end', function () {
+		var sourceMapFiles = getSourceMapFiles(files);
+		assert.equal(sourceMapFiles.length, 2);
 
-// 		// ouptuts correct number of files
-// 		assert.equal(files.length, 4);
+		var validCssFiles = getValidCssFiles(files);
+		assert.equal(validCssFiles.length, 2);
 
-// 		done();
-// 	});
-// });
+		sourceMapFiles.forEach(function (file) {
+			var sourcemap = JSON.parse(file.contents.toString());
+			// check object is sourcemap
+			assert.equal(sourcemap.version, 3)
+			// check sourcemap points to the correct files
+			assert.notEqual(expectedSources.indexOf(sourcemap.sources.sort().join(',')), -1);
+		});
+
+		done();
+	});
+});
+
+it('outputs inline sourcemaps', function (done) {
+	this.timeout(20000);
+
+	var files = [];
+
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: true
+	})
+
+	.pipe(sourcemaps.write())
+
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		var sourceMapFiles = getSourceMapFiles(files);
+		assert.equal(sourceMapFiles.length, 0);
+
+		var validCssFiles = getValidCssFiles(files);
+		assert.equal(validCssFiles.length, 2);
+
+		validCssFiles.forEach(function (file) {
+			var sourcemap = convert.fromSource(file.contents.toString()).sourcemap;
+			// check object is sourcemap
+			assert.equal(sourcemap.version, 3);
+			// check sourcemap points to the correct files
+			assert.notEqual(expectedSources.indexOf(sourcemap.sources.sort().join(',')), -1);
+		});
+
+		done();
+	});
+});
 
 it('emits errors but streams file on Sass error', function (done) {
 	this.timeout(20000);
@@ -128,7 +186,6 @@ it('emits errors but streams file on Sass error', function (done) {
 
 	sass('fixture/source', {
 		quiet: true,
-		sourcemap: 'none',
 		unixNewlines: true
 	})
 
@@ -139,7 +196,7 @@ it('emits errors but streams file on Sass error', function (done) {
 
 	.on('data', function (file) {
 		// streams the erroring css file
-		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString())
+		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString());
 	})
 
 	.on('end', function () {
