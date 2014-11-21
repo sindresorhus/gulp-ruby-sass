@@ -6,6 +6,12 @@ This is slower than [gulp-sass](https://github.com/dlmanning/gulp-sass), but mor
 
 *Issues with the output should be reported on the Sass [issue tracker](https://github.com/sass/sass/issues).*
 
+## Note: Pre-1.0 versions are no longer supported<br>Please try 1.0.0-alpha
+
+- Install with `npm install --save-dev gulp-ruby-sass@1.0.0-alpha`.
+- New documentation [here](https://github.com/sindresorhus/gulp-ruby-sass/tree/rw/1.0).
+- More information in the [1.0 pull request](https://github.com/sindresorhus/gulp-ruby-sass/pull/137).
+
 
 ## Install
 
