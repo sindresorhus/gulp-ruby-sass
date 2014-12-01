@@ -100,6 +100,18 @@ module.exports = function (options) {
 			'container'
 		]);
 
+        /**
+         * SASS will very frequently default to Ruby's default character set
+         *  for READING files (the output files all appear to be UTF-8
+         *  regardless!)
+         *  On Linux/Mac OS X the default is UTF-8, which is good.
+         *  On Windows the default is... CP1252 - oops!
+         *  Easiest way to fix this is just to force it to use UTF-8 here. All
+         *  of the other options are horrendous.
+         * @link http://blog.pixelastic.com/2014/09/06/compass-utf-8-encoding-on-windows/
+         */
+        args.push("-Eutf-8");
+
 		args.push(tempDir + ':' + compileDir);
 
 		if (options.bundleExec) {
