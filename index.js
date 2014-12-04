@@ -183,7 +183,7 @@ module.exports = function (source, options) {
 
 						// create relative paths for sources
 						sourcemap.sources = sourcemap.sources.map(function (sourcemapSource) {
-							var absoluteSourcePath = sourcemapSource.replace('file://', '');
+							var absoluteSourcePath = sourcemapSource.replace(/file:\/\/\/?/i, '').split('/').map(decodeURIComponent).join('/');
 							return path.relative(base, absoluteSourcePath);
 						});
 
