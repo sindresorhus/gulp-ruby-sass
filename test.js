@@ -209,6 +209,33 @@ it('outputs inline sourcemaps', function (done) {
 	});
 });
 
+it('outputs correct sourcemap paths for files and paths containing spaces', function (done) {
+	this.timeout(20000);
+
+	var file;
+
+	sass('fixture/source/directory with spaces/_partial with spaces.scss', {
+		quiet: true,
+		sourcemap: true
+	})
+
+	.pipe(sourcemaps.write())
+
+	.on('data', function (data) {
+		file = data;
+	})
+
+	.on('end', function () {
+		var sourcemap = convert.fromSource(file.contents.toString()).sourcemap;
+		// check object is sourcemap
+		assert.equal(sourcemap.version, 3);
+		// check sourcemap points to the correct file
+		assert.deepEqual(sourcemap.sources, ['_partial with spaces.scss']);
+
+		done();
+	});
+});
+
 it('emits errors but streams file on Sass error', function (done) {
 	this.timeout(20000);
 
