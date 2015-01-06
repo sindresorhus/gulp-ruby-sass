@@ -54,6 +54,7 @@
   "devDependencies": {
     "gulp": "^3.7.0",
     "gulp-add": "0.0.2",
+    "gulp-chmod": "^1.2.0",
     "mocha": "*"
   }
 }

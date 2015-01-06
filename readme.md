@@ -26,12 +26,14 @@ You also need to have [Ruby](http://www.ruby-lang.org/en/downloads/) and [Sass](
 
 ```js
 var gulp = require('gulp');
+var chmod = require('gulp-chmod');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('default', function () {
 	return gulp.src('src/scss/app.scss')
 		.pipe(sass({sourcemap: true, sourcemapPath: '../scss'}))
 		.on('error', function (err) { console.log(err.message); })
+		.pipe(chmod(644))
 		.pipe(gulp.dest('dist/css'));
 });
 ```
