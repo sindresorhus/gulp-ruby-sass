@@ -19,19 +19,20 @@ var escapeRegExp = require('escape-string-regexp');
 var File = require('vinyl');
 var Readable = require('stream').Readable;
 
-// Removes OS temp dir and line breaks for more Sass-like logging
+// remove temp directory and line breaks for more Sass-like logging
 function formatMsg (msg, tempDir) {
 	msg = msg.replace(new RegExp((tempDir) + '/?', 'g'), '');
 	msg = msg.trim();
 	return msg;
 }
 
+// convenience function to create a gulp error
 function newErr (err, opts) {
 	return new gutil.PluginError('gulp-ruby-sass', err, opts);
 }
 
-// TODO: For now, source is only a single dir Source will be either a directory,
-// a group of directories, or a glob of indv. files.
+// for now, source is only a single directory or a single file
+// TODO: implement glob source
 module.exports = function (source, options) {
 	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
@@ -147,8 +148,6 @@ module.exports = function (source, options) {
 	});
 
 	sass.on('close', function (code) {
-		// TODO: Here be dragons. Right now we grab all files in the directory. This
-		// will have to grab x files based on the task source glob.
 		glob(path.join(destDir, '**', '*'), function (err, files) {
 			if (err) {
 				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
@@ -167,8 +166,8 @@ module.exports = function (source, options) {
 						return;
 					}
 
-					// rewrite file paths so gulp thinks the file came from the cwd, not
-					// the temp directory
+					// rewrite file paths so gulp thinks the files came from cwd, not the
+					// OS temp directory
 					var vinylFile = new File({
 						cwd: cwd,
 						base: base,
@@ -176,6 +175,7 @@ module.exports = function (source, options) {
 					});
 					var sourcemap;
 
+					// if we are managing sourcemaps and the sourcemap exists
 					if (options.sourcemap === 'file' && path.extname(file) === '.css' && fs.existsSync(file + '.map')) {
 						// remove Sass sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer( convert.removeMapFileComments(data.toString()) );
@@ -183,7 +183,7 @@ module.exports = function (source, options) {
 
 						// create relative paths for sources
 						sourcemap.sources = sourcemap.sources.map(function (sourcemapSource) {
-							// sourcemaps encode special chars, node does not, so we normalize here
+							// sourcemaps encode special chars while node does not; normalize here
 							var absoluteSourcePath = decodeURI(sourcemapSource.replace('file://', ''));
 							return path.relative(base, absoluteSourcePath);
 						});
