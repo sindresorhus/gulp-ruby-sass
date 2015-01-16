@@ -176,7 +176,7 @@ module.exports = function (source, options) {
 					var sourcemap;
 
 					// if we are managing sourcemaps and the sourcemap exists
-					if (options.sourcemap === 'file' && path.extname(file) === '.css' && fs.existsSync(file + '.map')) {
+					if (options.sourcemap === 'file' && fs.existsSync(file + '.map')) {
 						// remove Sass sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer( convert.removeMapFileComments(data.toString()) );
 						sourcemap = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
