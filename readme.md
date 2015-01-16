@@ -49,8 +49,9 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 
 #### Handling errors
 
-Handle Sass errors with an `on('error', cb)` listener or a plugin like [plumber](https://github.com/floatdrop/gulp-plumber). gulp-ruby-sass throws errors like a gulp plugin, but streams the erroring files so you can see the errors in your browser.
+Handle Sass errors with an `on('error', cb)` listener. gulp-ruby-sass throws errors like a gulp plugin, but streams the erroring files so you can see the errors in your browser.
 
+<!-- or a plugin like [plumber](https://github.com/floatdrop/gulp-plumber). -->
 
 ### Plugin options
 
