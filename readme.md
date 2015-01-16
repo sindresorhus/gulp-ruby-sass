@@ -139,8 +139,8 @@ Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html): `bu
 
 ### Sass options
 
-All other options are passed directly to the Sass executable.  
-For up-to-date options run `sass -h`. The docs below are supplied for convenience.
+All other options are passed directly to the Sass executable, only in camelCase instead of dashed-case.  
+For up-to-date options run `sass -h`. The docs below list common options for convenience.
 
 #### trace
 
@@ -156,6 +156,11 @@ Type: `Boolean`
 Default: `false` on Windows, otherwise `true`
 
 Use Unix-style newlines in written files.
+
+
+####  defaultEncoding
+
+Specify the default encoding for input files. If using special characters on Windows computers you may want to set this to `UTF-8`.
 
 
 #### check
