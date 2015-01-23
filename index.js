@@ -183,8 +183,7 @@ module.exports = function (source, options) {
 
 						// create relative paths for sources
 						sourcemap.sources = sourcemap.sources.map(function (sourcemapSource) {
-							// sourcemaps encode special chars while node does not; normalize here
-							var absoluteSourcePath = decodeURI(sourcemapSource.replace('file://', ''));
+							var absoluteSourcePath = decodeURI(path.resolve('/', sourcemapSource.replace('file:///', '')))
 							return path.relative(base, absoluteSourcePath);
 						});
 
