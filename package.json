@@ -43,7 +43,6 @@
     "convert-source-map": "^0.4.1",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",
-    "escape-string-regexp": "^1.0.1",
     "glob": "^4.0.2",
     "gulp-util": "^3.0.0",
     "mkdirp": "^0.5.0",
