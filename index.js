@@ -13,7 +13,6 @@ var assign = require('object-assign');
 var convert = require('convert-source-map');
 var eachAsync = require('each-async');
 var osTempDir = require('os').tmpdir();
-var escapeRegExp = require('escape-string-regexp');
 
 var File = require('vinyl');
 var Readable = require('stream').Readable;
