@@ -56,17 +56,18 @@ module.exports = function (source, options) {
 
 	options.sourcemap = options.sourcemap ? 'file' : 'none';
 
+	// sass options need unix style slashes
+	destDir = slash(path.join(osTempDir, options.container));
+
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		destDir = slash(path.join(osTempDir, options.container)); // sass options need unix style slashes
 		compileMappings = source + ':' + destDir;
 		options.update = true;
 	}
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
-		destDir = path.join(osTempDir, options.container);
 		destFile = slash(path.join(destDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
 		compileMappings = [ source, destFile ];
 		mkdirp(destDir);
