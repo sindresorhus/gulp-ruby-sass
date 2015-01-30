@@ -40,7 +40,6 @@
     "sourcemaps"
   ],
   "dependencies": {
-    "chalk": "^0.5.1",
     "convert-source-map": "^0.4.1",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",

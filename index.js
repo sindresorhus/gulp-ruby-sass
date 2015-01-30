@@ -3,7 +3,6 @@
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
-var chalk = require('chalk');
 var dargs = require('dargs');
 var slash = require('slash');
 var mkdirp = require('mkdirp');
@@ -42,18 +41,22 @@ module.exports = function (source, options) {
 	var destDir;
 	var destFile;
 	var compileMappings;
+	var defaults = {
+		container: 'gulp-ruby-sass',
+		verbose: false
+	};
 
 	// redundant but necessary
 	stream._read = function () {};
 
-	options = assign({}, options);
-	options.container = options.container || 'gulp-ruby-sass';
+	options = assign(defaults, options);
 
 	// sourcemap can only be true or false; warn those trying to pass a Sass string option
 	if (typeof options.sourcemap === 'string') {
 		throw newErr('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
+	// reassign options.sourcemap boolean to our two acceptable Sass arguments
 	options.sourcemap = options.sourcemap ? 'file' : 'none';
 
 	// sass options need unix style slashes
@@ -78,7 +81,8 @@ module.exports = function (source, options) {
 		'bundleExec',
 		'watch',
 		'poll',
-		'container'
+		'container',
+		'verbose'
 	]).concat(compileMappings);
 
 	if (options.bundleExec) {
@@ -88,11 +92,6 @@ module.exports = function (source, options) {
 		command = 'sass';
 	}
 
-	// temporary logging until gulp adds its own
-	if (process.argv.indexOf('--verbose') !== -1) {
-		gutil.log('gulp-ruby-sass:', 'Running command:', chalk.blue(command, args.join(' ')));
-	}
-
 	// error handling
 	var matchNoSass = /execvp\(\): No such file or directory|spawn ENOENT/;
 	var msgNoSass = 'Missing the Sass executable. Please install and make available on your PATH.';
@@ -100,6 +99,11 @@ module.exports = function (source, options) {
 	var matchNoBundler = /ERROR: Gem bundler is not installed/;
 	var matchNoGemfile = /Could not locate Gemfile/;
 	var matchNoBundledSass = /bundler: command not found: sass|Could not find gem/;
+
+	// plugin logging
+	if (options.verbose) {
+		gutil.log('gulp-ruby-sass', 'Running command:', command, args.join(' '));
+	}
 
 	var sass = spawn(command, args);
 

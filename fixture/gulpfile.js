@@ -6,7 +6,7 @@ var sass = require('../');
 
 // inline sourcemaps
 gulp.task('sass-inline', function() {
-	return sass('source', { sourcemap: true })
+	return sass('source', { sourcemap: true, verbose: true })
 	.on('error', function (err) {
 	  console.error('Error!', err.message);
    })

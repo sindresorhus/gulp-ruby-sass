@@ -55,6 +55,13 @@ Handle Sass errors with an `on('error', cb)` listener. gulp-ruby-sass throws err
 
 ### Plugin options
 
+#### verbose
+
+Type: `Boolean`  
+Default: `false`  
+
+Gives some extra information for debugging, including the actual spawned Sass command.
+
 #### sourcemap
 
 Type: `Boolean`  
