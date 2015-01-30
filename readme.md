@@ -140,58 +140,61 @@ Any other options are passed directly to the Sass executable. gulp options are c
 
 The docs below list common options for convenience. Run `sass -h` for the complete list.
 
-#### trace
-
-Type: `Boolean`  
-Default: `false`
-
-Show a full traceback on error.
-
-#### unixNewlines
-
-Type: `Boolean`  
-Default: `false` on Windows, otherwise `true`
-
-Use Unix-style newlines in written files.
-
-####  defaultEncoding
-
-Specify the default encoding for input files. If using special characters on Windows computers you may want to set this to `UTF-8`.
-
-#### check
-
-Type: `Boolean`  
-Default: `false`
-
-Just check syntax, don't evaluate.
-
-#### style
+#### loadPath
 
 Type: `String`  
-Default: `nested`
-
-Output style. Can be `nested`, `compact`, `compressed`, `expanded`.
-
-#### precision
-
-Type: `Number`  
-Default: `3`
-
-How many digits of precision to use when outputting decimal numbers.
-
-#### quiet
-
-Type: `Boolean`  
 Default: `false`
 
-Silence warnings and status messages during compilation. **NOTE:** If you set `quiet` to `true` gulp will no longer emit most Sass and Bundler errors.
+Specify a Sass import path.
+
+#### require
+
+Type: `String`  
+Default: `false`
+
+Require a Ruby library before running Sass.
 
 #### compass
 
 Type: `Boolean`  
 Default: `false`
 
-Make Compass imports available and load project configuration (`config.rb` located close to the `gulpfile.js`).
+Make Compass imports available and load project configuration.
+
+#### style
+
+Type: `String`  
+Default: `nested`
+
+Output style. Can be nested (default), compact, compressed, or expanded.
+
+#### force
+
+Type: `Boolean`  
+Default: `false`
+
+Recompile every Sass file, even if the CSS file is newer.
+
+#### stopOnError
+
+Type: `Boolean`  
+Default: `false`
+
+If a file fails to compile, exit immediately.
+
+#### defaultEncoding
+
+Type: `String`  
+Default: `false`
+
+Specify the default encoding for input files.
+
+#### unixNewlines
+
+Type: `Boolean`  
+Default: `false`
+
+Use Unix-style newlines in written files on non-Unix systems. Always true on Unix.
 
 #### debugInfo
 
@@ -207,31 +210,47 @@ Default: `false`
 
 Emit comments in the generated CSS indicating the corresponding source line.
 
-#### loadPath
+#### check
 
-Type: `String|Array`
+Type: `Boolean`  
+Default: `false`
 
-One or more Sass import paths, relative to the gulpfile.
+Just check syntax, don't evaluate.
 
-#### require
+#### precision 
 
-Type: `String|Array`
+Type: `Number`  
+Default: `5`
 
-Require one or more Ruby libraries before running Sass.
+How many digits of precision to use when outputting decimal numbers.
 
 #### cacheLocation
 
 Type: `String`  
-Default: `.sass-cache`
+Default: `false`
 
-The path to put cached Sass files.
+The path to save parsed Sass files. Defaults to .sass-cache.
 
 #### noCache
 
 Type: `Boolean`  
 Default: `false`
 
-Don't cache to sassc files.
+Don't cache parsed Sass files.
+
+#### trace
+
+Type: `Boolean`  
+Default: `false`
+
+Show a full Ruby stack trace on error.
+
+#### quiet
+
+Type: `Boolean`  
+Default: `false`
+
+Silence warnings and status messages during compilation.
 
 ## License
 
