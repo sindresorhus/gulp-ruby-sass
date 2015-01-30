@@ -54,6 +54,13 @@ Handle Sass errors with an `on('error', cb)` listener or a plugin like [plumber]
 
 ### Plugin options
 
+#### verbose
+
+Type: `Boolean`  
+Default: `false`  
+
+Gives some extra information for debugging, including the actual spawned Sass command.
+
 #### sourcemap
 
 Type: `Boolean`  
