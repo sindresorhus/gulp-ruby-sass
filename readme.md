@@ -27,16 +27,20 @@ You also need to have [Ruby](http://www.ruby-lang.org/en/downloads/) and [Sass](
 ```js
 var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
+var autoprefixer = require('gulp-autoprefixer');
+var sourcemaps   = require('gulp-sourcemaps');
 
 gulp.task('default', function () {
-	return gulp.src('src/scss/app.scss')
-		.pipe(sass({sourcemap: true, sourcemapPath: '../scss'}))
+	return sass('src/scss/app.scss', {sourcemap: true}))
 		.on('error', function (err) { console.log(err.message); })
+		.pipe(autoprefixer(config.autoprefixer))
+		// Add any other processors that support gulp-sourcemaps here
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('dist/css'));
 });
 ```
 
-Add the files you want to compile to `gulp.src()`.
+`gulp.src().pipe(sass(options))` doesn't cope well with inlining sourcemaps. Use `sass(filename, options)` instead. You will need to run it separately for each source file, because sass does not yet support globbing.
 
 Handle Sass errors with an `on('error', cb)` listener or a plugin like [plumber](https://github.com/floatdrop/gulp-plumber). gulp-ruby-sass throws errors like a gulp plugin, but also passes the erroring Sass files through the stream if you prefer to see the errors in your browser.
 
