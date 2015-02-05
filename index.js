@@ -72,7 +72,7 @@ module.exports = function (options) {
 
 	var stream = intermediate({
 		output: relativeCompileDir,
-		container: options.container || 'gulp-ruby-sass'
+		container: options.container || path.join(process.pid.toString(), 'gulp-ruby-sass')
 	}, function (tempDir, cb, vinylFiles) {
 		// all paths passed to sass must have unix path separators
 		tempDir = slash(tempDir);
