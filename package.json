@@ -54,7 +54,7 @@
     "vinyl": "^0.4.3"
   },
   "devDependencies": {
-    "gulp": "^3.7.0",
+    "gulp": "^3.8.11",
     "gulp-sourcemaps": "^1.2.7",
     "mocha": "*"
   }
