@@ -40,7 +40,7 @@
     "sourcemaps"
   ],
   "dependencies": {
-    "convert-source-map": "^0.4.1",
+    "convert-source-map": "^1.0.0",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",
     "glob": "^4.0.2",
