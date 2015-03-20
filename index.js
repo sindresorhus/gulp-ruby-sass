@@ -1,166 +1,213 @@
 'use strict';
+
 var fs = require('fs');
 var path = require('path');
-var chalk = require('chalk');
+var glob = require('glob');
 var dargs = require('dargs');
 var slash = require('slash');
+var mkdirp = require('mkdirp');
+var rimraf = require('rimraf');
+var spawn = require('win-spawn');
 var gutil = require('gulp-util');
 var assign = require('object-assign');
-var spawn = require('win-spawn');
+var convert = require('convert-source-map');
 var eachAsync = require('each-async');
-var glob = require('glob');
-var intermediate = require('gulp-intermediate');
-var escapeStringRegexp = require('escape-string-regexp');
+var osTempDir = require('os').tmpdir();
 
+var File = require('vinyl');
+var Readable = require('stream').Readable;
 
-function rewriteSourcemapPaths (compileDir, relativePath, cb) {
-	glob(path.join(compileDir, '**/*.map'), function (err, files) {
-		if (err) {
-			cb(err);
-			return;
-		}
-
-		eachAsync(files, function (file, i, next) {
-			fs.readFile(file, function (err, data) {
-				if (err) {
-					next(err);
-					return;
-				}
-
-				var sourceMap = JSON.parse(data);
-				var stepUp = path.relative(path.dirname(file), compileDir);
-
-				// rewrite sourcemaps to point to the original source files
-				sourceMap.sources = sourceMap.sources.map(function (source) {
-					var sourceBase = source.replace(/\.\.\//g, '');
-
-					// normalize to browser style paths if we're on windows
-					return slash(path.join(stepUp, relativePath, sourceBase));
-				});
-
-				fs.writeFile(file, JSON.stringify(sourceMap, null, '  '), next);
-			});
-		}, cb);
-	});
-}
-
-function removePaths(msg, paths) {
-	paths.forEach(function (path) {
-		msg = msg.replace(new RegExp(escapeStringRegexp(path) + '/?', 'g'), '');
-	});
-
+// remove temp directory and line breaks for more Sass-like logging
+function formatMsg (msg, tempDir) {
+	msg = msg.replace(new RegExp((tempDir) + '/?', 'g'), '');
+	msg = msg.trim();
 	return msg;
 }
 
-function createErr(err, opts) {
+// convenience function to create a gulp error
+function newErr (err, opts) {
 	return new gutil.PluginError('gulp-ruby-sass', err, opts);
 }
 
-module.exports = function (options) {
-	var relativeCompileDir = '_14139e58-9ebe-4c0f-beca-73a65bb01ce9';
-	var procDir = process.cwd();
-	options = assign({}, options);
+// for now, source is only a single directory or a single file
+module.exports = function (source, options) {
+	var stream = new Readable({objectMode: true});
+	var cwd = process.cwd();
+	var defaults = {
+		container: 'gulp-ruby-sass',
+		verbose: false,
+		sourcemap: false
+	};
+	var command;
+	var args;
+	var base;
+	var destDir;
+	var destFile;
+	var compileMappings;
+
+	// redundant but necessary
+	stream._read = function () {};
+
+	options = assign(defaults, options);
+
+	// sourcemap can only be true or false; warn those trying to pass a Sass string option
+	if (typeof options.sourcemap !== 'boolean') {
+		throw newErr('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
+	}
+
+	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
+	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
+
+	// sass options need unix style slashes
+	destDir = slash(path.join(osTempDir, options.container));
+
+	// directory source
+	if (path.extname(source) === '') {
+		base = path.join(cwd, source);
+		compileMappings = source + ':' + destDir;
+		options.update = true;
+	}
+	// single file source
+	else {
+		base = path.join(cwd, path.dirname(source));
+		destFile = slash(path.join(destDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
+		compileMappings = [ source, destFile ];
+		mkdirp(destDir);
+	}
+	// TODO: implement glob file source
+
+	args = dargs(options, [
+		'bundleExec',
+		'watch',
+		'poll',
+		'container',
+		'verbose'
+	]).concat(compileMappings);
+
+	if (options.bundleExec) {
+		command = 'bundle';
+		args.unshift('exec', 'sass');
+	} else {
+		command = 'sass';
+	}
 
 	// error handling
-	var sassErrMatcher = /^error/;
-	var noBundlerMatcher = /Gem bundler is not installed/;
-	var noGemfileMatcher = /Could not locate Gemfile/;
-	var noBundleSassMatcher = /bundler: command not found|Could not find gem/;
-	var noSassMatcher = /execvp\(\): No such file or directory|spawn ENOENT/;
-	var bundleErrMsg = 'Gemfile version of Sass not found. Install missing gems with `bundle install`.';
-	var noSassErrMsg = 'spawn ENOENT: Missing the Sass executable. Please install and make available on your PATH.';
+	var matchNoSass = /execvp\(\): No such file or directory|spawn ENOENT/;
+	var msgNoSass = 'Missing the Sass executable. Please install and make available on your PATH.';
+	var matchSassErr = /error\s/;
+	var matchNoBundler = /ERROR: Gem bundler is not installed/;
+	var matchNoGemfile = /Could not locate Gemfile/;
+	var matchNoBundledSass = /bundler: command not found: sass|Could not find gem/;
 
-	var stream = intermediate({
-		output: relativeCompileDir,
-		container: options.container || 'gulp-ruby-sass'
-	}, function (tempDir, cb, vinylFiles) {
-		// all paths passed to sass must have unix path separators
-		tempDir = slash(tempDir);
-		var compileDir = slash(path.join(tempDir, relativeCompileDir));
+	// plugin logging
+	if (options.verbose) {
+		gutil.log('gulp-ruby-sass', 'Running command:', command, args.join(' '));
+	}
 
-		options = options || {};
-		options.update = true;
-		options.loadPath = typeof options.loadPath === 'undefined' ? [] : [].concat(options.loadPath);
+	var sass = spawn(command, args);
 
-		// add loadPaths for each temp file
-		vinylFiles.forEach(function (file) {
-			var loadPath = slash(path.dirname(path.relative(procDir, file.path)));
+	sass.stdout.setEncoding('utf8');
+	sass.stderr.setEncoding('utf8');
 
-			if (options.loadPath.indexOf(loadPath) === -1) {
-				options.loadPath.push(loadPath);
-			}
+	// sass stdout: successful compile messages
+	// bundler stdout: bundler not installed, no gemfile, correct version of sass not installed
+	sass.stdout.on('data', function (data) {
+		var msg = formatMsg(data, destDir);
+		var isError = [
+			matchSassErr,
+			matchNoBundler,
+			matchNoGemfile,
+			matchNoBundledSass
+		].some(function (match) {
+			return match.test(msg);
 		});
 
-		var command;
-		var args = dargs(options, [
-			'bundleExec',
-			'watch',
-			'poll',
-			'sourcemapPath',
-			'container'
-		]);
-
-		args.push(tempDir + ':' + compileDir);
-
-		if (options.bundleExec) {
-			command = 'bundle';
-			args.unshift('exec', 'sass');
+		if (isError) {
+			stream.emit('error', newErr(msg));
 		} else {
-			command = 'sass';
+			gutil.log('gulp-ruby-sass stdout:', msg);
 		}
+	});
 
-		// temporary logging until gulp adds its own
-		if (process.argv.indexOf('--verbose') !== -1) {
-			gutil.log('gulp-ruby-sass:', 'Running command:', chalk.blue(command, args.join(' ')));
+	// sass stderr: warnings, debug statements
+	// bundler stderr: no version of sass installed
+	// spawn stderr: no sass executable
+	sass.stderr.on('data', function (data) {
+		var msg = formatMsg(data, destDir);
+
+		if (matchNoBundledSass.test(msg)) {
+			stream.emit('error', newErr(msg));
 		}
+		else if (!matchNoSass.test(msg)) {
+			gutil.log('gulp-ruby-sass stderr:', msg);
+		}
+	});
 
-		var sass = spawn(command, args);
+	// spawn error: no sass executable
+	sass.on('error', function (err) {
+		if (matchNoSass.test(err)) {
+			err.message = msgNoSass;
+		}
+		stream.emit('error', newErr(err));
+	});
 
-		sass.stdout.setEncoding('utf8');
-		sass.stderr.setEncoding('utf8');
-
-		sass.stdout.on('data', function (data) {
-			var msg = removePaths(data, [tempDir, relativeCompileDir]).trim();
-
-			if (sassErrMatcher.test(msg) || noBundlerMatcher.test(msg) || noGemfileMatcher.test(msg)) {
-				stream.emit('error', createErr(msg, {showStack: false}));
-			} else if (noBundleSassMatcher.test(msg)) {
-				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
-			} else {
-				gutil.log('gulp-ruby-sass:', msg);
+	sass.on('close', function (code) {
+		glob(path.join(destDir, '**', '*'), function (err, files) {
+			if (err) {
+				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 			}
-		});
 
-		sass.stderr.on('data', function (data) {
-			var msg = removePaths(data, [tempDir, relativeCompileDir]).trim();
+			eachAsync(files, function (file, i, next) {
+				if (fs.statSync(file).isDirectory() || path.extname(file) === '.map') {
+					next();
+					return;
+				}
 
-			if (noBundleSassMatcher.test(msg)) {
-				stream.emit('error', createErr(bundleErrMsg, {showStack: false}));
-			} else if (!noSassMatcher.test(msg)) {
-				gutil.log('gulp-ruby-sass: stderr:', msg);
-			}
-		});
-
-		sass.on('error', function (err) {
-			if (noSassMatcher.test(err.message)) {
-				stream.emit('error', createErr(noSassErrMsg, {showStack: false}));
-			} else {
-				stream.emit('error', createErr(err));
-			}
-		});
-
-		sass.on('close', function (code) {
-			if (options.sourcemap && options.sourcemapPath) {
-				rewriteSourcemapPaths(compileDir, options.sourcemapPath, function (err) {
+				fs.readFile(file, function (err, data) {
 					if (err) {
-						stream.emit('error', createErr(err));
+						stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+						next();
+						return;
 					}
 
-					cb();
+					// rewrite file paths so gulp thinks the files came from cwd, not the
+					// OS temp directory
+					var vinylFile = new File({
+						cwd: cwd,
+						base: base,
+						path: file.replace(destDir, base)
+					});
+					var sourcemap;
+
+					// if we are managing sourcemaps and the sourcemap exists
+					if (options.sourcemap === 'file' && fs.existsSync(file + '.map')) {
+						// remove Sass sourcemap comment; gulp-sourcemaps will add it back in
+						data = new Buffer( convert.removeMapFileComments(data.toString()) );
+						sourcemap = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
+
+						// create relative paths for sources
+						sourcemap.sources = sourcemap.sources.map(function (sourcemapSource) {
+							var absoluteSourcePath = decodeURI(path.resolve('/', sourcemapSource.replace('file:///', '')))
+							return path.relative(base, absoluteSourcePath);
+						});
+
+						vinylFile.sourceMap = sourcemap;
+					}
+
+					vinylFile.contents = data;
+					stream.push(vinylFile);
+					next();
+					return;
 				});
-			} else {
-				cb();
-			}
+			}, function () {
+				// cleanup previously generated files for next run
+				// TODO: This kills caching. Keeping will push files through that are not in
+				// the current gulp.src. We need to decide whether to use a Sass style caching
+				// strategy, or a gulp style strategy, and what each would look like.
+				rimraf(destDir, function () {
+					stream.push(null);
+				});
+			});
 		});
 	});
 

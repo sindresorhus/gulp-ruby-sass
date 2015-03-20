@@ -1,6 +1,6 @@
 {
   "name": "gulp-ruby-sass",
-  "version": "0.7.1",
+  "version": "1.0.0",
   "description": "Compile Sass to CSS with Ruby Sass",
   "license": "MIT",
   "repository": "sindresorhus/gulp-ruby-sass",
@@ -40,20 +40,22 @@
     "sourcemaps"
   ],
   "dependencies": {
-    "chalk": "^0.5.1",
+    "convert-source-map": "^0.4.1",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",
-    "escape-string-regexp": "^1.0.1",
     "glob": "^4.0.2",
-    "gulp-intermediate": "3.0.1",
     "gulp-util": "^3.0.0",
+    "mkdirp": "^0.5.0",
+    "object-assign": "^1.0.0",
+    "rimraf": "^2.2.8",
     "slash": "^1.0.0",
+    "vinyl-fs": "^0.3.7",
     "win-spawn": "^2.0.0",
-    "object-assign": "~1.0.0"
+    "vinyl": "^0.4.3"
   },
   "devDependencies": {
     "gulp": "^3.7.0",
-    "gulp-add": "0.0.2",
+    "gulp-sourcemaps": "^1.2.7",
     "mocha": "*"
   }
 }

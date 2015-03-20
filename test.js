@@ -1,148 +1,264 @@
 'use strict';
 
-var assert = require('assert');
-var gulp = require('gulp');
+var fs = require('fs');
 var sass = require('./');
-var EOL = require('os').EOL;
 var path = require('path');
+var assert = require('assert');
+var convert = require('convert-source-map');
+var sourcemaps = require('gulp-sourcemaps');
 
-var addSourcemapComment = function (name, contents) {
-	return contents + EOL + '/*# sourceMappingURL=' + name + '.css.map */' + EOL;
-};
-
-var results = [
-	'h1 .link {' + EOL +
-	'  color: green; }' + EOL + EOL +
-	'html {'  + EOL +
-	'  font-size: 16px;'  + EOL +
-	'  line-height: 24px; }' + EOL + EOL +
-	'body {' + EOL +
-	'  color: black;' + EOL +
-	'  content: \'local imported mixin\';' + EOL +
-	'  content: \'component mixin\'; }' + EOL,
-
-	'h1 .link {' + EOL +
-	'  color: green; }' + EOL + EOL +
-	'h2 {' + EOL +
-	'  content: \'component mixin\'; }' + EOL
+var expectedSources = [
+	'_obj-1.scss,_partial-1.scss,component/_obj-2.scss,fixture-a.scss',
+	'_partial-1.scss,component/_obj-2.scss,nested/fixture-b.scss'
 ];
 
-it('compiles Sass', function (done) {
-	this.timeout(20000);
+var expectedFixtureAContents = fs.readFileSync('fixture/result/fixture-a.css', {encoding: 'utf8'});
+var expectedFixtureBContents = fs.readFileSync('fixture/result/nested/fixture-b.css', {encoding: 'utf8'});
 
-	var files = [];
-
-	gulp.src([
-		'fixture/fixture-a.scss',
-		'fixture/nested/fixture-b.scss'
-	], { base: '.' })
-
-	.pipe(sass({ quiet: true, sourcemap: 'none' }))
-
-	.on('data', function (data) {
-		files.push(data);
-	})
-
-	.on('end', function () {
-		// file path
-		assert.equal(files[0].relative, path.join('fixture', 'fixture-a.css'));
-		assert.equal(files[1].relative, path.join('fixture', 'nested', 'fixture-b.css'));
-
-		// css content
-		assert.equal(files[0].contents.toString(), results[0]);
-		assert.equal(files[1].contents.toString(), results[1]);
-
-		// ouptuts correct number of files
-		assert.equal(files.length, 2);
-
-		done();
+function getCssFiles (files) {
+	return files.filter(function (file) {
+		return path.extname(file.path) === '.css';
 	});
-});
+}
 
-it('compiles Sass with sourcemaps', function (done) {
+function getErrorFiles (files) {
+	return files.filter(function (file) {
+		return /Error: File to import not found or unreadable/.test(file.contents.toString());
+	});
+}
+
+function getSourceMapFiles (files) {
+	return files.filter(function (file) {
+		return path.extname(file.path) === '.map';
+	});
+}
+
+function getValidCssFiles (files) {
+	return rejectFromArray(getCssFiles(files), getErrorFiles(files));
+}
+
+function rejectFromArray (baseArray, rejectArray) {
+	return baseArray.filter(function (value) {
+		return rejectArray.indexOf(value) === -1
+	});
+}
+
+it('compiles Sass from file source', function (done) {
 	this.timeout(20000);
 
 	var files = [];
 
-	gulp.src([
-		'fixture/fixture-a.scss',
-		'fixture/nested/fixture-b.scss'
-	], { base: '.' })
-
-	.pipe(sass({
+	sass('fixture/source/fixture-a.scss', {
 		quiet: true,
-		sourcemapPath: '../css'
-  }))
+		unixNewlines: true
+	})
 
 	.on('data', function (data) {
 		files.push(data);
 	})
 
 	.on('end', function () {
-		var maps = [
-			JSON.parse(files[1].contents.toString()),
-			JSON.parse(files[3].contents.toString())
-		];
+		// number of files
+		assert.equal(files.length, 1);
 
-		// TODO: Fix import source paths, remove absolute path
-		// var sources = [
-		// 	[
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-		// 		"../../css/fixture/fixture-a.scss",
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_obj-1.scss",
-		// 		"../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-		// 	],
-		// 	[
-		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/_partial-1.scss",
-		// 		"../../../css/fixture/nested/fixture-b.scss",
-		// 		"../../../css/Users/robw/Documents/Contrib/gulp-ruby-sass/fixture/component/_obj-2.scss"
-		// 	]
-		// ]
+		// file paths
+		assert.equal(files[0].relative, 'fixture-a.css');
 
-		// file path
-		assert.equal(files[1].relative, path.join('fixture', 'fixture-a.css.map'));
-		assert.equal(files[3].relative, path.join('fixture', 'nested', 'fixture-b.css.map'));
-
-		// css content
-		assert.equal(files[0].contents.toString(), addSourcemapComment('fixture-a', results[0]));
-		assert.equal(files[2].contents.toString(), addSourcemapComment('fixture-b', results[1]));
-
-		// map content
-		assert.equal(maps[0].version, 3);
-		assert.equal(maps[0].file, 'fixture-a.css');
-		assert.equal(maps[1].file, 'fixture-b.css');
-
-		// TODO: Fix import source paths
-		// assert.deepEqual(maps[0].sources, sources[0]);
-		// assert.deepEqual(maps[1].sources, sources[1]);
-
-		// ouptuts correct number of files
-		assert.equal(files.length, 4);
+		// file contents
+		assert.equal(files[0].contents.toString(), expectedFixtureAContents);
 
 		done();
 	});
 });
 
-it('emits errors but still streams file on Sass error', function (done) {
+it('compiles Sass from directory source', function (done) {
 	this.timeout(20000);
 
-	var errMsgMatcher = new RegExp('File to import not found or unreadable: i-dont-exist.');
+	var files = [];
 
-	gulp.src('fixture/fixture-error.scss')
+	sass('fixture/source', {
+		quiet: true,
+		unixNewlines: true
+	})
 
-	.pipe(sass())
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		// number of files
+		assert.equal(files.length, 3);
+
+		// file paths
+		assert.deepEqual(
+			[ files[0].relative, files[1].relative, files[2].relative ].sort(),
+			[ 'fixture-error.css', 'fixture-a.css', path.join('nested', 'fixture-b.css') ].sort()
+		);
+
+		// find the compile error file and remove it from the array
+		var validCssFiles = getValidCssFiles(files);
+		assert.equal(validCssFiles.length, 2);
+
+		// correctly compiled file contents
+		assert.deepEqual(
+		  [
+				validCssFiles[0].contents.toString(),
+				validCssFiles[1].contents.toString(),
+			].sort(),
+			[
+				expectedFixtureAContents,
+				expectedFixtureBContents
+			].sort()
+		);
+
+		done();
+	});
+});
+
+it('doesn\'t stream map files', function (done) {
+	this.timeout(20000);
+
+	var files = [];
+
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: true
+	})
+
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		// number of files
+		assert.equal(files.length, 3);
+		done();
+	});
+});
+
+it('outputs sourcemap files', function (done) {
+	this.timeout(20000);
+
+	var files = [];
+
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: true
+	})
+
+	.pipe(sourcemaps.write('../maps', {
+		includeContent: false,
+		sourceRoot: '/fixture/source'
+	}))
+
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		var sourceMapFiles = getSourceMapFiles(files);
+		assert.equal(sourceMapFiles.length, 2);
+
+		var validCssFiles = getValidCssFiles(files);
+		assert.equal(validCssFiles.length, 2);
+
+		sourceMapFiles.forEach(function (file) {
+			var sourcemap = JSON.parse(file.contents.toString());
+			// check object is sourcemap
+			assert.equal(sourcemap.version, 3)
+			// check sourcemap points to the correct files
+			assert.notEqual(expectedSources.indexOf(sourcemap.sources.sort().join(',')), -1);
+		});
+
+		done();
+	});
+});
+
+it('outputs inline sourcemaps', function (done) {
+	this.timeout(20000);
+
+	var files = [];
+
+	sass('fixture/source', {
+		quiet: true,
+		sourcemap: true
+	})
+
+	.pipe(sourcemaps.write())
+
+	.on('data', function (data) {
+		files.push(data);
+	})
+
+	.on('end', function () {
+		var sourceMapFiles = getSourceMapFiles(files);
+		assert.equal(sourceMapFiles.length, 0);
+
+		var validCssFiles = getValidCssFiles(files);
+		assert.equal(validCssFiles.length, 2);
+
+		validCssFiles.forEach(function (file) {
+			var sourcemap = convert.fromSource(file.contents.toString()).sourcemap;
+			// check object is sourcemap
+			assert.equal(sourcemap.version, 3);
+			// check sourcemap points to the correct files
+			assert.notEqual(expectedSources.indexOf(sourcemap.sources.sort().join(',')), -1);
+		});
+
+		done();
+	});
+});
+
+it('outputs correct sourcemap paths for files and paths containing spaces', function (done) {
+	this.timeout(20000);
+
+	var file;
+
+	sass('fixture/source/directory with spaces/_partial with spaces.scss', {
+		quiet: true,
+		sourcemap: true
+	})
+
+	.pipe(sourcemaps.write())
+
+	.on('data', function (data) {
+		file = data;
+	})
+
+	.on('end', function () {
+		var sourcemap = convert.fromSource(file.contents.toString()).sourcemap;
+		// check object is sourcemap
+		assert.equal(sourcemap.version, 3);
+		// check sourcemap points to the correct file
+		assert.deepEqual(sourcemap.sources, ['_partial with spaces.scss']);
+
+		done();
+	});
+});
+
+it('emits errors but streams file on Sass error', function (done) {
+	this.timeout(20000);
+
+	var matchErrMsg = new RegExp('File to import not found or unreadable: i-dont-exist.');
+	var errFileExists;
+
+	sass('fixture/source', {
+		quiet: true,
+		unixNewlines: true
+	})
 
 	.on('error', function (err) {
 		// throws an error
-		assert(errMsgMatcher.test(err.message));
+		assert(matchErrMsg.test(err.message));
 	})
 
 	.on('data', function (file) {
-		// still pushes the compiled erroring css file through
-		assert(errMsgMatcher.test(file.contents.toString()));
+		// streams the erroring css file
+		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString());
 	})
 
 	.on('end', function () {
+		assert(errFileExists);
 		done();
 	});
 });
