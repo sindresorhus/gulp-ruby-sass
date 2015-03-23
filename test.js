@@ -236,13 +236,65 @@ it('outputs correct sourcemap paths for files and paths containing spaces', func
 	});
 });
 
-it('emits errors but streams file on Sass error', function (done) {
+it('emits errors but streams file on Sass error (directory)', function (done) {
 	this.timeout(20000);
+	
+	var errorEvent = false;
+	var dataEvent = false;
+	var endEvent = false;
 
 	var matchErrMsg = new RegExp('File to import not found or unreadable: i-dont-exist.');
 	var errFileExists;
 
+	setTimeout(function () {
+    assert(errorEvent, 'Error event did not fire in 1000 ms.');
+		assert(dataEvent, 'Data event did not fire in 1000 ms.');
+		assert(endEvent, 'End event did not fire in 1000 ms.');
+    done();
+  }, 2000);
+
 	sass('fixture/source', {
+		quiet: true,
+		unixNewlines: true,
+		verbose: true
+	})
+
+	.on('error', function (err) {
+		// throws an error
+		assert(matchErrMsg.test(err.message));
+		errorEvent = true;
+	})
+
+	.on('data', function (file) {
+		// streams the erroring css file
+		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString());
+		dataEvent = true;
+	})
+
+	.on('end', function () {
+		assert(errFileExists);
+		endEvent = true;
+	});
+});
+
+it('emits errors but streams file on Sass error (single file)', function (done) {
+	this.timeout(20000);
+	
+	var errorEvent = false;
+	var dataEvent = false;
+	var endEvent = false;
+
+	var matchErrMsg = new RegExp('File to import not found or unreadable: i-dont-exist.');
+	var errFileExists;
+
+	setTimeout(function () {
+    assert(errorEvent, 'Error event did not fire in 1000 ms.');
+		assert(dataEvent, 'Data event did not fire in 1000 ms.');
+		assert(endEvent, 'End event did not fire in 1000 ms.');
+    done();
+  }, 2000);
+
+	sass('fixture/source/fixture-error.scss', {
 		quiet: true,
 		unixNewlines: true
 	})
@@ -250,15 +302,17 @@ it('emits errors but streams file on Sass error', function (done) {
 	.on('error', function (err) {
 		// throws an error
 		assert(matchErrMsg.test(err.message));
+		errorEvent = true;
 	})
 
 	.on('data', function (file) {
 		// streams the erroring css file
 		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString());
+		dataEvent = true;
 	})
 
 	.on('end', function () {
 		assert(errFileExists);
-		done();
+		endEvent = true;
 	});
 });
