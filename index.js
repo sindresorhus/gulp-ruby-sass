@@ -56,7 +56,7 @@ module.exports = function (source, options) {
 	}
 
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
-	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
+	options.sourcemap = options.sourcemap === true ? 'file' : false;
 
 	// sass options need unix style slashes
 	destDir = slash(path.join(osTempDir, options.container));
