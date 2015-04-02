@@ -142,10 +142,10 @@ The docs below list common options for convenience. Run `sass -h` for the comple
 
 #### loadPath
 
-Type: `String`  
+Type: `String|Array`  
 Default: `false`
 
-Specify a Sass import path.
+Specify one or more Sass import paths.
 
 #### require
 
