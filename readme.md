@@ -3,13 +3,15 @@
 Compiles Sass with [the Sass gem](http://sass-lang.com/install).  
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
+
 ## Install
 
-You must have [Sass >= 3.4](http://sass-lang.com/install).
+You must have [Sass >=3.4](http://sass-lang.com/install).
 
-```sh
+```
 $ npm install --save-dev gulp-ruby-sass
 ```
+
 
 ## Important!
 
@@ -19,6 +21,7 @@ $ npm install --save-dev gulp-ruby-sass
 - gulp-ruby-sass doesn't support incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 - gulp-ruby-sass doesn't alter Sass's output in any way. Problems with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
+
 ## Usage
 
 Use gulp-ruby-sass instead of `gulp.src` to compile a file or directory.  
@@ -27,7 +30,7 @@ Use gulp-ruby-sass instead of `gulp.src` to compile a file or directory.
 var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
-gulp.task('sass', function() {
+gulp.task('sass', function () {
 	return sass('source/') 
 	.on('error', function (err) {
 	  console.error('Error!', err.message);
@@ -142,115 +145,116 @@ The docs below list common options for convenience. Run `sass -h` for the comple
 
 #### loadPath
 
-Type: `String|Array`  
+Type: `string`, `array`  
 Default: `false`
 
-Specify one or more Sass import paths.
+Import paths.
 
 #### require
 
-Type: `String`  
+Type: `string`  
 Default: `false`
 
 Require a Ruby library before running Sass.
 
 #### compass
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Make Compass imports available and load project configuration.
 
 #### style
 
-Type: `String`  
+Type: `string`  
 Default: `nested`
 
 Output style. Can be nested (default), compact, compressed, or expanded.
 
 #### force
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Recompile every Sass file, even if the CSS file is newer.
 
 #### stopOnError
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 If a file fails to compile, exit immediately.
 
 #### defaultEncoding
 
-Type: `String`  
+Type: `string`  
 Default: `false`
 
 Specify the default encoding for input files.
 
 #### unixNewlines
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Use Unix-style newlines in written files on non-Unix systems. Always true on Unix.
 
 #### debugInfo
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Emit output that can be used by the FireSass Firebug plugin.
 
 #### lineNumbers
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Emit comments in the generated CSS indicating the corresponding source line.
 
 #### check
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Just check syntax, don't evaluate.
 
 #### precision 
 
-Type: `Number`  
+Type: `number`  
 Default: `5`
 
 How many digits of precision to use when outputting decimal numbers.
 
 #### cacheLocation
 
-Type: `String`  
+Type: `string`  
 Default: `false`
 
 The path to save parsed Sass files. Defaults to .sass-cache.
 
 #### noCache
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Don't cache parsed Sass files.
 
 #### trace
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Show a full Ruby stack trace on error.
 
 #### quiet
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Silence warnings and status messages during compilation.
+
 
 ## License
 
