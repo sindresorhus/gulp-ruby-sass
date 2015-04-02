@@ -74,7 +74,12 @@ module.exports = function (source, options) {
 		compileMappings = [ source, destFile ];
 		mkdirp(destDir);
 	}
-	// TODO: implement glob file source
+
+	var useGlobbing = false;
+	if (options.globbing === true) {
+		useGlobbing = true;
+		delete options.globbing;
+	}
 
 	args = dargs(options, [
 		'bundleExec',
@@ -83,6 +88,10 @@ module.exports = function (source, options) {
 		'container',
 		'verbose'
 	]).concat(compileMappings);
+
+	if (useGlobbing) {
+		args.push('-r', 'sass-globbing');
+	}
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -98,6 +107,8 @@ module.exports = function (source, options) {
 	var matchNoBundler = /ERROR: Gem bundler is not installed/;
 	var matchNoGemfile = /Could not locate Gemfile/;
 	var matchNoBundledSass = /bundler: command not found: sass|Could not find gem/;
+	var matchNoGlobbingGem = /cannot load such file -- sass-globbing/;
+	var msgNoGlobbingGem = 'Missing the sass-globbing gem. Please run `[sudo] gem install sass-globbing`';
 
 	// plugin logging
 	if (options.verbose) {
@@ -117,7 +128,8 @@ module.exports = function (source, options) {
 			matchSassErr,
 			matchNoBundler,
 			matchNoGemfile,
-			matchNoBundledSass
+			matchNoBundledSass,
+			matchNoGlobbingGem
 		].some(function (match) {
 			return match.test(msg);
 		});
@@ -137,6 +149,9 @@ module.exports = function (source, options) {
 
 		if (matchNoBundledSass.test(msg)) {
 			stream.emit('error', newErr(msg));
+		}
+		else if (matchNoGlobbingGem.test(msg)) {
+			stream.emit('error', newErr(msgNoGlobbingGem));
 		}
 		else if (!matchNoSass.test(msg)) {
 			gutil.log('gulp-ruby-sass stderr:', msg);
