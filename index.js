@@ -94,7 +94,7 @@ module.exports = function (source, options) {
 	// error handling
 	var matchNoSass = /execvp\(\): No such file or directory|spawn ENOENT/;
 	var msgNoSass = 'Missing the Sass executable. Please install and make available on your PATH.';
-	var matchSassErr = /error\s/;
+	var matchSassErr = /[e,E]rror[\s,:]/;
 	var matchNoBundler = /ERROR: Gem bundler is not installed/;
 	var matchNoGemfile = /Could not locate Gemfile/;
 	var matchNoBundledSass = /bundler: command not found: sass|Could not find gem/;
@@ -134,8 +134,15 @@ module.exports = function (source, options) {
 	// spawn stderr: no sass executable
 	sass.stderr.on('data', function (data) {
 		var msg = formatMsg(data, destDir);
+		
+		var isError = [
+			matchSassErr,
+			matchNoBundledSass
+		].some(function (match) {
+			return match.test(msg);
+		});
 
-		if (matchNoBundledSass.test(msg)) {
+		if (isError) {
 			stream.emit('error', newErr(msg));
 		}
 		else if (!matchNoSass.test(msg)) {
