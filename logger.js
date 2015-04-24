@@ -8,30 +8,36 @@ function prettifyDirectoryLogging (msg, tempDir) {
 
 module.exports = {
 	verbose: function  (command, args) {
-		console.log("Running command " + command + " " + args.join(" "));
+		gutil.log('Running command ' + command + ' ' + args.join(' '));
 	},
 
 	stdout: function (data, tempDir, stream) {
 		// Bundler error: no Sass version found
 		if (/bundler: command not found: sass/.test(data)) {
-			stream.emit('error', new Error("bundler: command not found: sass"));
+			stream.emit('error', new gutil.PluginError(
+				'gulp-ruby-sass',
+				'bundler: command not found: sass'
+			));
 		}
 
 		// Bundler error: Gemfile not found
 		else if (/Could not locate Gemfile or .bundle\/ directory/.test(data)) {
-			stream.emit('error', new Error("bundler: could not locate Gemfile or .bundle directory"));
+			stream.emit('error', new gutil.PluginError(
+				'gulp-ruby-sass',
+				'bundler: could not locate Gemfile or .bundle directory'
+			));
 		}
 
 		// Sass error: directory missing
 		else if (/No such file or directory @ rb_sysopen/.test(data)) {
-			stream.emit('error', new Error(data.trim()));
+			stream.emit('error', new gutil.PluginError('gulp-ruby-sass', data.trim()));
 		}
 
 		// Not an error: Sass logging
 		else {
 			data = prettifyDirectoryLogging(data, tempDir);
 			data = data.trim()
-			console.log(data);
+			gutil.log(data);
 		}
 	},
 
@@ -41,35 +47,40 @@ module.exports = {
 
 		// Ruby error: Bundler gem not installed
 		if (bundlerMissing) {
-			stream.emit('error', new Error(
-				"ruby: Could not find 'bundler' (" + bundlerMissing[1] + ")."
+			stream.emit('error', new gutil.PluginError(
+				'gulp-ruby-sass',
+				'ruby: Could not find \'bundler\' (' + bundlerMissing[1] + ').'
 			));
 		}
 
 		// Bundler error: no matching Sass version
 		else if (sassVersionMissing) {
-			stream.emit('error', new Error(
-				"bundler: Could not find gem 'sass (" + sassVersionMissing[1] + ")'."
+			stream.emit('error', new gutil.PluginError(
+				'gulp-ruby-sass',
+				'bundler: Could not find gem \'sass (' + sassVersionMissing[1] + ')\'.'
 			));
 		}
 
 		// Sass error: file missing
 		else if (/No such file or directory @ rb_sysopen/.test(data)) {
-			stream.emit('error', new Error(data.trim()));
+			stream.emit('error', new gutil.PluginError('gulp-ruby-sass', data.trim()));
 		}
 
 		// Not an error: Sass warnings, debug statements
 		else {
 			data = prettifyDirectoryLogging(data, tempDir);
 			data = data.trim()
-			console.log(data);
+			gutil.log(data);
 		}
 	},
 
 	error: function (err, stream) {
 		// Spawn error: bundle or sass not installed
 		if (err.code === 'ENOENT') {
-			stream.emit('error', new Error('Gem ' + err.path + ' is not installed.'));
+			stream.emit('error', new gutil.PluginError(
+				'gulp-ruby-sass',
+				'Gem ' + err.path + ' is not installed.'
+			));
 		}
 
 		// Other errors
