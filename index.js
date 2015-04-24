@@ -31,7 +31,7 @@ module.exports = function (source, options) {
 	var command;
 	var args;
 	var base;
-	var destDir;
+	var tempDir;
 	var destFile;
 	var compileMappings;
 
@@ -49,20 +49,20 @@ module.exports = function (source, options) {
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
 	// sass options need unix style slashes
-	destDir = slash(path.join(osTempDir, options.container));
+	tempDir = slash(path.join(osTempDir, options.container));
 
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMappings = source + ':' + destDir;
+		compileMappings = source + ':' + tempDir;
 		options.update = true;
 	}
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
-		destFile = slash(path.join(destDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
+		destFile = slash(path.join(tempDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
 		compileMappings = [ source, destFile ];
-		mkdirp(destDir);
+		mkdirp(tempDir);
 	}
 	// TODO: implement glob file source
 
@@ -92,11 +92,11 @@ module.exports = function (source, options) {
 	sass.stderr.setEncoding('utf8');
 
 	sass.stdout.on('data', function (data) {
-		logger.stdout(data, destDir, stream);
+		logger.stdout(data, tempDir, stream);
 	});
 
 	sass.stderr.on('data', function (data) {
-		logger.stderr(data, destDir, stream);
+		logger.stderr(data, tempDir, stream);
 	});
 
 	sass.on('error', function (err) {
@@ -104,7 +104,7 @@ module.exports = function (source, options) {
 	});
 
 	sass.on('close', function (code) {
-		glob(path.join(destDir, '**', '*'), function (err, files) {
+		glob(path.join(tempDir, '**', '*'), function (err, files) {
 			if (err) {
 				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 			}
@@ -127,7 +127,7 @@ module.exports = function (source, options) {
 					var vinylFile = new File({
 						cwd: cwd,
 						base: base,
-						path: file.replace(destDir, base)
+						path: file.replace(tempDir, base)
 					});
 					var sourcemap;
 
@@ -156,7 +156,7 @@ module.exports = function (source, options) {
 				// TODO: This kills caching. Keeping will push files through that are not in
 				// the current gulp.src. We need to decide whether to use a Sass style caching
 				// strategy, or a gulp style strategy, and what each would look like.
-				rimraf(destDir, function () {
+				rimraf(tempDir, function () {
 					stream.push(null);
 				});
 			});
