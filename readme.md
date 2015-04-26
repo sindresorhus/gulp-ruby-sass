@@ -16,8 +16,8 @@ $ npm install --save-dev gulp-ruby-sass
 ## Important!
 
 - gulp-ruby-sass is a gulp source adapter. Use it instead of `gulp.src`.
+- Since it's a source adapter you need to catch errors on the stream itself instead of using a package like plumber. See the Usage section for examples.
 - gulp-ruby-sass doesn't support globs yet, only single files or directories. Just like Sass.
-- gulp-ruby-sass doesn't support managing errors with plumber yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/164)).
 - gulp-ruby-sass doesn't support incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 - gulp-ruby-sass doesn't alter Sass's output in any way. Problems with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
