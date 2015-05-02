@@ -1,7 +1,7 @@
 'use strict';
-
 var fs = require('fs');
 var path = require('path');
+var Readable = require('stream').Readable;
 var glob = require('glob');
 var dargs = require('dargs');
 var slash = require('slash');
@@ -14,11 +14,8 @@ var convert = require('convert-source-map');
 var eachAsync = require('each-async');
 var osTempDir = require('os').tmpdir();
 var pathExists = require('path-exists');
-
-var logger = require('./logger')
-
 var File = require('vinyl');
-var Readable = require('stream').Readable;
+var logger = require('./logger')
 
 // for now, source is only a single directory or a single file
 module.exports = function (source, options) {

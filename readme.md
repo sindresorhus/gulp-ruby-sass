@@ -31,11 +31,11 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('sass', function () {
-	return sass('source/') 
-	.on('error', function (err) {
-	  console.error('Error!', err.message);
-   })
-	.pipe(gulp.dest('result'));
+	return sass('source/')
+		.on('error', function (err) {
+			console.error('Error!', err.message);
+		})
+		.pipe(gulp.dest('result'));
 });
 ```
 
@@ -51,24 +51,24 @@ Handle Sass errors with an `on('error', cb)` listener. gulp-ruby-sass throws err
 
 #### verbose
 
-Type: `Boolean`  
-Default: `false`  
+Type: `boolean`  
+Default: `false`
 
 Gives some extra information for debugging, including the actual spawned Sass command.
 
 #### bundleExec
 
-Type: `Boolean`  
+Type: `boolean`  
 Default: `false`
 
 Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
 
 #### sourcemap
 
-Type: `Boolean`  
-Default: `false`  
+Type: `boolean`  
+Default: `false`
 
-Requires Sass `>= 3.4` and [gulp-sourcemaps](https://github.com/floridoo/gulp-sourcemaps).  
+Requires Sass `>=3.4` and [`gulp-sourcemaps`](https://github.com/floridoo/gulp-sourcemaps).
 
 *Inline sourcemaps* are recommended, as they "just work".
 
@@ -77,19 +77,17 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 var sourcemaps = require('gulp-sourcemaps');
 
-gulp.task('sass', function() {
-	return sass('source', { sourcemap: true })
-	.on('error', function (err) {
-	  console.error('Error', err.message);
-   })
-
-	.pipe(sourcemaps.write())
-
-	.pipe(gulp.dest('result'));
+gulp.task('sass', function () {
+	return sass('source', {sourcemap: true})
+		.on('error', function (err) {
+			console.error('Error!', err.message);
+		})
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('result'));
 });
 ```
 
-*File sourcemaps* require you to serve the sourcemap location so the browser can read the files. See the [gulp-sourcemaps readme](https://github.com/floridoo/gulp-sourcemaps) for more info.
+*File sourcemaps* require you to serve the sourcemap location so the browser can read the files. See the [`gulp-sourcemaps` readme](https://github.com/floridoo/gulp-sourcemaps) for more info.
 
 ```js
 gulp.task('sass', function() {
@@ -118,20 +116,20 @@ Name of the temporary directory used to process files. If you're running multipl
 var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
-gulp.task('sass-app', function() {
-	return sass('source/app.scss', { container: 'gulp-ruby-sass-app' })
-	.on('error', function (err) {
-	  console.error('Error', err.message);
-   })
-	.pipe(gulp.dest('result/app'));
+gulp.task('sass-app', function () {
+	return sass('source/app.scss', {container: 'gulp-ruby-sass-app'})
+		.on('error', function (err) {
+			console.error('Error!', err.message);
+		})
+		.pipe(gulp.dest('result/app'));
 });
 
-gulp.task('sass-site', function() {
-	return sass('source/site.scss', { container: 'gulp-ruby-sass-site' })
-	.on('error', function (err) {
-	  console.error('Error', err.message);
-   })
-	.pipe(gulp.dest('result/site'));
+gulp.task('sass-site', function () {
+	return sass('source/site.scss', {container: 'gulp-ruby-sass-site'})
+		.on('error', function (err) {
+			console.error('Error!', err.message);
+		})
+		.pipe(gulp.dest('result/site'));
 });
 
 gulp.task('sass', ['sass-app', 'sass-site']);
@@ -139,7 +137,7 @@ gulp.task('sass', ['sass-app', 'sass-site']);
 
 ### Sass options
 
-Any other options are passed directly to the Sass executable. gulp options are camelCase versions of Sass's dashed-case options.
+Any other options are passed directly to the Sass executable. The options are camelCase versions of Sass's dashed-case options.
 
 The docs below list common options for convenience. Run `sass -h` for the complete list.
 
