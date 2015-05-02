@@ -13,6 +13,7 @@ var assign = require('object-assign');
 var convert = require('convert-source-map');
 var eachAsync = require('each-async');
 var osTempDir = require('os').tmpdir();
+var pathExists = require('path-exists');
 
 var logger = require('./logger')
 
@@ -132,7 +133,7 @@ module.exports = function (source, options) {
 					var sourcemap;
 
 					// if we are managing sourcemaps and the sourcemap exists
-					if (options.sourcemap === 'file' && fs.existsSync(file + '.map')) {
+					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
 						// remove Sass sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer( convert.removeMapFileComments(data.toString()) );
 						sourcemap = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
