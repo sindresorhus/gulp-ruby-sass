@@ -12,10 +12,11 @@ var gutil = require('gulp-util');
 var assign = require('object-assign');
 var convert = require('convert-source-map');
 var eachAsync = require('each-async');
-var osTempDir = require('os').tmpdir();
+var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 var File = require('vinyl');
-var logger = require('./logger')
+var logger = require('./logger');
+var TMP_DIR = osTmpdir();
 
 // for now, source is only a single directory or a single file
 module.exports = function (source, options) {
@@ -47,7 +48,7 @@ module.exports = function (source, options) {
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
 	// sass options need unix style slashes
-	tempDir = slash(path.join(osTempDir, options.container));
+	tempDir = slash(path.join(TMP_DIR, options.container));
 
 	// directory source
 	if (path.extname(source) === '') {
