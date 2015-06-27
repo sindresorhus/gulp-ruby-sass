@@ -16,6 +16,7 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 var File = require('vinyl');
 var logger = require('./logger');
+var md5Hex = require('md5-hex');
 
 // for now, source is only a single directory or a single file
 module.exports = function (source, options) {
@@ -23,7 +24,6 @@ module.exports = function (source, options) {
 	var cwd = process.cwd();
 	var defaults = {
 		tempDir: osTmpdir(),
-		container: 'gulp-ruby-sass',
 		verbose: false,
 		sourcemap: false
 	};
@@ -47,8 +47,13 @@ module.exports = function (source, options) {
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
+	// create temporary directory path for the task using current working
+	// directory, source and options
 	// sass options need unix style slashes
-	intermediateDir = slash(path.join(options.tempDir, options.container));
+	intermediateDir = slash(path.join(
+		options.tempDir,
+		'gulp-ruby-sass-' + md5Hex(process.cwd()) + md5Hex(source + JSON.stringify(options))
+	));
 
 	// directory source
 	if (path.extname(source) === '') {
@@ -70,7 +75,6 @@ module.exports = function (source, options) {
 		'watch',
 		'poll',
 		'tempDir',
-		'container',
 		'verbose'
 	]).concat(compileMappings);
 
