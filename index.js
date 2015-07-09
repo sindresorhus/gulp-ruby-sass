@@ -41,7 +41,7 @@ module.exports = function (source, options) {
 
 	// sourcemap can only be true or false; warn those trying to pass a Sass string option
 	if (typeof options.sourcemap !== 'boolean') {
-		throw newErr('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
+		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
