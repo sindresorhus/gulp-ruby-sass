@@ -105,19 +105,26 @@ gulp.task('sass', function() {
 });
 ```
 
+#### tempDir
+
+Type: `String`  
+Default: the OS temp directory as reported by [os-tempDir](https://github.com/sindresorhus/os-tmpdir)
+
+This plugin compiles Sass files to a temporary directory before pushing them through the stream. Use `tempDir` to choose an alternate directory if you aren't able to use the default OS temporary directory.
+
 #### container
 
 Type: `String`  
 Default: `gulp-ruby-sass`
 
-Name of the temporary directory used to process files. If you're running multiple instances of gulp-ruby-sass at once, specify a separate container for each task to avoid files mixing together.
+If you only have a single gulp-ruby-sass task you can ignore this option. If you're running multiple gulp-ruby-sass tasks at once you must specify a separate `container` for each task to avoid file collisions. The value is appended to the `tempDir` option.
 
 ```js
 var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('sass-app', function () {
-	return sass('source/app.scss', {container: 'gulp-ruby-sass-app'})
+	return sass('source/app.scss', {container: 'app'})
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
@@ -125,7 +132,7 @@ gulp.task('sass-app', function () {
 });
 
 gulp.task('sass-site', function () {
-	return sass('source/site.scss', {container: 'gulp-ruby-sass-site'})
+	return sass('source/site.scss', {container: 'site'})
 		.on('error', function (err) {
 			console.error('Error!', err.message);
 		})
