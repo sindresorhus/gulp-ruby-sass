@@ -16,13 +16,13 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 var File = require('vinyl');
 var logger = require('./logger');
-var TMP_DIR = osTmpdir();
 
 // for now, source is only a single directory or a single file
 module.exports = function (source, options) {
 	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
 	var defaults = {
+		tempDir: osTmpdir(),
 		container: 'gulp-ruby-sass',
 		verbose: false,
 		sourcemap: false
@@ -30,7 +30,7 @@ module.exports = function (source, options) {
 	var command;
 	var args;
 	var base;
-	var tempDir;
+	var intermediateDir;
 	var destFile;
 	var compileMappings;
 
@@ -48,20 +48,20 @@ module.exports = function (source, options) {
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
 	// sass options need unix style slashes
-	tempDir = slash(path.join(TMP_DIR, options.container));
+	intermediateDir = slash(path.join(options.tempDir, options.container));
 
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMappings = source + ':' + tempDir;
+		compileMappings = source + ':' + intermediateDir;
 		options.update = true;
 	}
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
-		destFile = slash(path.join(tempDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
+		destFile = slash(path.join(intermediateDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
 		compileMappings = [ source, destFile ];
-		mkdirp(tempDir);
+		mkdirp(intermediateDir);
 	}
 	// TODO: implement glob file source
 
@@ -69,6 +69,7 @@ module.exports = function (source, options) {
 		'bundleExec',
 		'watch',
 		'poll',
+		'tempDir',
 		'container',
 		'verbose'
 	]).concat(compileMappings);
@@ -91,11 +92,11 @@ module.exports = function (source, options) {
 	sass.stderr.setEncoding('utf8');
 
 	sass.stdout.on('data', function (data) {
-		logger.stdout(data, tempDir, stream);
+		logger.stdout(data, intermediateDir, stream);
 	});
 
 	sass.stderr.on('data', function (data) {
-		logger.stderr(data, tempDir, stream);
+		logger.stderr(data, intermediateDir, stream);
 	});
 
 	sass.on('error', function (err) {
@@ -103,7 +104,7 @@ module.exports = function (source, options) {
 	});
 
 	sass.on('close', function (code) {
-		glob(path.join(tempDir, '**', '*'), function (err, files) {
+		glob(path.join(intermediateDir, '**', '*'), function (err, files) {
 			if (err) {
 				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 			}
@@ -126,7 +127,7 @@ module.exports = function (source, options) {
 					var vinylFile = new File({
 						cwd: cwd,
 						base: base,
-						path: file.replace(tempDir, base)
+						path: file.replace(intermediateDir, base)
 					});
 					var sourcemap;
 
@@ -155,7 +156,7 @@ module.exports = function (source, options) {
 				// TODO: This kills caching. Keeping will push files through that are not in
 				// the current gulp.src. We need to decide whether to use a Sass style caching
 				// strategy, or a gulp style strategy, and what each would look like.
-				rimraf(tempDir, function () {
+				rimraf(intermediateDir, function () {
 					stream.push(null);
 				});
 			});
