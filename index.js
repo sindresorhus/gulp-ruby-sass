@@ -44,6 +44,14 @@ module.exports = function (source, options) {
 		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
+	// deprecation message for `container`.
+	if (options.container) {
+		gutil.log(gutil.colors.yellow(
+			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
+		  'This will become an error in gulp-ruby-sass 2.0'
+	  ));
+	}
+
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
@@ -75,7 +83,8 @@ module.exports = function (source, options) {
 		'watch',
 		'poll',
 		'tempDir',
-		'verbose'
+		'verbose',
+		'container'
 	]).concat(compileMappings);
 
 	if (options.bundleExec) {
