@@ -112,36 +112,6 @@ Default: the OS temp directory as reported by [os-tempDir](https://github.com/si
 
 This plugin compiles Sass files to a temporary directory before pushing them through the stream. Use `tempDir` to choose an alternate directory if you aren't able to use the default OS temporary directory.
 
-#### container
-
-Type: `String`  
-Default: `gulp-ruby-sass`
-
-If you only have a single gulp-ruby-sass task you can ignore this option. If you're running multiple gulp-ruby-sass tasks at once you must specify a separate `container` for each task to avoid file collisions. The value is appended to the `tempDir` option.
-
-```js
-var gulp = require('gulp');
-var sass = require('gulp-ruby-sass');
-
-gulp.task('sass-app', function () {
-	return sass('source/app.scss', {container: 'app'})
-		.on('error', function (err) {
-			console.error('Error!', err.message);
-		})
-		.pipe(gulp.dest('result/app'));
-});
-
-gulp.task('sass-site', function () {
-	return sass('source/site.scss', {container: 'site'})
-		.on('error', function (err) {
-			console.error('Error!', err.message);
-		})
-		.pipe(gulp.dest('result/site'));
-});
-
-gulp.task('sass', ['sass-app', 'sass-site']);
-```
-
 ### Sass options
 
 Any other options are passed directly to the Sass executable. The options are camelCase versions of Sass's dashed-case options.
