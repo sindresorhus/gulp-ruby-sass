@@ -112,6 +112,26 @@ Default: the OS temp directory as reported by [os-tempDir](https://github.com/si
 
 This plugin compiles Sass files to a temporary directory before pushing them through the stream. Use `tempDir` to choose an alternate directory if you aren't able to use the default OS temporary directory.
 
+#### emitCompileError
+
+Type: `boolean`  
+Default: `false`
+
+If set to true the plugin will emit a gulp error when Sass compilation fails. This error can be used to exit the stream early. Note exiting early will break Sass's default behavior of writing a special CSS file that shows errors in the browser.
+
+```js
+gulp.task('sass', function () {
+	return sass('source', { emitCompileError: true })
+
+	.on('error', function(err) {
+		console.error('Error', err.message);
+		process.exit(1); // exit the stream immediately
+	})
+
+	.pipe(gulp.dest('result'));
+});
+```
+
 ### Sass options
 
 Any other options are passed directly to the Sass executable. The options are camelCase versions of Sass's dashed-case options.
