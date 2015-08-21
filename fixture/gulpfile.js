@@ -23,7 +23,7 @@ gulp.task('sass-file', function() {
 
 	.pipe(sourcemaps.write('../maps', {
 		includeContent: false,
-		sourceRoot: '/fixture/source'
+		sourceRoot: 'source'
 	}))
 
 	.pipe(gulp.dest('result'));

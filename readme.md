@@ -98,7 +98,7 @@ gulp.task('sass', function() {
 
 	.pipe(sourcemaps.write('maps', {
 		includeContent: false,
-		sourceRoot: '/source'
+		sourceRoot: 'source'
 	}))
 
 	.pipe(gulp.dest('result'));
