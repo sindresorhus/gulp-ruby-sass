@@ -235,30 +235,3 @@ it('outputs correct sourcemap paths for files and paths containing spaces', func
 		done();
 	});
 });
-
-it('emits errors but streams file on Sass error', function (done) {
-	this.timeout(20000);
-
-	var matchErrMsg = new RegExp('File to import not found or unreadable: i-dont-exist.');
-	var errFileExists;
-
-	sass('fixture/source', {
-		quiet: true,
-		unixNewlines: true
-	})
-
-	.on('error', function (err) {
-		// throws an error
-		assert(matchErrMsg.test(err.message));
-	})
-
-	.on('data', function (file) {
-		// streams the erroring css file
-		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString());
-	})
-
-	.on('end', function () {
-		assert(errFileExists);
-		done();
-	});
-});
