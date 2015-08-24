@@ -24,7 +24,9 @@ $ npm install --save-dev gulp-ruby-sass
 
 ## Usage
 
-Use gulp-ruby-sass instead of `gulp.src` to compile a file or directory.  
+Use gulp-ruby-sass instead of `gulp.src` to compile a file or directory.
+
+Catch errors with an `on('error', cb)` listener. You can use the plugin's `logError` method to log pretty errors to your console. Erroring files will still be streamed unless you use Sass's `stopOnError` option.
 
 ```js
 var gulp = require('gulp');
@@ -32,9 +34,7 @@ var sass = require('gulp-ruby-sass');
 
 gulp.task('sass', function () {
 	return sass('source/')
-		.on('error', function (err) {
-			console.error('Error!', err.message);
-		})
+		.on('error', sass.logError)
 		.pipe(gulp.dest('result'));
 });
 ```
@@ -42,10 +42,6 @@ gulp.task('sass', function () {
 #### Recompiling on changes
 
 Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to automatically recompile your files on change.
-
-#### Handling errors
-
-Handle Sass errors with an `on('error', cb)` listener. gulp-ruby-sass throws errors like a gulp plugin, but streams the erroring files so you can see Sass errors in your browser too.
 
 ### Plugin options
 
@@ -79,9 +75,7 @@ var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('sass', function () {
 	return sass('source', {sourcemap: true})
-		.on('error', function (err) {
-			console.error('Error!', err.message);
-		})
+		.on('error', sass.logError)
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('result'));
 });
@@ -92,9 +86,7 @@ gulp.task('sass', function () {
 ```js
 gulp.task('sass', function() {
 	return sass('source', { sourcemap: true })
-	.on('error', function (err) {
-	  console.error('Error', err.message);
-   })
+	.on('error', sass.logError)
 
 	.pipe(sourcemaps.write('maps', {
 		includeContent: false,
@@ -124,7 +116,7 @@ gulp.task('sass', function () {
 	return sass('source', { emitCompileError: true })
 
 	.on('error', function(err) {
-		console.error('Error', err.message);
+		sass.logError(err);
 		process.exit(1); // exit the stream immediately
 	})
 

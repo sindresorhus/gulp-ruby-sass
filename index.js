@@ -19,7 +19,7 @@ var logger = require('./logger');
 var md5Hex = require('md5-hex');
 
 // for now, source is only a single directory or a single file
-module.exports = function (source, options) {
+function gulpRubySass (source, options) {
 	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
 	var defaults = {
@@ -187,3 +187,11 @@ module.exports = function (source, options) {
 
 	return stream;
 };
+
+gulpRubySass.logError = function logError(err) {
+  var message = new gutil.PluginError('gulp-ruby-sass', err);
+  process.stderr.write(message + '\n');
+  this.emit('end');
+};
+
+module.exports = gulpRubySass
