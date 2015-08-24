@@ -14,7 +14,6 @@ var convert = require('convert-source-map');
 var eachAsync = require('each-async');
 var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
-var File = require('vinyl');
 var logger = require('./logger');
 var md5Hex = require('md5-hex');
 
@@ -146,7 +145,7 @@ function gulpRubySass (source, options) {
 
 					// rewrite file paths so gulp thinks the files came from cwd, not the
 					// OS temp directory
-					var vinylFile = new File({
+					var vinylFile = new gutil.File({
 						cwd: cwd,
 						base: base,
 						path: file.replace(intermediateDir, base)
