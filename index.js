@@ -36,7 +36,7 @@ function gulpRubySass (source, options) {
 	var base;
 	var intermediateDir;
 	var dest;
-	var compileMappings;
+	var compileMapping;
 
 	// redundant but necessary
 	stream._read = function () {};
@@ -70,7 +70,7 @@ function gulpRubySass (source, options) {
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMappings = source + ':' + intermediateDir;
+		compileMapping = source + ':' + intermediateDir;
 		options.update = true;
 	}
 	// single file source
@@ -83,7 +83,7 @@ function gulpRubySass (source, options) {
 			gutil.replaceExtension(path.basename(source), '.css')
 		));
 
-		compileMappings = [ source, dest ];
+		compileMapping = [ source, dest ];
 
 		// sass's single file compilation doesn't create a destination directory, so
 		// we have to ourselves
@@ -99,7 +99,7 @@ function gulpRubySass (source, options) {
 		'verbose',
 		'emitCompileError',
 		'container'
-	]).concat(compileMappings);
+	]).concat(compileMapping);
 
 	if (options.bundleExec) {
 		command = 'bundle';
