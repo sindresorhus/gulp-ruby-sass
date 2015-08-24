@@ -76,6 +76,7 @@ function gulpRubySass (source, options) {
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
+
 		// sass options need unix style slashes
 		dest = slash(path.join(
 			intermediateDir,
@@ -83,6 +84,9 @@ function gulpRubySass (source, options) {
 		));
 
 		compileMappings = [ source, dest ];
+
+		// sass's single file compilation doesn't create a destination directory, so
+		// we have to ourselves
 		mkdirp(intermediateDir);
 	}
 	// TODO: implement glob file source
