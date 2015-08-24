@@ -17,6 +17,10 @@ var pathExists = require('path-exists');
 var logger = require('./logger');
 var md5Hex = require('md5-hex');
 
+function emitErr (stream, err) {
+	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+}
+
 // for now, source is only a single directory or a single file
 function gulpRubySass (source, options) {
 	var stream = new Readable({objectMode: true});
@@ -124,15 +128,12 @@ function gulpRubySass (source, options) {
 
 	sass.on('close', function (code) {
 		if (options.emitCompileError && code !== 0) {
-			stream.emit('error', new gutil.PluginError(
-				'gulp-ruby-sass',
-				'Sass compilation failed. See console output for more information.'
-			));
+			emitErr(stream, 'Sass compilation failed. See console output for more information.');
 		}
 
 		glob(path.join(intermediateDir, '**', '*'), function (err, files) {
 			if (err) {
-				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+				emitErr(stream, err);
 			}
 
 			eachAsync(files, function (file, i, next) {
@@ -143,7 +144,7 @@ function gulpRubySass (source, options) {
 
 				fs.readFile(file, function (err, data) {
 					if (err) {
-						stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+						emitErr(stream, err);
 						next();
 						return;
 					}
