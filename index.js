@@ -31,7 +31,7 @@ function gulpRubySass (source, options) {
 	var args;
 	var base;
 	var intermediateDir;
-	var destFile;
+	var dest;
 	var compileMappings;
 
 	// redundant but necessary
@@ -72,8 +72,13 @@ function gulpRubySass (source, options) {
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
-		destFile = slash(path.join(intermediateDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
-		compileMappings = [ source, destFile ];
+		// sass options need unix style slashes
+		dest = slash(path.join(
+			intermediateDir,
+			gutil.replaceExtension(path.basename(source), '.css')
+		));
+
+		compileMappings = [ source, dest ];
 		mkdirp(intermediateDir);
 	}
 	// TODO: implement glob file source
