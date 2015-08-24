@@ -119,15 +119,15 @@ function gulpRubySass (source, options) {
 	sass.stderr.setEncoding('utf8');
 
 	sass.stdout.on('data', function (data) {
-		logger.stdout(data, intermediateDir, stream);
+		logger.stdout(stream, intermediateDir, data);
 	});
 
 	sass.stderr.on('data', function (data) {
-		logger.stderr(data, intermediateDir, stream);
+		logger.stderr(stream, intermediateDir, data);
 	});
 
 	sass.on('error', function (err) {
-		logger.error(err, stream);
+		logger.error(stream, err);
 	});
 
 	sass.on('close', function (code) {

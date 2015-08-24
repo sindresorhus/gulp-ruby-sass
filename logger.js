@@ -6,8 +6,8 @@ function emitErr (stream, err) {
 }
 
 // Remove temp directory for more Sass-like logging
-function prettifyDirectoryLogging (msg, tempDir) {
-	return msg.replace(new RegExp((tempDir) + '/?', 'g'), './');
+function prettifyDirectoryLogging (msg, intermediateDir) {
+	return msg.replace(new RegExp((intermediateDir) + '/?', 'g'), './');
 }
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
 		gutil.log('Running command ' + command + ' ' + args.join(' '));
 	},
 
-	stdout: function (data, tempDir, stream) {
+	stdout: function (stream, intermediateDir, data) {
 		// Bundler error: no Sass version found
 		if (/bundler: command not found: sass/.test(data)) {
 			emitErr(stream, 'bundler: command not found: sass');
@@ -33,13 +33,13 @@ module.exports = {
 
 		// Not an error: Sass logging
 		else {
-			data = prettifyDirectoryLogging(data, tempDir);
+			data = prettifyDirectoryLogging(data, intermediateDir);
 			data = data.trim()
 			gutil.log(data);
 		}
 	},
 
-	stderr: function (data, tempDir, stream) {
+	stderr: function (stream, intermediateDir, data) {
 		var bundlerMissing = /Could not find 'bundler' \((.*?)\)/.exec(data)
 		var sassVersionMissing = /Could not find gem 'sass \((.*?)\) ruby'/.exec(data)
 
@@ -60,13 +60,13 @@ module.exports = {
 
 		// Not an error: Sass warnings, debug statements
 		else {
-			data = prettifyDirectoryLogging(data, tempDir);
+			data = prettifyDirectoryLogging(data, intermediateDir);
 			data = data.trim()
 			gutil.log(data);
 		}
 	},
 
-	error: function (err, stream) {
+	error: function (stream, err) {
 		// Spawn error: bundle or sass not installed
 		if (err.code === 'ENOENT') {
 			emitErr(stream, 'Gem ' + err.path + ' is not installed.');
