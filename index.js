@@ -43,17 +43,17 @@ function gulpRubySass (source, options) {
 
 	options = assign(defaults, options);
 
-	// sourcemap can only be true or false; warn those trying to pass a Sass string option
-	if (typeof options.sourcemap !== 'boolean') {
-		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
-	}
-
 	// deprecation message for `container`.
 	if (options.container) {
 		gutil.log(gutil.colors.yellow(
 			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
 		  'This will become an error in gulp-ruby-sass 2.0'
 	  ));
+	}
+
+	// sourcemap can only be true or false; warn those trying to pass a Sass string option
+	if (typeof options.sourcemap !== 'boolean') {
+		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
