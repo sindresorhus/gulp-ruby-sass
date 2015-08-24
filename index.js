@@ -7,6 +7,7 @@ var dargs = require('dargs');
 var slash = require('slash');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
+var md5Hex = require('md5-hex');
 var spawn = require('win-spawn');
 var gutil = require('gulp-util');
 var assign = require('object-assign');
@@ -14,8 +15,8 @@ var convert = require('convert-source-map');
 var eachAsync = require('each-async');
 var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
+
 var logger = require('./logger');
-var md5Hex = require('md5-hex');
 
 function emitErr (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
