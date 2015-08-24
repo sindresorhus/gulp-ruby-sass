@@ -25,7 +25,8 @@ module.exports = function (source, options) {
 	var defaults = {
 		tempDir: osTmpdir(),
 		verbose: false,
-		sourcemap: false
+		sourcemap: false,
+		emitCompileError: false
 	};
 	var command;
 	var args;
@@ -84,6 +85,7 @@ module.exports = function (source, options) {
 		'poll',
 		'tempDir',
 		'verbose',
+		'emitCompileError',
 		'container'
 	]).concat(compileMappings);
 
@@ -117,6 +119,13 @@ module.exports = function (source, options) {
 	});
 
 	sass.on('close', function (code) {
+		if (options.emitCompileError && code !== 0) {
+			stream.emit('error', new gutil.PluginError(
+				'gulp-ruby-sass',
+				'Sass compilation failed. See console output for more information.'
+			));
+		}
+
 		glob(path.join(intermediateDir, '**', '*'), function (err, files) {
 			if (err) {
 				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));

@@ -236,29 +236,25 @@ it('outputs correct sourcemap paths for files and paths containing spaces', func
 	});
 });
 
-it('emits errors but streams file on Sass error', function (done) {
+it('`emitCompileError` emits a gulp error when Sass compilation fails', function (done) {
 	this.timeout(20000);
 
-	var matchErrMsg = new RegExp('File to import not found or unreadable: i-dont-exist.');
-	var errFileExists;
-
-	sass('fixture/source', {
+	sass('fixture/source/fixture-error.scss', {
 		quiet: true,
-		unixNewlines: true
+		unixNewlines: true,
+		emitCompileError: true
 	})
+
+	.on('data', function () {})
 
 	.on('error', function (err) {
-		// throws an error
-		assert(matchErrMsg.test(err.message));
-	})
-
-	.on('data', function (file) {
-		// streams the erroring css file
-		errFileExists = errFileExists || matchErrMsg.test(file.contents.toString());
+		assert.equal(
+			'Sass compilation failed. See console output for more information.',
+			err.message
+		);
 	})
 
 	.on('end', function () {
-		assert(errFileExists);
 		done();
 	});
 });
