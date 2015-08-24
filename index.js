@@ -22,7 +22,6 @@ function emitErr (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 }
 
-// for now, source is only a single directory or a single file
 function gulpRubySass (source, options) {
 	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
