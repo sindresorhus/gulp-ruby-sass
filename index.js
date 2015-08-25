@@ -7,6 +7,7 @@ var dargs = require('dargs');
 var slash = require('slash');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
+var md5Hex = require('md5-hex');
 var spawn = require('win-spawn');
 var gutil = require('gulp-util');
 var assign = require('object-assign');
@@ -14,13 +15,14 @@ var convert = require('convert-source-map');
 var eachAsync = require('each-async');
 var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
-var File = require('vinyl');
-var logger = require('./logger');
-var md5Hex = require('md5-hex');
 
-// for now, source is only a single directory or a single file
+var logger = require('./logger');
+
+function emitErr (stream, err) {
+	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+}
+
 function gulpRubySass (source, options) {
-	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
 	var defaults = {
 		tempDir: osTmpdir(),
@@ -28,22 +30,11 @@ function gulpRubySass (source, options) {
 		sourcemap: false,
 		emitCompileError: false
 	};
-	var command;
-	var args;
-	var base;
-	var intermediateDir;
-	var destFile;
-	var compileMappings;
 
-	// redundant but necessary
-	stream._read = function () {};
+	var stream = new Readable({objectMode: true});
+	stream._read = function () {}; 	// redundant but necessary
 
 	options = assign(defaults, options);
-
-	// sourcemap can only be true or false; warn those trying to pass a Sass string option
-	if (typeof options.sourcemap !== 'boolean') {
-		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
-	}
 
 	// deprecation message for `container`.
 	if (options.container) {
@@ -53,33 +44,51 @@ function gulpRubySass (source, options) {
 	  ));
 	}
 
+	// sourcemap can only be true or false; warn those trying to pass a Sass string option
+	if (typeof options.sourcemap !== 'boolean') {
+		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
+	}
+
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
 	// create temporary directory path for the task using current working
 	// directory, source and options
 	// sass options need unix style slashes
-	intermediateDir = slash(path.join(
+	var intermediateDir = slash(path.join(
 		options.tempDir,
-		'gulp-ruby-sass-' + md5Hex(process.cwd()) + md5Hex(source + JSON.stringify(options))
+		'gulp-ruby-sass-' + md5Hex(cwd) + md5Hex(source + JSON.stringify(options))
 	));
+	var base;
+	var compileMapping;
 
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMappings = source + ':' + intermediateDir;
+		compileMapping = source + ':' + intermediateDir;
 		options.update = true;
 	}
+
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
-		destFile = slash(path.join(intermediateDir, path.basename(source, path.extname(source)) + '.css')); // sass options need unix style slashes
-		compileMappings = [ source, destFile ];
+
+		// sass options need unix style slashes
+		var dest = slash(path.join(
+			intermediateDir,
+			gutil.replaceExtension(path.basename(source), '.css')
+		));
+
+		compileMapping = [ source, dest ];
+
+		// sass's single file compilation doesn't create a destination directory, so
+		// we have to ourselves
 		mkdirp(intermediateDir);
 	}
+
 	// TODO: implement glob file source
 
-	args = dargs(options, [
+	var args = dargs(options, [
 		'bundleExec',
 		'watch',
 		'poll',
@@ -87,7 +96,9 @@ function gulpRubySass (source, options) {
 		'verbose',
 		'emitCompileError',
 		'container'
-	]).concat(compileMappings);
+	]).concat(compileMapping);
+
+	var command;
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -107,28 +118,25 @@ function gulpRubySass (source, options) {
 	sass.stderr.setEncoding('utf8');
 
 	sass.stdout.on('data', function (data) {
-		logger.stdout(data, intermediateDir, stream);
+		logger.stdout(stream, intermediateDir, data);
 	});
 
 	sass.stderr.on('data', function (data) {
-		logger.stderr(data, intermediateDir, stream);
+		logger.stderr(stream, intermediateDir, data);
 	});
 
 	sass.on('error', function (err) {
-		logger.error(err, stream);
+		logger.error(stream, err);
 	});
 
 	sass.on('close', function (code) {
 		if (options.emitCompileError && code !== 0) {
-			stream.emit('error', new gutil.PluginError(
-				'gulp-ruby-sass',
-				'Sass compilation failed. See console output for more information.'
-			));
+			emitErr(stream, 'Sass compilation failed. See console output for more information.');
 		}
 
 		glob(path.join(intermediateDir, '**', '*'), function (err, files) {
 			if (err) {
-				stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+				emitErr(stream, err);
 			}
 
 			eachAsync(files, function (file, i, next) {
@@ -139,33 +147,37 @@ function gulpRubySass (source, options) {
 
 				fs.readFile(file, function (err, data) {
 					if (err) {
-						stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+						emitErr(stream, err);
 						next();
 						return;
 					}
 
-					// rewrite file paths so gulp thinks the files came from cwd, not the
-					// OS temp directory
-					var vinylFile = new File({
+					// rewrite file paths so gulp thinks the file came from cwd, not the
+					// intermediate directory
+					var vinylFile = new gutil.File({
 						cwd: cwd,
 						base: base,
 						path: file.replace(intermediateDir, base)
 					});
-					var sourcemap;
 
-					// if we are managing sourcemaps and the sourcemap exists
+					// sourcemap integration
+					// if we are managing sourcemaps and a sourcemap exists
 					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
-						// remove Sass sourcemap comment; gulp-sourcemaps will add it back in
+
+						// remove sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer( convert.removeMapFileComments(data.toString()) );
-						sourcemap = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
+						var sourcemapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
 
 						// create relative paths for sources
-						sourcemap.sources = sourcemap.sources.map(function (sourcemapSource) {
-							var absoluteSourcePath = decodeURI(path.resolve('/', sourcemapSource.replace('file:///', '')))
-							return path.relative(base, absoluteSourcePath);
+						sourcemapObject.sources = sourcemapObject.sources.map(function (sourcemapPath) {
+							var absoluteSourcemapPath = decodeURI(path.resolve(
+								'/',
+								sourcemapPath.replace('file:///', '')
+							));
+							return path.relative(base, absoluteSourcemapPath);
 						});
 
-						vinylFile.sourceMap = sourcemap;
+						vinylFile.sourceMap = sourcemapObject;
 					}
 
 					vinylFile.contents = data;

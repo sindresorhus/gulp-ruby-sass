@@ -53,7 +53,6 @@
     "path-exists": "^1.0.0",
     "rimraf": "^2.2.8",
     "slash": "^1.0.0",
-    "vinyl": "^0.4.3",
     "vinyl-fs": "^1.0.0",
     "win-spawn": "^2.0.0"
   },
