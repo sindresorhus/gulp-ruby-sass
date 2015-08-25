@@ -5,7 +5,7 @@ function emitErr (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 }
 
-// Remove temp directory for more Sass-like logging
+// Remove intermediate directory for more Sass-like logging
 function prettifyDirectoryLogging (msg, intermediateDir) {
 	return msg.replace(new RegExp((intermediateDir) + '/?', 'g'), './');
 }
