@@ -31,7 +31,7 @@ function cacheDirectory (tempDir) {
 };
 
 function uniqueIntermediateDirectory (tempDir, source) {
-	return slash(path.join(
+	return path.join(
 		tempDir,
 		'gulp-ruby-sass',
 		'cwd-' + md5Hex(process.cwd()) + '-source-' + md5Hex(source)
@@ -75,7 +75,6 @@ function gulpRubySass (source, options) {
 
 	// create temporary directory path for the task using current working
 	// directory, source and options
-	// sass options need unix style slashes
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
 	var base;
 	var compileMapping;
@@ -83,7 +82,8 @@ function gulpRubySass (source, options) {
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMapping = source + ':' + intermediateDir;
+		// sass options need unix style slashes
+		compileMapping = source + ':' + slash(intermediateDir);
 		options.update = true;
 	}
 
@@ -91,13 +91,13 @@ function gulpRubySass (source, options) {
 	else {
 		base = path.join(cwd, path.dirname(source));
 
-		// sass options need unix style slashes
-		var dest = slash(path.join(
+		var dest = path.join(
 			intermediateDir,
 			gutil.replaceExtension(path.basename(source), '.css')
-		));
+		);
 
-		compileMapping = [ source, dest ];
+		// sass options need unix style slashes
+		compileMapping = [ source, slash(dest) ];
 
 		// sass's single file compilation doesn't create a destination directory, so
 		// we have to ourselves
