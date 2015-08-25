@@ -64,7 +64,7 @@ function gulpRubySass (source, options) {
 	// sass options need unix style slashes
 	intermediateDir = slash(path.join(
 		options.tempDir,
-		'gulp-ruby-sass-' + md5Hex(process.cwd()) + md5Hex(source + JSON.stringify(options))
+		'gulp-ruby-sass-' + md5Hex(cwd) + md5Hex(source + JSON.stringify(options))
 	));
 
 	// directory source
