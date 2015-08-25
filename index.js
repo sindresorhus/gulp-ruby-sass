@@ -26,6 +26,10 @@ function emitErr (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 };
 
+function cacheDirectory (tempDir) {
+	return path.join(tempDir, 'gulp-ruby-sass');
+};
+
 function uniqueIntermediateDirectory (tempDir, source) {
 	return slash(path.join(
 		tempDir,
