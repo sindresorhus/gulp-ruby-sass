@@ -20,7 +20,15 @@ var logger = require('./logger');
 
 function emitErr (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
-}
+};
+
+function uniqueIntermediateDirectory (tempDir, source) {
+	return slash(path.join(
+		tempDir,
+		'gulp-ruby-sass',
+		'cwd-' + md5Hex(process.cwd()) + '-source-' + md5Hex(source)
+	));
+};
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
@@ -60,10 +68,7 @@ function gulpRubySass (source, options) {
 	// create temporary directory path for the task using current working
 	// directory, source and options
 	// sass options need unix style slashes
-	var intermediateDir = slash(path.join(
-		options.tempDir,
-		'gulp-ruby-sass-' + md5Hex(cwd) + md5Hex(source + JSON.stringify(options))
-	));
+	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
 	var base;
 	var compileMapping;
 
