@@ -67,7 +67,7 @@ module.exports = {
 	},
 
 	error: function (stream, err) {
-		// Spawn error: bundle or sass not installed
+		// Spawn error: gems not installed
 		if (err.code === 'ENOENT') {
 			emitErr(stream, 'Gem ' + err.path + ' is not installed.');
 		}
