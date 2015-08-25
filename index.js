@@ -23,7 +23,6 @@ function emitErr (stream, err) {
 }
 
 function gulpRubySass (source, options) {
-	var stream = new Readable({objectMode: true});
 	var cwd = process.cwd();
 	var defaults = {
 		tempDir: osTmpdir(),
@@ -31,15 +30,9 @@ function gulpRubySass (source, options) {
 		sourcemap: false,
 		emitCompileError: false
 	};
-	var command;
-	var args;
-	var base;
-	var intermediateDir;
-	var dest;
-	var compileMapping;
 
-	// redundant but necessary
-	stream._read = function () {};
+	var stream = new Readable({objectMode: true});
+	stream._read = function () {}; 	// redundant but necessary
 
 	options = assign(defaults, options);
 
@@ -62,10 +55,12 @@ function gulpRubySass (source, options) {
 	// create temporary directory path for the task using current working
 	// directory, source and options
 	// sass options need unix style slashes
-	intermediateDir = slash(path.join(
+	var intermediateDir = slash(path.join(
 		options.tempDir,
 		'gulp-ruby-sass-' + md5Hex(cwd) + md5Hex(source + JSON.stringify(options))
 	));
+	var base;
+	var compileMapping;
 
 	// directory source
 	if (path.extname(source) === '') {
@@ -73,12 +68,13 @@ function gulpRubySass (source, options) {
 		compileMapping = source + ':' + intermediateDir;
 		options.update = true;
 	}
+
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
 
 		// sass options need unix style slashes
-		dest = slash(path.join(
+		var dest = slash(path.join(
 			intermediateDir,
 			gutil.replaceExtension(path.basename(source), '.css')
 		));
@@ -89,9 +85,10 @@ function gulpRubySass (source, options) {
 		// we have to ourselves
 		mkdirp(intermediateDir);
 	}
+
 	// TODO: implement glob file source
 
-	args = dargs(options, [
+	var args = dargs(options, [
 		'bundleExec',
 		'watch',
 		'poll',
@@ -100,6 +97,8 @@ function gulpRubySass (source, options) {
 		'emitCompileError',
 		'container'
 	]).concat(compileMapping);
+
+	var command;
 
 	if (options.bundleExec) {
 		command = 'bundle';
@@ -160,6 +159,7 @@ function gulpRubySass (source, options) {
 						base: base,
 						path: file.replace(intermediateDir, base)
 					});
+
 					var sourcemap;
 
 					// if we are managing sourcemaps and the sourcemap exists
