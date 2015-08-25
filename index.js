@@ -193,13 +193,7 @@ function gulpRubySass (source, options) {
 					return;
 				});
 			}, function () {
-				// cleanup previously generated files for next run
-				// TODO: This kills caching. Keeping will push files through that are not in
-				// the current gulp.src. We need to decide whether to use a Sass style caching
-				// strategy, or a gulp style strategy, and what each would look like.
-				rimraf(intermediateDir, function () {
-					stream.push(null);
-				});
+				stream.push(null);
 			});
 		});
 	});
@@ -207,10 +201,25 @@ function gulpRubySass (source, options) {
 	return stream;
 };
 
-gulpRubySass.logError = function logError(err) {
+gulpRubySass.logError = function (err) {
   var message = new gutil.PluginError('gulp-ruby-sass', err);
   process.stderr.write(message + '\n');
   this.emit('end');
+};
+
+gulpRubySass.clearCache = function (source, tempDir, done) {
+	tempDir = tempDir || sharedDefaults.tempDir;
+
+	// clear either a single source's intermediate dir or the entire grs cache
+	var dir = source ? uniqueIntermediateDirectory(tempDir, source) : cacheDirectory(tempDir);
+
+	// Run async if a callback was passed, sync if not
+	if (done) {
+		rimraf(dir, done);
+	}
+	else {
+		rimraf.sync(dir);
+	}
 };
 
 module.exports = gulpRubySass
