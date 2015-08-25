@@ -18,6 +18,10 @@ var pathExists = require('path-exists');
 
 var logger = require('./logger');
 
+var sharedDefaults = {
+	tempDir: osTmpdir()
+}
+
 function emitErr (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 };
@@ -33,7 +37,7 @@ function uniqueIntermediateDirectory (tempDir, source) {
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
 	var defaults = {
-		tempDir: osTmpdir(),
+		tempDir: sharedDefaults.tempDir,
 		verbose: false,
 		sourcemap: false,
 		emitCompileError: false
