@@ -152,8 +152,8 @@ function gulpRubySass (source, options) {
 						return;
 					}
 
-					// rewrite file paths so gulp thinks the files came from cwd, not the
-					// OS temp directory
+					// rewrite file paths so gulp thinks the file came from cwd, not the
+					// intermediate directory
 					var vinylFile = new gutil.File({
 						cwd: cwd,
 						base: base,
