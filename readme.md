@@ -1,6 +1,6 @@
 # gulp-ruby-sass [![Build Status](https://travis-ci.org/sindresorhus/gulp-ruby-sass.svg?branch=master)](https://travis-ci.org/sindresorhus/gulp-ruby-sass)
 
-Compiles Sass with the [Sass gem](http://sass-lang.com/install).  
+Compiles Sass with the [Sass gem](http://sass-lang.com/install) and pipes the results into a gulp stream.  
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
 ## Install
