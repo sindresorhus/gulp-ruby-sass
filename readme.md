@@ -3,7 +3,6 @@
 Compiles Sass with the [Sass gem](http://sass-lang.com/install).  
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
-
 ## Install
 
 You must have [Sass >=3.4](http://sass-lang.com/install).
@@ -17,7 +16,6 @@ $ npm install --save-dev gulp-ruby-sass
 
 - gulp-ruby-sass doesn't support incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 - gulp-ruby-sass doesn't alter Sass's output in any way. Problems with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
-
 
 ## Usage
 
@@ -250,7 +248,6 @@ Type: `Boolean`
 Default: `false`
 
 Silence warnings and status messages during compilation.
-
 
 ## License
 
