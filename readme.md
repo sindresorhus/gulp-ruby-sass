@@ -18,7 +18,7 @@ Requires [Sass >=3.4](http://sass-lang.com/install).
 
 ## Usage
 
-#### sass(source, options)
+### sass(source, options)
 
 Use gulp-ruby-sass *instead of `gulp.src`* to compile Sass files.
 
@@ -33,13 +33,13 @@ gulp.task('sass', function () {
 });
 ```
 
-##### source
+#### source
 
 Type: `String`
 
 A directory or file to compile. Note gulp-ruby-sass does not use globs. It only accepts the input values that Ruby Sass accepts.
 
-##### options
+#### options
 
 Type: `String`
 
@@ -47,28 +47,19 @@ An object containing plugin and Sass options.
 
 ### Plugin options
 
-#### verbose
-
-Type: `Boolean`  
-Default: `false`
-
-Gives some extra information for debugging, including the actual spawned Sass command.
-
 #### bundleExec
 
 Type: `Boolean`  
 Default: `false`
 
-Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
+Run Sass with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
 
 #### sourcemap
 
 Type: `Boolean`  
 Default: `false`
 
-Requires Sass `>=3.4` and [`gulp-sourcemaps`](https://github.com/floridoo/gulp-sourcemaps).
-
-*Inline sourcemaps* are recommended, as they "just work".
+Initialize and pass Sass sourcemaps to [gulp-sourcemaps](https://github.com/floridoo/gulp-sourcemaps). Note this option replaces Sass's `sourcemap` option.
 
 ```js
 var gulp = require('gulp');
@@ -78,31 +69,24 @@ var sourcemaps = require('gulp-sourcemaps');
 gulp.task('sass', function () {
 	return sass('source', {sourcemap: true})
 		.on('error', sass.logError)
+
+		// For inline sourcemaps
 		.pipe(sourcemaps.write())
+
+		// For file sourcemaps
+		.pipe(sourcemaps.write('maps', {
+			includeContent: false,
+			sourceRoot: 'source'
+		}))
+
 		.pipe(gulp.dest('result'));
-});
-```
-
-*File sourcemaps* require you to serve the sourcemap location so the browser can read the files. See the [`gulp-sourcemaps` readme](https://github.com/floridoo/gulp-sourcemaps) for more info.
-
-```js
-gulp.task('sass', function() {
-	return sass('source', { sourcemap: true })
-	.on('error', sass.logError)
-
-	.pipe(sourcemaps.write('maps', {
-		includeContent: false,
-		sourceRoot: 'source'
-	}))
-
-	.pipe(gulp.dest('result'));
 });
 ```
 
 #### tempDir
 
 Type: `String`  
-Default: the OS temp directory as reported by [os-tempDir](https://github.com/sindresorhus/os-tmpdir)
+Default: the system temp directory as reported by [os-tempDir](https://github.com/sindresorhus/os-tmpdir)
 
 This plugin compiles Sass files to a temporary directory before pushing them through the stream. Use `tempDir` to choose an alternate directory if you aren't able to use the default OS temporary directory.
 
@@ -111,20 +95,14 @@ This plugin compiles Sass files to a temporary directory before pushing them thr
 Type: `Boolean`  
 Default: `false`
 
-If set to true the plugin will emit a gulp error when Sass compilation fails. This error can be used to exit the stream early. Note exiting early will break Sass's default behavior of writing a special CSS file that shows errors in the browser.
+Emit a gulp error when Sass compilation fails.
 
-```js
-gulp.task('sass', function () {
-	return sass('source', { emitCompileError: true })
+#### verbose
 
-	.on('error', function(err) {
-		sass.logError(err);
-		process.exit(1); // exit the stream immediately
-	})
+Type: `Boolean`  
+Default: `false`
 
-	.pipe(gulp.dest('result'));
-});
-```
+Log the spawned Sass or Bundler command. Useful for debugging.
 
 ### Sass options
 
