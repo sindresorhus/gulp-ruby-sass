@@ -238,6 +238,7 @@ it('outputs correct sourcemap paths for files and paths containing spaces', func
 
 it('`emitCompileError` emits a gulp error when Sass compilation fails', function (done) {
 	this.timeout(20000);
+	var errorOccured = false;
 
 	sass('fixture/source/fixture-error.scss', {
 		quiet: true,
@@ -248,6 +249,7 @@ it('`emitCompileError` emits a gulp error when Sass compilation fails', function
 	.on('data', function () {})
 
 	.on('error', function (err) {
+		errorOccured = true;
 		assert.equal(
 			'Sass compilation failed. See console output for more information.',
 			err.message
@@ -255,6 +257,7 @@ it('`emitCompileError` emits a gulp error when Sass compilation fails', function
 	})
 
 	.on('end', function () {
+		assert(errorOccured, 'An error was not thrown');
 		done();
 	});
 });
