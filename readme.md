@@ -1,6 +1,6 @@
 # gulp-ruby-sass [![Build Status](https://travis-ci.org/sindresorhus/gulp-ruby-sass.svg?branch=master)](https://travis-ci.org/sindresorhus/gulp-ruby-sass)
 
-Compiles Sass with [the Sass gem](http://sass-lang.com/install).  
+Compiles Sass with the [Sass gem](http://sass-lang.com/install).  
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
 
@@ -15,18 +15,15 @@ $ npm install --save-dev gulp-ruby-sass
 
 ## Important!
 
-- gulp-ruby-sass is a gulp source adapter. Use it instead of `gulp.src`.
-- Since it's a source adapter you need to catch errors on the stream itself instead of using a package like plumber. See the Usage section for examples.
-- gulp-ruby-sass doesn't support globs yet, only single files or directories. Just like Sass.
 - gulp-ruby-sass doesn't support incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 - gulp-ruby-sass doesn't alter Sass's output in any way. Problems with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
 
 ## Usage
 
-Use gulp-ruby-sass instead of `gulp.src` to compile a file or directory.
+#### sass(source, options)
 
-Catch errors with an `on('error', cb)` listener. You can use the plugin's `logError` method to log pretty errors to your console. Erroring files will still be streamed unless you use Sass's `stopOnError` option.
+Use gulp-ruby-sass *instead of `gulp.src`* to compile Sass files.
 
 ```js
 var gulp = require('gulp');
@@ -38,6 +35,18 @@ gulp.task('sass', function () {
 		.pipe(gulp.dest('result'));
 });
 ```
+
+##### source
+
+Type: `string`
+
+A directory or file to compile. Note gulp-ruby-sass does not use globs. It only accepts the input values that Ruby Sass accepts.
+
+##### options
+
+Type: `string`
+
+An object containing plugin and Sass options.
 
 #### Recompiling on changes
 
