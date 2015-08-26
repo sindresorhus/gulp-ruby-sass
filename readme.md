@@ -1,72 +1,60 @@
 # gulp-ruby-sass [![Build Status](https://travis-ci.org/sindresorhus/gulp-ruby-sass.svg?branch=master)](https://travis-ci.org/sindresorhus/gulp-ruby-sass)
 
-Compiles Sass with [the Sass gem](http://sass-lang.com/install).  
+Compiles Sass with the [Sass gem](http://sass-lang.com/install) and pipes the results into a gulp stream.  
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
-
 ## Install
-
-You must have [Sass >=3.4](http://sass-lang.com/install).
 
 ```
 $ npm install --save-dev gulp-ruby-sass
 ```
 
-
-## Important!
-
-- gulp-ruby-sass is a gulp source adapter. Use it instead of `gulp.src`.
-- Since it's a source adapter you need to catch errors on the stream itself instead of using a package like plumber. See the Usage section for examples.
-- gulp-ruby-sass doesn't support globs yet, only single files or directories. Just like Sass.
-- gulp-ruby-sass doesn't support incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
-- gulp-ruby-sass doesn't alter Sass's output in any way. Problems with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
-
+Requires [Sass >=3.4](http://sass-lang.com/install).
 
 ## Usage
 
-Use gulp-ruby-sass instead of `gulp.src` to compile a file or directory.
+### sass(source, options)
 
-Catch errors with an `on('error', cb)` listener. You can use the plugin's `logError` method to log pretty errors to your console. Erroring files will still be streamed unless you use Sass's `stopOnError` option.
+Use gulp-ruby-sass *instead of `gulp.src`* to compile Sass files.
 
 ```js
 var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('sass', function () {
-	return sass('source/')
-		.on('error', sass.logError)
-		.pipe(gulp.dest('result'));
+  return sass('source/')
+    .on('error', sass.logError)
+    .pipe(gulp.dest('result'));
 });
 ```
 
-#### Recompiling on changes
+#### source
 
-Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to automatically recompile your files on change.
+Type: `String`
+
+A directory or file to compile. Note gulp-ruby-sass does not use globs. It only accepts the input values that Ruby Sass accepts.
+
+#### options
+
+Type: `String`
+
+An object containing plugin and Sass options.
 
 ### Plugin options
 
-#### verbose
-
-Type: `boolean`  
-Default: `false`
-
-Gives some extra information for debugging, including the actual spawned Sass command.
-
 #### bundleExec
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
-Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
+Run Sass with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
 
 #### sourcemap
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
-Requires Sass `>=3.4` and [`gulp-sourcemaps`](https://github.com/floridoo/gulp-sourcemaps).
-
-*Inline sourcemaps* are recommended, as they "just work".
+Initialize and pass Sass sourcemaps to [gulp-sourcemaps](https://github.com/floridoo/gulp-sourcemaps). Note this option replaces Sass's `sourcemap` option.
 
 ```js
 var gulp = require('gulp');
@@ -74,174 +62,67 @@ var sass = require('gulp-ruby-sass');
 var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('sass', function () {
-	return sass('source', {sourcemap: true})
-		.on('error', sass.logError)
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('result'));
-});
-```
+  return sass('source', {sourcemap: true})
+    .on('error', sass.logError)
 
-*File sourcemaps* require you to serve the sourcemap location so the browser can read the files. See the [`gulp-sourcemaps` readme](https://github.com/floridoo/gulp-sourcemaps) for more info.
+    // For inline sourcemaps
+    .pipe(sourcemaps.write())
 
-```js
-gulp.task('sass', function() {
-	return sass('source', { sourcemap: true })
-	.on('error', sass.logError)
+    // For file sourcemaps
+    .pipe(sourcemaps.write('maps', {
+      includeContent: false,
+      sourceRoot: 'source'
+    }))
 
-	.pipe(sourcemaps.write('maps', {
-		includeContent: false,
-		sourceRoot: 'source'
-	}))
-
-	.pipe(gulp.dest('result'));
+    .pipe(gulp.dest('result'));
 });
 ```
 
 #### tempDir
 
 Type: `String`  
-Default: the OS temp directory as reported by [os-tempDir](https://github.com/sindresorhus/os-tmpdir)
+Default: the system temp directory as reported by [os-tempDir](https://github.com/sindresorhus/os-tmpdir)
 
 This plugin compiles Sass files to a temporary directory before pushing them through the stream. Use `tempDir` to choose an alternate directory if you aren't able to use the default OS temporary directory.
 
 #### emitCompileError
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
-If set to true the plugin will emit a gulp error when Sass compilation fails. This error can be used to exit the stream early. Note exiting early will break Sass's default behavior of writing a special CSS file that shows errors in the browser.
+Emit a gulp error when Sass compilation fails.
 
-```js
-gulp.task('sass', function () {
-	return sass('source', { emitCompileError: true })
+#### verbose
 
-	.on('error', function(err) {
-		sass.logError(err);
-		process.exit(1); // exit the stream immediately
-	})
+Type: `Boolean`  
+Default: `false`
 
-	.pipe(gulp.dest('result'));
-});
-```
+Log the spawned Sass or Bundler command. Useful for debugging.
 
 ### Sass options
 
-Any other options are passed directly to the Sass executable. The options are camelCase versions of Sass's dashed-case options.
+Any additional options are passed directly to the Sass executable. The options are camelCase versions of Sass's options parsed by [dargs](https://github.com/sindresorhus/dargs).
 
-The docs below list common options for convenience. Run `sass -h` for the complete list.
+Run `sass -h` for a complete list of Sass options.
 
-#### loadPath
+```js
+gulp.task('sass', function () {
+  return sass('source/', {
+      precision: 6,
+      stopOnError: true,
+      cacheLocation: './',
+      loadPath: [ 'library', '../../shared-components' ]
+    })
+    .on('error', sass.logError)
+    .pipe(gulp.dest('result'));
+});
+```
 
-Type: `string`, `array`  
-Default: `false`
+## Issues
 
-Import paths.
+This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
-#### require
-
-Type: `string`  
-Default: `false`
-
-Require a Ruby library before running Sass.
-
-#### compass
-
-Type: `boolean`  
-Default: `false`
-
-Make Compass imports available and load project configuration.
-
-#### style
-
-Type: `string`  
-Default: `nested`
-
-Output style. Can be nested (default), compact, compressed, or expanded.
-
-#### force
-
-Type: `boolean`  
-Default: `false`
-
-Recompile every Sass file, even if the CSS file is newer.
-
-#### stopOnError
-
-Type: `boolean`  
-Default: `false`
-
-If a file fails to compile, exit immediately.
-
-#### defaultEncoding
-
-Type: `string`  
-Default: `false`
-
-Specify the default encoding for input files.
-
-#### unixNewlines
-
-Type: `boolean`  
-Default: `false`
-
-Use Unix-style newlines in written files on non-Unix systems. Always true on Unix.
-
-#### debugInfo
-
-Type: `boolean`  
-Default: `false`
-
-Emit output that can be used by the FireSass Firebug plugin.
-
-#### lineNumbers
-
-Type: `boolean`  
-Default: `false`
-
-Emit comments in the generated CSS indicating the corresponding source line.
-
-#### check
-
-Type: `boolean`  
-Default: `false`
-
-Just check syntax, don't evaluate.
-
-#### precision 
-
-Type: `number`  
-Default: `5`
-
-How many digits of precision to use when outputting decimal numbers.
-
-#### cacheLocation
-
-Type: `string`  
-Default: `false`
-
-The path to save parsed Sass files. Defaults to .sass-cache.
-
-#### noCache
-
-Type: `boolean`  
-Default: `false`
-
-Don't cache parsed Sass files.
-
-#### trace
-
-Type: `boolean`  
-Default: `false`
-
-Show a full Ruby stack trace on error.
-
-#### quiet
-
-Type: `boolean`  
-Default: `false`
-
-Silence warnings and status messages during compilation.
-
+gulp-ruby-sass doesn't support Sass caching or incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 
 ## License
 
