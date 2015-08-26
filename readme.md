@@ -45,10 +45,6 @@ Type: `String`
 
 An object containing plugin and Sass options.
 
-#### Recompiling on changes
-
-Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatchglob--opts-tasks-or-gulpwatchglob--opts-cb) to automatically recompile your files on change.
-
 ### Plugin options
 
 #### verbose

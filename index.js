@@ -36,7 +36,7 @@ function gulpRubySass (source, options) {
 
 	options = assign(defaults, options);
 
-	// deprecation message for `container`.
+	// alert user that `container` is deprecated
 	if (options.container) {
 		gutil.log(gutil.colors.yellow(
 			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
@@ -44,7 +44,12 @@ function gulpRubySass (source, options) {
 	  ));
 	}
 
-	// sourcemap can only be true or false; warn those trying to pass a Sass string option
+	// error if user tries to watch their files with the Sass gem
+	if (options.watch || options.poll) {
+		throw new Error('`watch` and `poll` are not valid options for gulp-ruby-sass. Use `gulp.watch` to rebuild your files on change.');
+	}
+
+	// error if user tries to pass a Sass option to sourcemap
 	if (typeof options.sourcemap !== 'boolean') {
 		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
