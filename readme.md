@@ -11,11 +11,6 @@ $ npm install --save-dev gulp-ruby-sass
 
 Requires [Sass >=3.4](http://sass-lang.com/install).
 
-## Important!
-
-- gulp-ruby-sass doesn't support incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
-- gulp-ruby-sass doesn't alter Sass's output in any way. Problems with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
-
 ## Usage
 
 ### sass(source, options)
@@ -221,6 +216,12 @@ Type: `Boolean`
 Default: `false`
 
 Silence warnings and status messages during compilation.
+
+## Issues
+
+This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
+
+gulp-ruby-sass doesn't support Sass caching or incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 
 ## License
 
