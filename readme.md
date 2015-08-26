@@ -101,121 +101,22 @@ Log the spawned Sass or Bundler command. Useful for debugging.
 
 ### Sass options
 
-Any other options are passed directly to the Sass executable. The options are camelCase versions of Sass's dashed-case options.
+Any additional options are passed directly to the Sass executable. The options are camelCase versions of Sass's options parsed by [dargs](https://github.com/sindresorhus/dargs).
 
-The docs below list common options for convenience. Run `sass -h` for the complete list.
+Run `sass -h` for a complete list of Sass options.
 
-#### loadPath
-
-Type: `String` or `Array`  
-Default: `false`
-
-Import paths.
-
-#### require
-
-Type: `String`  
-Default: `false`
-
-Require a Ruby library before running Sass.
-
-#### compass
-
-Type: `Boolean`  
-Default: `false`
-
-Make Compass imports available and load project configuration.
-
-#### style
-
-Type: `String`  
-Default: `nested`
-
-Output style. Can be nested (default), compact, compressed, or expanded.
-
-#### force
-
-Type: `Boolean`  
-Default: `false`
-
-Recompile every Sass file, even if the CSS file is newer.
-
-#### stopOnError
-
-Type: `Boolean`  
-Default: `false`
-
-If a file fails to compile, exit immediately.
-
-#### defaultEncoding
-
-Type: `String`  
-Default: `false`
-
-Specify the default encoding for input files.
-
-#### unixNewlines
-
-Type: `Boolean`  
-Default: `false`
-
-Use Unix-style newlines in written files on non-Unix systems. Always true on Unix.
-
-#### debugInfo
-
-Type: `Boolean`  
-Default: `false`
-
-Emit output that can be used by the FireSass Firebug plugin.
-
-#### lineNumbers
-
-Type: `Boolean`  
-Default: `false`
-
-Emit comments in the generated CSS indicating the corresponding source line.
-
-#### check
-
-Type: `Boolean`  
-Default: `false`
-
-Just check syntax, don't evaluate.
-
-#### precision 
-
-Type: `Number`  
-Default: `5`
-
-How many digits of precision to use when outputting decimal numbers.
-
-#### cacheLocation
-
-Type: `String`  
-Default: `false`
-
-The path to save parsed Sass files. Defaults to .sass-cache.
-
-#### noCache
-
-Type: `Boolean`  
-Default: `false`
-
-Don't cache parsed Sass files.
-
-#### trace
-
-Type: `Boolean`  
-Default: `false`
-
-Show a full Ruby stack trace on error.
-
-#### quiet
-
-Type: `Boolean`  
-Default: `false`
-
-Silence warnings and status messages during compilation.
+```js
+gulp.task('sass', function () {
+	return sass('source/', {
+			precision: 6,
+			stopOnError: true,
+			cacheLocation: './',
+			loadPath: [ 'library', '../../shared-components' ]
+		})
+		.on('error', sass.logError)
+		.pipe(gulp.dest('result'));
+});
+```
 
 ## Issues
 
