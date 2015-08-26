@@ -22,9 +22,9 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('sass', function () {
-	return sass('source/')
-		.on('error', sass.logError)
-		.pipe(gulp.dest('result'));
+  return sass('source/')
+    .on('error', sass.logError)
+    .pipe(gulp.dest('result'));
 });
 ```
 
@@ -62,19 +62,19 @@ var sass = require('gulp-ruby-sass');
 var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('sass', function () {
-	return sass('source', {sourcemap: true})
-		.on('error', sass.logError)
+  return sass('source', {sourcemap: true})
+    .on('error', sass.logError)
 
-		// For inline sourcemaps
-		.pipe(sourcemaps.write())
+    // For inline sourcemaps
+    .pipe(sourcemaps.write())
 
-		// For file sourcemaps
-		.pipe(sourcemaps.write('maps', {
-			includeContent: false,
-			sourceRoot: 'source'
-		}))
+    // For file sourcemaps
+    .pipe(sourcemaps.write('maps', {
+      includeContent: false,
+      sourceRoot: 'source'
+    }))
 
-		.pipe(gulp.dest('result'));
+    .pipe(gulp.dest('result'));
 });
 ```
 
@@ -107,14 +107,14 @@ Run `sass -h` for a complete list of Sass options.
 
 ```js
 gulp.task('sass', function () {
-	return sass('source/', {
-			precision: 6,
-			stopOnError: true,
-			cacheLocation: './',
-			loadPath: [ 'library', '../../shared-components' ]
-		})
-		.on('error', sass.logError)
-		.pipe(gulp.dest('result'));
+  return sass('source/', {
+      precision: 6,
+      stopOnError: true,
+      cacheLocation: './',
+      loadPath: [ 'library', '../../shared-components' ]
+    })
+    .on('error', sass.logError)
+    .pipe(gulp.dest('result'));
 });
 ```
 
