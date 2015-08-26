@@ -99,7 +99,7 @@ Log the spawned Sass or Bundler command. Useful for debugging.
 
 ##### Sass options
 
-Any additional options are passed directly to the Sass executable. The options are camelCase versions of Sass's options parsed by [dargs](https://github.com/sindresorhus/dargs).
+Any additional options are passed directly to the Sass executable. Options are camelCase versions of Sass's options (parsed by [dargs](https://github.com/sindresorhus/dargs)).
 
 Run `sass -h` for a complete list of Sass options.
 
