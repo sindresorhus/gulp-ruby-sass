@@ -1,11 +1,13 @@
 'use strict';
-
 var fs = require('fs');
-var sass = require('./');
 var path = require('path');
 var assert = require('assert');
+var pathExists = require('path-exists');
 var convert = require('convert-source-map');
 var sourcemaps = require('gulp-sourcemaps');
+
+var sass = require('./');
+var utils = require('./utils');
 
 var expectedSources = [
 	'_obj-1.scss,_partial-1.scss,component/_obj-2.scss,fixture-a.scss',
@@ -42,6 +44,10 @@ function rejectFromArray (baseArray, rejectArray) {
 		return rejectArray.indexOf(value) === -1
 	});
 }
+
+beforeEach(function(done) {
+	sass.clearCache(undefined, undefined, done);
+});
 
 it('compiles Sass from file source', function (done) {
 	this.timeout(20000);
@@ -259,5 +265,58 @@ it('`emitCompileError` emits a gulp error when Sass compilation fails', function
 	.on('end', function () {
 		assert(errorOccured, 'An error was not thrown');
 		done();
+	});
+});
+
+it('clears a single source\'s intermediateDir when clearCache is called with a source', function (done) {
+	this.timeout(20000);
+
+	var source = 'fixture/source/fixture-a.scss';
+	var options = {
+		quiet: true,
+		tempDir: '.tmp'
+	};
+	var intermediateDir = utils.uniqueIntermediateDirectory(options.tempDir, source);
+
+	sass(source, options)
+
+	.on('data', function () {})
+
+	.on('end', function () {
+		assert(pathExists.sync(intermediateDir));
+		done();
+
+		sass.clearCache(source, {}, function () {
+			assert(!pathExists.sync(intermediateDir));
+			done();
+		});
+	});
+});
+
+it('clears every intermediateDir for a cwd when clearCache is called without a source', function (done) {
+	this.timeout(20000);
+
+	var source = 'fixture/source/fixture-a.scss';
+	var options = {
+		quiet: true,
+		tempDir: '.tmp'
+	};
+	var cacheDir = utils.cacheDirectory(options.tempDir);
+
+	sass(source, options)
+
+	.on('data', function () {})
+
+	// TODO: This is somewhat of an inference. Could be hardend by running
+	// multiple tasks, clearing cache and asserting when all are done. For now
+	// this is acceptable.
+	.on('end', function () {
+		assert(pathExists.sync(cacheDir));
+		done();
+
+		sass.clearCache(source, {}, function () {
+			assert(!pathExists.sync(cacheDir));
+			done();
+		});
 	});
 });
