@@ -38,13 +38,13 @@ gulp.task('sass', function () {
 
 ##### source
 
-Type: `string`
+Type: `String`
 
 A directory or file to compile. Note gulp-ruby-sass does not use globs. It only accepts the input values that Ruby Sass accepts.
 
 ##### options
 
-Type: `string`
+Type: `String`
 
 An object containing plugin and Sass options.
 
@@ -56,21 +56,21 @@ Use [gulp-watch](https://github.com/gulpjs/gulp/blob/master/docs/API.md#gulpwatc
 
 #### verbose
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Gives some extra information for debugging, including the actual spawned Sass command.
 
 #### bundleExec
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Run `sass` with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
 
 #### sourcemap
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Requires Sass `>=3.4` and [`gulp-sourcemaps`](https://github.com/floridoo/gulp-sourcemaps).
@@ -115,7 +115,7 @@ This plugin compiles Sass files to a temporary directory before pushing them thr
 
 #### emitCompileError
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 If set to true the plugin will emit a gulp error when Sass compilation fails. This error can be used to exit the stream early. Note exiting early will break Sass's default behavior of writing a special CSS file that shows errors in the browser.
@@ -141,112 +141,112 @@ The docs below list common options for convenience. Run `sass -h` for the comple
 
 #### loadPath
 
-Type: `string`, `array`  
+Type: `String` or `Array`  
 Default: `false`
 
 Import paths.
 
 #### require
 
-Type: `string`  
+Type: `String`  
 Default: `false`
 
 Require a Ruby library before running Sass.
 
 #### compass
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Make Compass imports available and load project configuration.
 
 #### style
 
-Type: `string`  
+Type: `String`  
 Default: `nested`
 
 Output style. Can be nested (default), compact, compressed, or expanded.
 
 #### force
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Recompile every Sass file, even if the CSS file is newer.
 
 #### stopOnError
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 If a file fails to compile, exit immediately.
 
 #### defaultEncoding
 
-Type: `string`  
+Type: `String`  
 Default: `false`
 
 Specify the default encoding for input files.
 
 #### unixNewlines
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Use Unix-style newlines in written files on non-Unix systems. Always true on Unix.
 
 #### debugInfo
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Emit output that can be used by the FireSass Firebug plugin.
 
 #### lineNumbers
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Emit comments in the generated CSS indicating the corresponding source line.
 
 #### check
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Just check syntax, don't evaluate.
 
 #### precision 
 
-Type: `number`  
+Type: `Number`  
 Default: `5`
 
 How many digits of precision to use when outputting decimal numbers.
 
 #### cacheLocation
 
-Type: `string`  
+Type: `String`  
 Default: `false`
 
 The path to save parsed Sass files. Defaults to .sass-cache.
 
 #### noCache
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Don't cache parsed Sass files.
 
 #### trace
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Show a full Ruby stack trace on error.
 
 #### quiet
 
-Type: `boolean`  
+Type: `Boolean`  
 Default: `false`
 
 Silence warnings and status messages during compilation.
