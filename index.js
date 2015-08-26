@@ -17,18 +17,10 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 
 var logger = require('./logger');
+var utils = require('./utils');
 
-function emitErr (stream, err) {
-	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
-};
-
-function uniqueIntermediateDirectory (tempDir, source) {
-	return slash(path.join(
-		tempDir,
-		'gulp-ruby-sass',
-		'cwd-' + md5Hex(process.cwd()) + '-source-' + md5Hex(source)
-	));
-};
+var emitErr = utils.emitErr
+var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
