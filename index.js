@@ -222,4 +222,4 @@ gulpRubySass.clearCache = function (source, tempDir, done) {
 	}
 };
 
-module.exports = gulpRubySass
+module.exports = gulpRubySass;
