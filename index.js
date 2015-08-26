@@ -46,12 +46,12 @@ function gulpRubySass (source, options) {
 
 	// error if user tries to watch their files with the Sass gem
 	if (options.watch || options.poll) {
-		throw new Error('`watch` and `poll` are not valid options for gulp-ruby-sass. Use `gulp.watch` to rebuild your files on change.');
+		emitErr(stream, '`watch` and `poll` are not valid options for gulp-ruby-sass. Use `gulp.watch` to rebuild your files on change.');
 	}
 
 	// error if user tries to pass a Sass option to sourcemap
 	if (typeof options.sourcemap !== 'boolean') {
-		throw new Error('The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
+		emitErr(stream, 'The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
 	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
