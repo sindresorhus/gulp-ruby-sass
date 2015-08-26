@@ -17,15 +17,20 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 
 var logger = require('./logger');
+var utils = require('./utils');
 
-function emitErr (stream, err) {
-	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
+var cacheDirectory = utils.cacheDirectory
+var emitErr = utils.emitErr
+var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory
+
+var sharedDefaults = {
+	tempDir: osTmpdir()
 }
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
 	var defaults = {
-		tempDir: osTmpdir(),
+		tempDir: sharedDefaults.tempDir,
 		verbose: false,
 		sourcemap: false,
 		emitCompileError: false
@@ -59,18 +64,15 @@ function gulpRubySass (source, options) {
 
 	// create temporary directory path for the task using current working
 	// directory, source and options
-	// sass options need unix style slashes
-	var intermediateDir = slash(path.join(
-		options.tempDir,
-		'gulp-ruby-sass-' + md5Hex(cwd) + md5Hex(source + JSON.stringify(options))
-	));
+	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
 	var base;
 	var compileMapping;
 
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMapping = source + ':' + intermediateDir;
+		// sass options need unix style slashes
+		compileMapping = source + ':' + slash(intermediateDir);
 		options.update = true;
 	}
 
@@ -78,13 +80,13 @@ function gulpRubySass (source, options) {
 	else {
 		base = path.join(cwd, path.dirname(source));
 
-		// sass options need unix style slashes
-		var dest = slash(path.join(
+		var dest = path.join(
 			intermediateDir,
 			gutil.replaceExtension(path.basename(source), '.css')
-		));
+		);
 
-		compileMapping = [ source, dest ];
+		// sass options need unix style slashes
+		compileMapping = [ source, slash(dest) ];
 
 		// sass's single file compilation doesn't create a destination directory, so
 		// we have to ourselves
@@ -191,13 +193,7 @@ function gulpRubySass (source, options) {
 					return;
 				});
 			}, function () {
-				// cleanup previously generated files for next run
-				// TODO: This kills caching. Keeping will push files through that are not in
-				// the current gulp.src. We need to decide whether to use a Sass style caching
-				// strategy, or a gulp style strategy, and what each would look like.
-				rimraf(intermediateDir, function () {
-					stream.push(null);
-				});
+				stream.push(null);
 			});
 		});
 	});
@@ -205,10 +201,25 @@ function gulpRubySass (source, options) {
 	return stream;
 };
 
-gulpRubySass.logError = function logError(err) {
+gulpRubySass.logError = function (err) {
   var message = new gutil.PluginError('gulp-ruby-sass', err);
   process.stderr.write(message + '\n');
   this.emit('end');
 };
 
-module.exports = gulpRubySass
+gulpRubySass.clearCache = function (source, tempDir, done) {
+	tempDir = tempDir || sharedDefaults.tempDir;
+
+	// clear either a single source's intermediate dir or the entire grs cache
+	var dir = source ? uniqueIntermediateDirectory(tempDir, source) : cacheDirectory(tempDir);
+
+	// Run async if a callback was passed, sync if not
+	if (done) {
+		rimraf(dir, done);
+	}
+	else {
+		rimraf.sync(dir);
+	}
+};
+
+module.exports = gulpRubySass;
