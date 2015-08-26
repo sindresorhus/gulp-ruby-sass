@@ -99,7 +99,7 @@ Log the spawned Sass or Bundler command. Useful for debugging.
 
 ##### Sass options
 
-Any additional options are passed directly to the Sass executable. The options are camelCase versions of Sass's options parsed by [dargs](https://github.com/sindresorhus/dargs).
+Any additional options are passed directly to the Sass executable. Options are camelCase versions of Sass's options (parsed by [dargs](https://github.com/sindresorhus/dargs)).
 
 Run `sass -h` for a complete list of Sass options.
 
@@ -115,6 +115,50 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('result'));
 });
 ```
+
+### sass.clearCache([source, tempDir, done])
+
+To enable Sass caching this plugin must keep a cache of each task's compiled files in a temporary directory. 
+
+Usually this works with no further user input. BUT, if you're compiling a directory and rename or delete source files you will need to run the `clearCache` function to prevent stale files from being piped through the stream.
+
+```js
+var sass = require('gulp-ruby-sass');
+
+gulp.task('sass-theme', function () {
+  return sass('theme/source').pipe(gulp.dest('result'));
+});
+
+gulp.task('sass-app', function () {
+  return sass('app/source').pipe(gulp.dest('result'));
+});
+
+gulp.task('clear-theme-cache', function () {
+  return sass.clearCache('theme/source');
+});
+
+gulp.task('clear-all-caches', function () {
+  return sass.clearCache();
+});
+```
+
+#### source
+
+Type: `string`
+
+The source of the task who's cache should be cleared. If no source is given `clearCache` will delete the cache for all gulp-ruby-sass tasks run from the current directory.
+
+#### tempDir
+
+Type: `string`
+
+If a gulp-ruby-sass task has the [`tempDir`](#tempdir) option set it must be passed to `clearCache`.
+
+#### done
+
+Type: `function`
+
+Pass a `done` callback to make the `clearCache` function asynchronous. If no function is provided the sync version of `clearCache` will be used.
 
 ## Issues
 
