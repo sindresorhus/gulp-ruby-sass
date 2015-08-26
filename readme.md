@@ -5,12 +5,11 @@ To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://git
 
 ## Install
 
-You must have [Sass >=3.4](http://sass-lang.com/install).
-
 ```
 $ npm install --save-dev gulp-ruby-sass
 ```
 
+Requires [Sass >=3.4](http://sass-lang.com/install).
 
 ## Important!
 
