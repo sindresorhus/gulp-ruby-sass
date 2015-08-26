@@ -36,20 +36,18 @@ A directory or file to compile. Note gulp-ruby-sass does not use globs. It only 
 
 #### options
 
-Type: `String`
+Type: `Object`
 
-An object containing plugin and Sass options.
+An object containing plugin and Sass options. Available options include:
 
-### Plugin options
-
-#### bundleExec
+##### bundleExec
 
 Type: `Boolean`  
 Default: `false`
 
 Run Sass with [bundle exec](http://gembundler.com/man/bundle-exec.1.html).
 
-#### sourcemap
+##### sourcemap
 
 Type: `Boolean`  
 Default: `false`
@@ -78,28 +76,28 @@ gulp.task('sass', function () {
 });
 ```
 
-#### tempDir
+##### tempDir
 
 Type: `String`  
 Default: the system temp directory as reported by [os-tempDir](https://github.com/sindresorhus/os-tmpdir)
 
 This plugin compiles Sass files to a temporary directory before pushing them through the stream. Use `tempDir` to choose an alternate directory if you aren't able to use the default OS temporary directory.
 
-#### emitCompileError
+##### emitCompileError
 
 Type: `Boolean`  
 Default: `false`
 
 Emit a gulp error when Sass compilation fails.
 
-#### verbose
+##### verbose
 
 Type: `Boolean`  
 Default: `false`
 
 Log the spawned Sass or Bundler command. Useful for debugging.
 
-### Sass options
+##### Sass options
 
 Any additional options are passed directly to the Sass executable. The options are camelCase versions of Sass's options parsed by [dargs](https://github.com/sindresorhus/dargs).
 
