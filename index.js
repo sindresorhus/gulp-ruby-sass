@@ -17,26 +17,15 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 
 var logger = require('./logger');
+var utils = require('./utils');
+
+var cacheDirectory = utils.cacheDirectory
+var emitErr = utils.emitErr
+var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory
 
 var sharedDefaults = {
 	tempDir: osTmpdir()
 }
-
-function emitErr (stream, err) {
-	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
-};
-
-function cacheDirectory (tempDir) {
-	return path.join(tempDir, 'gulp-ruby-sass');
-};
-
-function uniqueIntermediateDirectory (tempDir, source) {
-	return path.join(
-		tempDir,
-		'gulp-ruby-sass',
-		'cwd-' + md5Hex(process.cwd()) + '-source-' + md5Hex(source)
-	));
-};
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
