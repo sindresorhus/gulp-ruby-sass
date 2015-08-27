@@ -59,6 +59,10 @@ function gulpRubySass (source, options) {
 	// create temporary directory path for the task using current working
 	// directory, source and options
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
+
+	// Sass's single file compilation doesn't create a destination directory
+	mkdirp(intermediateDir);
+
 	var base;
 	var dest;
 
@@ -75,10 +79,6 @@ function gulpRubySass (source, options) {
 			intermediateDir,
 			gutil.replaceExtension(path.basename(source), '.css')
 		);
-
-		// sass's single file compilation doesn't create a destination directory, so
-		// we have to ourselves
-		mkdirp(intermediateDir);
 	}
 
 	var compileMapping = source + ':' + dest;
