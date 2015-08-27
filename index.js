@@ -60,29 +60,28 @@ function gulpRubySass (source, options) {
 	// directory, source and options
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
 	var base;
-	var compileMapping;
+	var dest;
 
 	// directory source
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
-		compileMapping = source + ':' + intermediateDir;
+		dest = intermediateDir;
 	}
 
 	// single file source
 	else {
 		base = path.join(cwd, path.dirname(source));
-
-		var dest = path.join(
+		dest = path.join(
 			intermediateDir,
 			gutil.replaceExtension(path.basename(source), '.css')
 		);
-
-		compileMapping = [ source, dest ];
 
 		// sass's single file compilation doesn't create a destination directory, so
 		// we have to ourselves
 		mkdirp(intermediateDir);
 	}
+
+	var compileMapping = source + ':' + dest;
 
 	// TODO: implement glob file source
 
