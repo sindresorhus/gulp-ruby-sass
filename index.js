@@ -23,14 +23,14 @@ var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
-	var defaults = {
+
+	options = assign({
 		tempDir: osTmpdir(),
 		verbose: false,
 		sourcemap: false,
 		emitCompileError: false
-	};
+	}, options);
 
-	options = assign(defaults, options);
 	options.update = true;
 
 	var stream = new Readable({objectMode: true});
