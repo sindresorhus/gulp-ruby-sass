@@ -30,10 +30,11 @@ function gulpRubySass (source, options) {
 		emitCompileError: false
 	};
 
+	options = assign(defaults, options);
+	options.update = true;
+
 	var stream = new Readable({objectMode: true});
 	stream._read = function () {}; 	// redundant but necessary
-
-	options = assign(defaults, options);
 
 	// alert user that `container` is deprecated
 	if (options.container) {
@@ -53,7 +54,6 @@ function gulpRubySass (source, options) {
 		emitErr(stream, 'The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
-	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
 	// create temporary directory path for the task using current working
@@ -66,7 +66,6 @@ function gulpRubySass (source, options) {
 	if (path.extname(source) === '') {
 		base = path.join(cwd, source);
 		compileMapping = source + ':' + intermediateDir;
-		options.update = true;
 	}
 
 	// single file source
