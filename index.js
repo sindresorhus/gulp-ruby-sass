@@ -9,6 +9,7 @@ var rimraf = require('rimraf');
 var md5Hex = require('md5-hex');
 var spawn = require('win-spawn');
 var gutil = require('gulp-util');
+var glob2base = require('glob2base');
 var assign = require('object-assign');
 var convert = require('convert-source-map');
 var eachAsync = require('each-async');
@@ -64,26 +65,29 @@ function gulpRubySass (source, options) {
 	mkdirp(intermediateDir);
 
 	var base;
-	var dest;
 
+	// glob source
+	if (glob.hasMagic(source)) {
+		base = glob2base(new glob.Glob(source));
+	}
 	// directory source
-	if (path.extname(source) === '') {
-		base = path.join(cwd, source);
-		dest = intermediateDir;
+	else if (fs.statSync(source).isDirectory()) {
+		base = source;
 	}
-
-	// single file source
+	// file source
 	else {
-		base = path.join(cwd, path.dirname(source));
-		dest = path.join(
-			intermediateDir,
-			gutil.replaceExtension(path.basename(source), '.css')
-		);
+		base = path.dirname(source);
 	}
 
-	var compileMapping = source + ':' + dest;
+	var compileMappings = glob.sync(source).map(function (match) {
+		var dest = match.replace(new RegExp('^' + base), intermediateDir);
 
-	// TODO: implement glob file source
+		if (path.extname(dest) !== '') {
+			dest = gutil.replaceExtension(dest, '.css');
+		}
+
+    return match + ':' + dest;
+  });
 
 	var args = dargs(options, [
 		'bundleExec',
@@ -93,7 +97,7 @@ function gulpRubySass (source, options) {
 		'verbose',
 		'emitCompileError',
 		'container'
-	]).concat(compileMapping);
+	]).concat(compileMappings);
 
 	var command;
 
