@@ -1,0 +1,53 @@
+/*
+Error: File to import not found or unreadable: i-dont-exist.
+       Load path: /Users/RobW/Documents/OSS/gulp-ruby-sass/test/source
+        on line 1 of source/error.scss
+
+1: @import 'i-dont-exist';
+
+Backtrace:
+source/error.scss:1
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/import_node.rb:66:in `rescue in import'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/import_node.rb:45:in `import'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/import_node.rb:28:in `imported_file'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/import_node.rb:37:in `css_import?'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:311:in `visit_import'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/stack.rb:79:in `block in with_base'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/stack.rb:115:in `with_frame'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/stack.rb:79:in `with_base'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:52:in `map'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:52:in `visit_children'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:167:in `block in visit_children'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:166:in `visit_children'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `block in visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:186:in `visit_root'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:157:in `visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/visitors/perform.rb:8:in `visit'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/root_node.rb:36:in `css_tree'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/tree/root_node.rb:20:in `render'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/engine.rb:268:in `render'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:492:in `update_stylesheet'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:209:in `each'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/plugin.rb:82:in `update_stylesheets'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/exec/sass_scss.rb:361:in `watch_or_update'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/exec/base.rb:52:in `parse'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/lib/sass/exec/base.rb:19:in `parse!'
+/Users/RobW/.rvm/gems/ruby-2.2.2/gems/sass-3.4.13/bin/sass:13:in `<top (required)>'
+/Users/RobW/.rvm/gems/ruby-2.2.2/bin/sass:23:in `load'
+/Users/RobW/.rvm/gems/ruby-2.2.2/bin/sass:23:in `<main>'
+/Users/RobW/.rvm/gems/ruby-2.2.2/bin/ruby_executable_hooks:15:in `eval'
+/Users/RobW/.rvm/gems/ruby-2.2.2/bin/ruby_executable_hooks:15:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: File to import not found or unreadable: i-dont-exist.\A        Load path: /Users/RobW/Documents/OSS/gulp-ruby-sass/test/source\A         on line 1 of source/error.scss\A \A 1: @import 'i-dont-exist';"; }
