@@ -1,0 +1,9 @@
+a {
+  color: green; }
+
+html {
+  font-size: 16px; }
+
+body {
+  color: black;
+  content: 'mixin from nested partial'; }
