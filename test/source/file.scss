@@ -1,0 +1,17 @@
+@import 'partial';
+@import 'directory/nested-partial';
+
+$base-font-size: 16px !default;
+
+@mixin foo() {
+	color: black;
+}
+
+html {
+	font-size: $base-font-size;
+}
+
+body {
+	@include foo();
+	@include bar();
+}

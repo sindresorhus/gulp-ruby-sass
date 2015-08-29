@@ -1,6 +1,0 @@
-@import '../partial-1';
-@import '../component/obj-2';
-
-h2 {
-	@include baz();
-}
