@@ -43,34 +43,6 @@ function rejectFromArray (baseArray, rejectArray) {
 	});
 }
 
-it('compiles Sass from file source', function (done) {
-	this.timeout(20000);
-
-	var files = [];
-
-	sass('fixture/source/fixture-a.scss', {
-		quiet: true,
-		unixNewlines: true
-	})
-
-	.on('data', function (data) {
-		files.push(data);
-	})
-
-	.on('end', function () {
-		// number of files
-		assert.equal(files.length, 1);
-
-		// file paths
-		assert.equal(files[0].relative, 'fixture-a.css');
-
-		// file contents
-		assert.equal(files[0].contents.toString(), expectedFixtureAContents);
-
-		done();
-	});
-});
-
 it('compiles Sass from directory source', function (done) {
 	this.timeout(20000);
 
