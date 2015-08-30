@@ -38,3 +38,50 @@ describe('compiles single file source', function() {
 		);
 	});
 });
+
+describe('compiles directory source', function() {
+	this.timeout(20000);
+	var files = [];
+
+	before(function(done) {
+		sass('source', defaultOptions)
+		.on('data', function (data) {
+			files.push(data);
+		})
+		.on('end', done);
+	});
+
+	it('creates correct number of files', function () {
+		assert.equal(files.length, 5);
+	});
+
+	it('creates file at correct path', function () {
+		files.forEach(function (file) {
+			assert(
+				fs.statSync( path.join('result', file.relative) ).isFile(),
+				'The file doesn\'t exist in the results directory.'
+			);
+		});
+	});
+
+	it('creates correct file contents', function () {
+		files.forEach(function (file) {
+			// the stack trace in the error file is specific to the system it's
+			// compiled on, so we just check for the error message
+			if (file.basename === 'error.css') {
+				var expectedError = 'Error: File to import not found or unreadable: i-dont-exist.';
+
+				assert(
+					file.contents.toString().indexOf(expectedError) !== -1,
+					'The error file does not contain the expected message "' + expectedError + '".'
+				);
+			}
+			else {
+				assert.deepEqual(
+					file.contents.toString(),
+					new vinylFile.readSync( path.join('result', file.relative )).contents.toString()
+				);
+			}
+		});
+	});
+});
