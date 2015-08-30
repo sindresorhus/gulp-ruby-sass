@@ -2,6 +2,7 @@
 var fs = require('fs');
 var path = require('path');
 var assert = require('assert');
+var assign = require('object-assign');
 var vinylFile = require('vinyl-file');
 
 var sass = require('../');
@@ -82,6 +83,63 @@ describe('compiles directory source', function() {
 					new vinylFile.readSync( path.join('result', file.relative )).contents.toString()
 				);
 			}
+		});
+	});
+});
+
+describe('creates vinyl sourcemaps', function() {
+	this.timeout(20000);
+	var files = [];
+
+	before(function(done) {
+		var options = assign({}, defaultOptions, { sourcemap: true });
+
+		sass('source/file.scss', options)
+		.on('data', function (data) {
+			files.push(data);
+		})
+		.on('end', done);
+	});
+
+	it('does not stream Sass sourcemap files', function () {
+		assert.equal(files.length, 1);
+	});
+
+	it('removes Sass sourcemap comment', function () {
+		assert(
+			files[0].contents.toString().indexOf('sourceMap') === -1,
+			'File contains sourcemap comment'
+		);
+	});
+
+	it('adds vinyl sourcemap', function () {
+		assert.equal(typeof files[0].sourceMap, 'object')
+		assert.equal(files[0].sourceMap.version, 3)
+	});
+
+	it('includes the correct sources', function () {
+		assert.deepEqual(
+			files[0].sourceMap.sources,
+			['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
+		)
+	});
+
+	describe('for files and directories with spaces', function() {
+		before(function(done) {
+			var options = assign({}, defaultOptions, { sourcemap: true });
+
+			sass('source/directory with spaces/file with spaces.scss', options)
+			.on('data', function (data) {
+				files.push(data);
+			})
+			.on('end', done);
+		});
+
+		it('includes the correct sources', function () {
+			assert.deepEqual(
+				files[1].sourceMap.sources,
+				['file with spaces.scss']
+			);
 		});
 	});
 });
