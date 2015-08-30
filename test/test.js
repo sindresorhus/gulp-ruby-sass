@@ -89,6 +89,50 @@ describe('compiles directory source', function () {
 	});
 });
 
+describe('concurrency', function () {
+	this.timeout(20000);
+	var aFiles = [];
+	var bFiles = [];
+	var cFiles = [];
+	var counter = 0;
+	var isDone = function(done) {
+		counter++
+		if (counter === 3) { done(); }
+	}
+
+	before(function(done) {
+		sass('source/file.scss', defaultOptions)
+		.on('data', function (data) {
+			aFiles.push(data);
+		})
+		.on('end', function () {
+			isDone(done);
+		});
+
+		sass('source/directory/nested-file.scss', defaultOptions)
+		.on('data', function (data) {
+			bFiles.push(data);
+		})
+		.on('end', function () {
+			isDone(done);
+		});
+
+		sass('source/directory with spaces/file with spaces.scss', defaultOptions)
+		.on('data', function (data) {
+			cFiles.push(data);
+		})
+		.on('end', function () {
+			isDone(done);
+		});
+	});
+
+	it('result files aren\'t intermixed when tasks are run simultaniously', function () {
+		assert.equal(aFiles.length, 1);
+		assert.equal(bFiles.length, 1);
+		assert.equal(cFiles.length, 1);
+	});
+});
+
 describe('creates vinyl sourcemaps', function () {
 	this.timeout(20000);
 	var files = [];
