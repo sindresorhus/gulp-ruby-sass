@@ -12,7 +12,7 @@ var defaultOptions = {
 	unixNewlines: true // normalize compilation results on Windows systems
 };
 
-describe('compiles single file source', function() {
+describe('compiles single file source', function () {
 	this.timeout(20000);
 	var files = [];
 
@@ -40,7 +40,7 @@ describe('compiles single file source', function() {
 	});
 });
 
-describe('compiles directory source', function() {
+describe('compiles directory source', function () {
 	this.timeout(20000);
 	var files = [];
 
@@ -87,7 +87,7 @@ describe('compiles directory source', function() {
 	});
 });
 
-describe('creates vinyl sourcemaps', function() {
+describe('creates vinyl sourcemaps', function () {
 	this.timeout(20000);
 	var files = [];
 
@@ -124,7 +124,7 @@ describe('creates vinyl sourcemaps', function() {
 		)
 	});
 
-	describe('for files and directories with spaces', function() {
+	describe('for files and directories with spaces', function () {
 		before(function(done) {
 			var options = assign({}, defaultOptions, { sourcemap: true });
 
@@ -161,7 +161,7 @@ describe('options', function () {
 			.on('end', done);
 		});
 
-		it('emits a gulp error when Sass compilation fails', function() {
+		it('emits a gulp error when Sass compilation fails', function () {
 			assert(error instanceof Error);
 			assert.equal(
 				error.message,
