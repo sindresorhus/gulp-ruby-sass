@@ -42,29 +42,3 @@ function rejectFromArray (baseArray, rejectArray) {
 		return rejectArray.indexOf(value) === -1
 	});
 }
-
-it('`emitCompileError` emits a gulp error when Sass compilation fails', function (done) {
-	this.timeout(20000);
-	var errorOccured = false;
-
-	sass('fixture/source/fixture-error.scss', {
-		quiet: true,
-		unixNewlines: true,
-		emitCompileError: true
-	})
-
-	.on('data', function () {})
-
-	.on('error', function (err) {
-		errorOccured = true;
-		assert.equal(
-			'Sass compilation failed. See console output for more information.',
-			err.message
-		);
-	})
-
-	.on('end', function () {
-		assert(errorOccured, 'An error was not thrown');
-		done();
-	});
-});
