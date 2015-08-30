@@ -143,3 +143,30 @@ describe('creates vinyl sourcemaps', function() {
 		});
 	});
 });
+
+describe('options', function () {
+	this.timeout(20000);
+
+	describe('emitCompileError', function () {
+		var error;
+
+		before(function(done) {
+			var options = assign({}, defaultOptions, { emitCompileError: true });
+
+			sass('source/error.scss', options)
+			.on('data', function () {})
+			.on('error', function (err) {
+				error = err;
+			})
+			.on('end', done);
+		});
+
+		it('emits a gulp error when Sass compilation fails', function() {
+			assert(error instanceof Error);
+			assert.equal(
+				error.message,
+				'Sass compilation failed. See console output for more information.'
+			);
+		});
+	});
+});
