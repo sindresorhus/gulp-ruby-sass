@@ -43,50 +43,6 @@ function rejectFromArray (baseArray, rejectArray) {
 	});
 }
 
-it('compiles Sass from directory source', function (done) {
-	this.timeout(20000);
-
-	var files = [];
-
-	sass('fixture/source', {
-		quiet: true,
-		unixNewlines: true
-	})
-
-	.on('data', function (data) {
-		files.push(data);
-	})
-
-	.on('end', function () {
-		// number of files
-		assert.equal(files.length, 3);
-
-		// file paths
-		assert.deepEqual(
-			[ files[0].relative, files[1].relative, files[2].relative ].sort(),
-			[ 'fixture-error.css', 'fixture-a.css', path.join('nested', 'fixture-b.css') ].sort()
-		);
-
-		// find the compile error file and remove it from the array
-		var validCssFiles = getValidCssFiles(files);
-		assert.equal(validCssFiles.length, 2);
-
-		// correctly compiled file contents
-		assert.deepEqual(
-		  [
-				validCssFiles[0].contents.toString(),
-				validCssFiles[1].contents.toString(),
-			].sort(),
-			[
-				expectedFixtureAContents,
-				expectedFixtureBContents
-			].sort()
-		);
-
-		done();
-	});
-});
-
 it('doesn\'t stream map files', function (done) {
 	this.timeout(20000);
 
