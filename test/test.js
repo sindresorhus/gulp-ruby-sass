@@ -1,11 +1,13 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var rimraf = require('rimraf');
 var assert = require('assert');
 var assign = require('object-assign');
 var vinylFile = require('vinyl-file');
 
 var sass = require('../');
+var uniqueIntermediateDirectory = require('../utils').uniqueIntermediateDirectory;
 
 var defaultOptions = {
 	quiet: true,
@@ -167,6 +169,31 @@ describe('options', function () {
 				error.message,
 				'Sass compilation failed. See console output for more information.'
 			);
+		});
+	});
+
+	describe('tempDir', function () {
+		it('compiles files to a specified directory', function (done) {
+			var source = 'source/file.scss';
+			var tempDir = './custom-temp-dir';
+			var options = assign({}, defaultOptions, { tempDir: tempDir });
+
+			sass(source, options)
+			.on('data', function (data) {
+				var expectedFileLocation = path.join(
+					uniqueIntermediateDirectory(tempDir, source),
+					data.relative
+				);
+
+				assert.equal(
+					data.contents.toString(),
+					fs.readFileSync(expectedFileLocation, {encoding: 'utf8'}),
+					'File does not exist in the custom temporary directory.'
+				);
+			})
+			.on('end', function () {
+				rimraf(tempDir, done);
+			});
 		});
 	});
 });
