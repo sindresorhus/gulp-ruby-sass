@@ -4,6 +4,7 @@ var path = require('path');
 var rimraf = require('rimraf');
 var assert = require('assert');
 var assign = require('object-assign');
+var vinylFile = require('vinyl-file');
 
 var sass = require('../');
 var uniqueIntermediateDirectory = require('../utils').uniqueIntermediateDirectory;
@@ -13,6 +14,14 @@ var defaultOptions = {
 	unixNewlines: true // normalize compilation results on Windows systems
 };
 
+// load the expected result file from the compiled results directory
+var expectedFile = function (relativePath) {
+	var base = path.join(process.cwd(), 'result');
+	var file = path.join(base, relativePath);
+
+	return vinylFile.readSync(file, { base: base });
+};
+
 var sortByRelative = function (a, b) {
   return a.relative.localeCompare(b.relative);
 };
@@ -20,6 +29,7 @@ var sortByRelative = function (a, b) {
 describe('single file source', function () {
 	this.timeout(20000);
 	var files = [];
+	var expected = expectedFile('file.css');
 
 	before(function(done) {
 		sass('source/file.scss', defaultOptions)
@@ -34,13 +44,13 @@ describe('single file source', function () {
 	});
 
 	it('creates file at correct path', function () {
-		assert.equal(files[0].relative, 'file.css');
+		assert.equal(files[0].relative, expected.relative);
 	});
 
 	it('creates correct file contents', function () {
 		assert.equal(
 			files[0].contents.toString(),
-			fs.readFileSync('result/file.css', {encoding: 'utf8'})
+			expected.contents.toString()
 		);
 	});
 });
@@ -49,11 +59,11 @@ describe('directory source', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		'directory with spaces/file with spaces.css',
-		'directory/nested-file.css',
-		'error.css',
-		'file.css',
-		'warnings.css'
+		expectedFile('directory with spaces/file with spaces.css'),
+		expectedFile('directory/nested-file.css'),
+		expectedFile('error.css'),
+		expectedFile('file.css'),
+		expectedFile('warnings.css')
 	];
 
 	before(function(done) {
@@ -73,7 +83,7 @@ describe('directory source', function () {
 
 	it('creates file at correct path', function () {
 		files.forEach(function (file, i) {
-			assert.equal( file.relative, expected[i] );
+			assert.equal(file.relative, expected[i].relative);
 		});
 	});
 
@@ -92,7 +102,7 @@ describe('directory source', function () {
 			else {
 				assert.deepEqual(
 					file.contents.toString(),
-					fs.readFileSync(path.join('result', expected[i]), {encoding: 'utf8'})
+					expected[i].contents.toString()
 				);
 			}
 		});
@@ -103,8 +113,8 @@ describe('glob source', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		'directory with spaces/file with spaces.css',
-		'file.css',
+		expectedFile('directory with spaces/file with spaces.css'),
+		expectedFile('file.css')
 	];
 
 	before(function(done) {
@@ -124,7 +134,7 @@ describe('glob source', function () {
 
 	it('creates file at correct path', function () {
 		files.forEach(function (file, i) {
-			assert.equal( file.relative, expected[i] );
+			assert.equal(file.relative, expected[i].relative);
 		});
 	});
 
@@ -132,7 +142,7 @@ describe('glob source', function () {
 		files.forEach(function (file, i) {
 			assert.deepEqual(
 				file.contents.toString(),
-				fs.readFileSync(path.join('result', expected[i]), {encoding: 'utf8'})
+				expected[i].contents.toString()
 			);
 		});
 	});
