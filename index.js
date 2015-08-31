@@ -19,8 +19,8 @@ var pathExists = require('path-exists');
 var logger = require('./logger');
 var utils = require('./utils');
 
-var emitErr = utils.emitErr
-var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory
+var emitErr = utils.emitErr;
+var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();

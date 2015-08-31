@@ -96,9 +96,9 @@ describe('concurrency', function () {
 	var cFiles = [];
 	var counter = 0;
 	var isDone = function(done) {
-		counter++
+		counter++;
 		if (counter === 3) { done(); }
-	}
+	};
 
 	before(function(done) {
 		sass('source/file.scss', defaultOptions)
@@ -159,15 +159,15 @@ describe('creates vinyl sourcemaps', function () {
 	});
 
 	it('adds vinyl sourcemap', function () {
-		assert.equal(typeof files[0].sourceMap, 'object')
-		assert.equal(files[0].sourceMap.version, 3)
+		assert.equal(typeof files[0].sourceMap, 'object');
+		assert.equal(files[0].sourceMap.version, 3);
 	});
 
 	it('includes the correct sources', function () {
 		assert.deepEqual(
 			files[0].sourceMap.sources,
 			['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
-		)
+		);
 	});
 
 	describe('for files and directories with spaces', function () {
