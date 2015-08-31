@@ -235,7 +235,35 @@ describe('sourcemap', function () {
 		);
 	});
 
+	describe('compiling files from glob source', function () {
+		var expected = [
+			[ 'directory with spaces/file with spaces.scss' ],
+			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
+		];
+
+		before(function(done) {
+			files = [];
+
+			sass('source/**/file*.scss', options)
+			.on('data', function (data) {
+				files.push(data);
+			})
+			.on('end', function() {
+				files.sort(sortByRelative);
+				done();
+			});
+		});
+
+		it('includes the correct sources', function () {
+			files.forEach(function (file, i) {
+				assert.deepEqual(file.sourceMap.sources, expected[i]);
+			});
+		});
+	});
+
 	describe('compiling files and directories with spaces', function () {
+		var expected = ['file with spaces.scss'];
+
 		before(function(done) {
 			files = [];
 
@@ -247,10 +275,7 @@ describe('sourcemap', function () {
 		});
 
 		it('includes the correct sources', function () {
-			assert.deepEqual(
-				files[0].sourceMap.sources,
-				['file with spaces.scss']
-			);
+			assert.deepEqual(files[0].sourceMap.sources, expected);
 		});
 	});
 });
