@@ -1,6 +1,6 @@
 'use strict';
 var gutil = require('gulp-util');
-var emitErr = require('./utils').emitErr
+var emitErr = require('./utils').emitErr;
 
 // Remove intermediate directory for more Sass-like logging
 function prettifyDirectoryLogging (msg, intermediateDir) {
