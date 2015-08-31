@@ -41,8 +41,8 @@ function gulpRubySass (source, options) {
 	if (options.container) {
 		gutil.log(gutil.colors.yellow(
 			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
-		  'This will become an error in gulp-ruby-sass 2.0'
-	  ));
+			'This will become an error in gulp-ruby-sass 2.0'
+		));
 	}
 
 	// error if user tries to watch their files with the Sass gem
@@ -209,9 +209,9 @@ function gulpRubySass (source, options) {
 }
 
 gulpRubySass.logError = function logError(err) {
-  var message = new gutil.PluginError('gulp-ruby-sass', err);
-  process.stderr.write(message + '\n');
-  this.emit('end');
+	var message = new gutil.PluginError('gulp-ruby-sass', err);
+	process.stderr.write(message + '\n');
+	this.emit('end');
 };
 
 module.exports = gulpRubySass;
