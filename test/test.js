@@ -44,10 +44,12 @@ describe('single file source', function () {
 	});
 
 	it('creates file at correct path', function () {
+		assert(files.length);
 		assert.equal(files[0].relative, expected.relative);
 	});
 
 	it('creates correct file contents', function () {
+		assert(files.length);
 		assert.equal(
 			files[0].contents.toString(),
 			expected.contents.toString()
@@ -82,12 +84,14 @@ describe('directory source', function () {
 	});
 
 	it('creates file at correct path', function () {
+		assert(files.length);
 		files.forEach(function (file, i) {
 			assert.equal(file.relative, expected[i].relative);
 		});
 	});
 
 	it('creates correct file contents', function () {
+		assert(files.length);
 		files.forEach(function (file, i) {
 			// the stack trace in the error file is specific to the system it's
 			// compiled on, so we just check for the error message
@@ -133,12 +137,14 @@ describe('glob source', function () {
 	});
 
 	it('creates file at correct path', function () {
+		assert(files.length);
 		files.forEach(function (file, i) {
 			assert.equal(file.relative, expected[i].relative);
 		});
 	});
 
 	it('creates correct file contents', function () {
+		assert(files.length);
 		files.forEach(function (file, i) {
 			assert.deepEqual(
 				file.contents.toString(),
