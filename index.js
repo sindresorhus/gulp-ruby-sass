@@ -4,7 +4,6 @@ var path = require('path');
 var Readable = require('stream').Readable;
 var glob = require('glob');
 var dargs = require('dargs');
-var slash = require('slash');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
 var md5Hex = require('md5-hex');
@@ -59,7 +58,6 @@ function gulpRubySass (source, options) {
 
 	// create temporary directory path for the task using current working
 	// directory, source and options
-	// sass options need unix style slashes
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
 	var base;
 	var compileMapping;
@@ -75,11 +73,10 @@ function gulpRubySass (source, options) {
 	else {
 		base = path.join(cwd, path.dirname(source));
 
-		// sass options need unix style slashes
-		var dest = slash(path.join(
+		var dest = path.join(
 			intermediateDir,
 			gutil.replaceExtension(path.basename(source), '.css')
-		));
+		);
 
 		compileMapping = [ source, dest ];
 
