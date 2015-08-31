@@ -232,7 +232,7 @@ describe('options', function () {
 
 				assert.equal(
 					data.contents.toString(),
-					fs.readFileSync('result/file.css', {encoding: 'utf8'}),
+					fs.readFileSync(expectedFileLocation, {encoding: 'utf8'}),
 					'File does not exist in the custom temporary directory.'
 				);
 			})
