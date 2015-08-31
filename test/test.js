@@ -13,7 +13,7 @@ var defaultOptions = {
 	unixNewlines: true // normalize compilation results on Windows systems
 };
 
-describe('compiles single file source', function () {
+describe('single file source', function () {
 	this.timeout(20000);
 	var files = [];
 
@@ -41,7 +41,7 @@ describe('compiles single file source', function () {
 	});
 });
 
-describe('compiles directory source', function () {
+describe('directory source', function () {
 	this.timeout(20000);
 	var files = [];
 
@@ -88,7 +88,7 @@ describe('compiles directory source', function () {
 	});
 });
 
-describe('concurrency', function () {
+describe('concurrently run tasks', function () {
 	this.timeout(20000);
 	var aFiles = [];
 	var bFiles = [];
@@ -125,14 +125,14 @@ describe('concurrency', function () {
 		});
 	});
 
-	it('result files aren\'t intermixed when tasks are run simultaniously', function () {
+	it('don\'t intermix result files', function () {
 		assert.equal(aFiles.length, 1);
 		assert.equal(bFiles.length, 1);
 		assert.equal(cFiles.length, 1);
 	});
 });
 
-describe('creates vinyl sourcemaps', function () {
+describe('sourcemap', function () {
 	this.timeout(20000);
 	var files = [];
 
@@ -146,7 +146,7 @@ describe('creates vinyl sourcemaps', function () {
 		.on('end', done);
 	});
 
-	it('does not stream Sass sourcemap files', function () {
+	it('doesn\'t stream Sass sourcemap files', function () {
 		assert.equal(files.length, 1);
 	});
 
@@ -157,7 +157,7 @@ describe('creates vinyl sourcemaps', function () {
 		);
 	});
 
-	it('adds vinyl sourcemap', function () {
+	it('adds a vinyl sourcemap', function () {
 		assert.equal(typeof files[0].sourceMap, 'object');
 		assert.equal(files[0].sourceMap.version, 3);
 	});
@@ -169,7 +169,7 @@ describe('creates vinyl sourcemaps', function () {
 		);
 	});
 
-	describe('for files and directories with spaces', function () {
+	describe('compiling files and directories with spaces', function () {
 		before(function(done) {
 			var options = assign({}, defaultOptions, { sourcemap: true });
 
@@ -216,7 +216,7 @@ describe('options', function () {
 	});
 
 	describe('tempDir', function () {
-		it('compiles files to a specified directory', function (done) {
+		it('compiles files to the specified directory', function (done) {
 			var source = 'source/file.scss';
 			var tempDir = './custom-temp-dir';
 			var options = assign({}, defaultOptions, { tempDir: tempDir });
