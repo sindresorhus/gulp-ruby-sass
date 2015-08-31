@@ -32,7 +32,7 @@ gulp.task('sass', function () {
 
 Type: `String`
 
-A directory or file to compile. Note gulp-ruby-sass does not use globs. It only accepts the input values that Ruby Sass accepts.
+A directory, file, or simple glob pattern (`source/**/*.scss`) to compile. Glob sources will ignore files prefixed with an underscore.
 
 #### options
 
