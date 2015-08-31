@@ -135,9 +135,9 @@ describe('concurrently run tasks', function () {
 describe('sourcemap', function () {
 	this.timeout(20000);
 	var files = [];
+	var options = assign({}, defaultOptions, { sourcemap: true });
 
 	before(function(done) {
-		var options = assign({}, defaultOptions, { sourcemap: true });
 
 		sass('source/file.scss', options)
 		.on('data', function (data) {
@@ -171,7 +171,7 @@ describe('sourcemap', function () {
 
 	describe('compiling files and directories with spaces', function () {
 		before(function(done) {
-			var options = assign({}, defaultOptions, { sourcemap: true });
+			files = [];
 
 			sass('source/directory with spaces/file with spaces.scss', options)
 			.on('data', function (data) {
@@ -182,7 +182,7 @@ describe('sourcemap', function () {
 
 		it('includes the correct sources', function () {
 			assert.deepEqual(
-				files[1].sourceMap.sources,
+				files[0].sourceMap.sources,
 				['file with spaces.scss']
 			);
 		});
