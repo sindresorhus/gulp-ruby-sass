@@ -13,6 +13,10 @@ var defaultOptions = {
 	unixNewlines: true // normalize compilation results on Windows systems
 };
 
+var sortByRelative = function (a, b) {
+  return a.relative.localeCompare(b.relative);
+};
+
 describe('single file source', function () {
 	this.timeout(20000);
 	var files = [];
@@ -44,13 +48,23 @@ describe('single file source', function () {
 describe('directory source', function () {
 	this.timeout(20000);
 	var files = [];
+	var expected = [
+		'directory with spaces/file with spaces.css',
+		'directory/nested-file.css',
+		'error.css',
+		'file.css',
+		'warnings.css'
+	];
 
 	before(function(done) {
 		sass('source', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', done);
+		.on('end', function() {
+			files.sort(sortByRelative);
+			done();
+		});
 	});
 
 	it('creates correct number of files', function () {
@@ -58,16 +72,13 @@ describe('directory source', function () {
 	});
 
 	it('creates file at correct path', function () {
-		files.forEach(function (file) {
-			assert(
-				fs.statSync( path.join('result', file.relative) ).isFile(),
-				'The file doesn\'t exist in the results directory.'
-			);
+		files.forEach(function (file, i) {
+			assert.equal( file.relative, expected[i] );
 		});
 	});
 
 	it('creates correct file contents', function () {
-		files.forEach(function (file) {
+		files.forEach(function (file, i) {
 			// the stack trace in the error file is specific to the system it's
 			// compiled on, so we just check for the error message
 			if (file.basename === 'error.css') {
@@ -81,7 +92,7 @@ describe('directory source', function () {
 			else {
 				assert.deepEqual(
 					file.contents.toString(),
-					fs.readFileSync(path.join('result', file.relative ), {encoding: 'utf8'})
+					fs.readFileSync(path.join('result', expected[i]), {encoding: 'utf8'})
 				);
 			}
 		});
@@ -91,13 +102,20 @@ describe('directory source', function () {
 describe('glob source', function () {
 	this.timeout(20000);
 	var files = [];
+	var expected = [
+		'directory with spaces/file with spaces.css',
+		'file.css',
+	];
 
 	before(function(done) {
 		sass('source/**/file*.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', done);
+		.on('end', function() {
+			files.sort(sortByRelative);
+			done();
+		});
 	});
 
 	it('creates correct number of files', function () {
@@ -105,19 +123,16 @@ describe('glob source', function () {
 	});
 
 	it('creates file at correct path', function () {
-		files.forEach(function (file) {
-			assert(
-				fs.statSync( path.join('result', file.relative) ).isFile(),
-				'The file doesn\'t exist in the results directory.'
-			);
+		files.forEach(function (file, i) {
+			assert.equal( file.relative, expected[i] );
 		});
 	});
 
 	it('creates correct file contents', function () {
-		files.forEach(function (file) {
+		files.forEach(function (file, i) {
 			assert.deepEqual(
 				file.contents.toString(),
-				fs.readFileSync(path.join('result', file.relative ), {encoding: 'utf8'})
+				fs.readFileSync(path.join('result', expected[i]), {encoding: 'utf8'})
 			);
 		});
 	});
