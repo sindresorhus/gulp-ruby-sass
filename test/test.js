@@ -216,8 +216,6 @@ describe('options', function () {
 	});
 
 	describe('tempDir', function () {
-		var error;
-
 		it('compiles files to a specified directory', function (done) {
 			var source = 'source/file.scss';
 			var tempDir = './custom-temp-dir';
