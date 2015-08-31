@@ -21,6 +21,7 @@ var utils = require('./utils');
 
 var emitErr = utils.emitErr;
 var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
+var replaceLocation = utils.replaceLocation;
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
@@ -87,7 +88,7 @@ function gulpRubySass (source, options) {
 
 		// create source:destination arguments for Sass
 		.map(function (match) {
-			var dest = match.replace(new RegExp('^' + base), intermediateDir);
+			var dest = replaceLocation(match, base, intermediateDir);
 
 			if (path.extname(dest) !== '') {
 				dest = gutil.replaceExtension(dest, '.css');
@@ -165,7 +166,7 @@ function gulpRubySass (source, options) {
 					var vinylFile = new gutil.File({
 						cwd: cwd,
 						base: base,
-						path: file.replace(intermediateDir, base)
+						path: replaceLocation(file, intermediateDir, base)
 					});
 
 					// sourcemap integration
