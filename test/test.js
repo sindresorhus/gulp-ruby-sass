@@ -4,7 +4,6 @@ var path = require('path');
 var rimraf = require('rimraf');
 var assert = require('assert');
 var assign = require('object-assign');
-var vinylFile = require('vinyl-file');
 
 var sass = require('../');
 var uniqueIntermediateDirectory = require('../utils').uniqueIntermediateDirectory;
@@ -37,7 +36,7 @@ describe('compiles single file source', function () {
 	it('creates correct file contents', function () {
 		assert.equal(
 			files[0].contents.toString(),
-			new vinylFile.readSync('result/file.css').contents.toString()
+			fs.readFileSync('result/file.css', {encoding: 'utf8'})
 		);
 	});
 });
@@ -82,7 +81,7 @@ describe('compiles directory source', function () {
 			else {
 				assert.deepEqual(
 					file.contents.toString(),
-					new vinylFile.readSync( path.join('result', file.relative )).contents.toString()
+					fs.readFileSync(path.join('result', file.relative ), {encoding: 'utf8'})
 				);
 			}
 		});
@@ -233,7 +232,7 @@ describe('options', function () {
 
 				assert.equal(
 					data.contents.toString(),
-					new vinylFile.readSync('result/file.css').contents.toString(),
+					fs.readFileSync('result/file.css', {encoding: 'utf8'}),
 					'File does not exist in the custom temporary directory.'
 				);
 			})
