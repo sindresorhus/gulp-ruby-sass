@@ -79,15 +79,22 @@ function gulpRubySass (source, options) {
 		base = path.dirname(source);
 	}
 
-	var compileMappings = glob.sync(source).map(function (match) {
-		var dest = match.replace(new RegExp('^' + base), intermediateDir);
+	var compileMappings = glob.sync(source)
+		// remove _partials
+		.filter(function (match) {
+			return path.basename(match).indexOf('_') !== 0;
+		})
 
-		if (path.extname(dest) !== '') {
-			dest = gutil.replaceExtension(dest, '.css');
-		}
+		// create source:destination arguments for Sass
+		.map(function (match) {
+			var dest = match.replace(new RegExp('^' + base), intermediateDir);
 
-    return match + ':' + dest;
-  });
+			if (path.extname(dest) !== '') {
+				dest = gutil.replaceExtension(dest, '.css');
+			}
+
+			return match + ':' + dest;
+		});
 
 	var args = dargs(options, [
 		'bundleExec',
