@@ -88,6 +88,41 @@ describe('directory source', function () {
 	});
 });
 
+describe('glob source', function () {
+	this.timeout(20000);
+	var files = [];
+
+	before(function(done) {
+		sass('source/**/file*.scss', defaultOptions)
+		.on('data', function (data) {
+			files.push(data);
+		})
+		.on('end', done);
+	});
+
+	it('creates correct number of files', function () {
+		assert.equal(files.length, 2);
+	});
+
+	it('creates file at correct path', function () {
+		files.forEach(function (file) {
+			assert(
+				fs.statSync( path.join('result', file.relative) ).isFile(),
+				'The file doesn\'t exist in the results directory.'
+			);
+		});
+	});
+
+	it('creates correct file contents', function () {
+		files.forEach(function (file) {
+			assert.deepEqual(
+				file.contents.toString(),
+				fs.readFileSync(path.join('result', file.relative ), {encoding: 'utf8'})
+			);
+		});
+	});
+});
+
 describe('concurrently run tasks', function () {
 	this.timeout(20000);
 	var aFiles = [];
