@@ -203,7 +203,7 @@ function gulpRubySass (source, options) {
 	});
 
 	return stream;
-};
+}
 
 gulpRubySass.logError = function logError(err) {
   var message = new gutil.PluginError('gulp-ruby-sass', err);
@@ -211,4 +211,4 @@ gulpRubySass.logError = function logError(err) {
   this.emit('end');
 };
 
-module.exports = gulpRubySass
+module.exports = gulpRubySass;

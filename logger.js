@@ -34,14 +34,14 @@ module.exports = {
 		// Not an error: Sass logging
 		else {
 			data = prettifyDirectoryLogging(data, intermediateDir);
-			data = data.trim()
+			data = data.trim();
 			gutil.log(data);
 		}
 	},
 
 	stderr: function (stream, intermediateDir, data) {
-		var bundlerMissing = /Could not find 'bundler' \((.*?)\)/.exec(data)
-		var sassVersionMissing = /Could not find gem 'sass \((.*?)\) ruby'/.exec(data)
+		var bundlerMissing = /Could not find 'bundler' \((.*?)\)/.exec(data);
+		var sassVersionMissing = /Could not find gem 'sass \((.*?)\) ruby'/.exec(data);
 
 		// Ruby error: Bundler gem not installed
 		if (bundlerMissing) {
@@ -61,7 +61,7 @@ module.exports = {
 		// Not an error: Sass warnings, debug statements
 		else {
 			data = prettifyDirectoryLogging(data, intermediateDir);
-			data = data.trim()
+			data = data.trim();
 			gutil.log(data);
 		}
 	},
@@ -77,4 +77,4 @@ module.exports = {
 			emitErr(stream, err);
 		}
 	}
-}
+};
