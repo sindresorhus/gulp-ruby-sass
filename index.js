@@ -4,7 +4,6 @@ var path = require('path');
 var Readable = require('stream').Readable;
 var glob = require('glob');
 var dargs = require('dargs');
-var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
 var md5Hex = require('md5-hex');
 var spawn = require('win-spawn');
@@ -56,10 +55,6 @@ function gulpRubySass (source, options) {
 	options.update = true;
 
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
-
-	// Sass's single file compilation doesn't create a destination directory
-	mkdirp(intermediateDir);
-
 	var base;
 
 	// glob source
