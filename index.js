@@ -24,8 +24,6 @@ var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 var replaceLocation = utils.replaceLocation;
 
 function gulpRubySass (source, options) {
-	var cwd = process.cwd();
-
 	options = assign({
 		tempDir: osTmpdir(),
 		verbose: false,
@@ -164,7 +162,7 @@ function gulpRubySass (source, options) {
 					// rewrite file paths so gulp thinks the file came from cwd, not the
 					// intermediate directory
 					var vinylFile = new gutil.File({
-						cwd: cwd,
+						cwd: process.cwd(),
 						base: base,
 						path: replaceLocation(file, intermediateDir, base)
 					});
