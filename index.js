@@ -31,8 +31,6 @@ function gulpRubySass (source, options) {
 		emitCompileError: false
 	}, options);
 
-	options.update = true;
-
 	var stream = new Readable({objectMode: true});
 	stream._read = function () {}; 	// redundant but necessary
 
@@ -55,6 +53,7 @@ function gulpRubySass (source, options) {
 	}
 
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
+	options.update = true;
 
 	// create temporary directory path for the task using current working
 	// directory, source and options
