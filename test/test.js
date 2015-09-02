@@ -204,7 +204,6 @@ describe('sourcemap', function () {
 	var options = assign({}, defaultOptions, { sourcemap: true });
 
 	before(function(done) {
-
 		sass('source/file.scss', options)
 		.on('data', function (data) {
 			files.push(data);
