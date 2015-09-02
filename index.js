@@ -55,8 +55,6 @@ function gulpRubySass (source, options) {
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 	options.update = true;
 
-	// create temporary directory path for the task using current working
-	// directory, source and options
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
 
 	// Sass's single file compilation doesn't create a destination directory

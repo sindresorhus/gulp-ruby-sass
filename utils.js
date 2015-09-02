@@ -9,6 +9,7 @@ utils.emitErr = function (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 };
 
+// create temporary directory path for a specific task using cwd and source
 utils.uniqueIntermediateDirectory = function (tempDir, source) {
 	return path.join(
 		tempDir,
