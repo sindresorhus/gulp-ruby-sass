@@ -9,6 +9,7 @@ var rimraf = require('rimraf');
 var md5Hex = require('md5-hex');
 var spawn = require('win-spawn');
 var gutil = require('gulp-util');
+var glob2base = require('glob2base');
 var assign = require('object-assign');
 var convert = require('convert-source-map');
 var eachAsync = require('each-async');
@@ -20,27 +21,29 @@ var utils = require('./utils');
 
 var emitErr = utils.emitErr;
 var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
+var replaceLocation = utils.replaceLocation;
 
 function gulpRubySass (source, options) {
 	var cwd = process.cwd();
-	var defaults = {
+
+	options = assign({
 		tempDir: osTmpdir(),
 		verbose: false,
 		sourcemap: false,
 		emitCompileError: false
-	};
+	}, options);
+
+	options.update = true;
 
 	var stream = new Readable({objectMode: true});
 	stream._read = function () {}; 	// redundant but necessary
-
-	options = assign(defaults, options);
 
 	// alert user that `container` is deprecated
 	if (options.container) {
 		gutil.log(gutil.colors.yellow(
 			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
-		  'This will become an error in gulp-ruby-sass 2.0'
-	  ));
+			'This will become an error in gulp-ruby-sass 2.0'
+		));
 	}
 
 	// error if user tries to watch their files with the Sass gem
@@ -53,39 +56,46 @@ function gulpRubySass (source, options) {
 		emitErr(stream, 'The sourcemap option must be true or false. See the readme for instructions on using Sass sourcemaps with gulp.');
 	}
 
-	// reassign options.sourcemap boolean to one of our two acceptable Sass arguments
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 
 	// create temporary directory path for the task using current working
 	// directory, source and options
 	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
+
+	// Sass's single file compilation doesn't create a destination directory
+	mkdirp(intermediateDir);
+
 	var base;
-	var compileMapping;
 
+	// glob source
+	if (glob.hasMagic(source)) {
+		base = glob2base(new glob.Glob(source));
+	}
 	// directory source
-	if (path.extname(source) === '') {
-		base = path.join(cwd, source);
-		compileMapping = source + ':' + intermediateDir;
-		options.update = true;
+	else if (fs.statSync(source).isDirectory()) {
+		base = source;
 	}
-
-	// single file source
+	// file source
 	else {
-		base = path.join(cwd, path.dirname(source));
-
-		var dest = path.join(
-			intermediateDir,
-			gutil.replaceExtension(path.basename(source), '.css')
-		);
-
-		compileMapping = [ source, dest ];
-
-		// sass's single file compilation doesn't create a destination directory, so
-		// we have to ourselves
-		mkdirp(intermediateDir);
+		base = path.dirname(source);
 	}
 
-	// TODO: implement glob file source
+	var compileMappings = glob.sync(source)
+		// remove _partials
+		.filter(function (match) {
+			return path.basename(match).indexOf('_') !== 0;
+		})
+
+		// create source:destination arguments for Sass
+		.map(function (match) {
+			var dest = replaceLocation(match, base, intermediateDir);
+
+			if (path.extname(dest) !== '') {
+				dest = gutil.replaceExtension(dest, '.css');
+			}
+
+			return match + ':' + dest;
+		});
 
 	var args = dargs(options, [
 		'bundleExec',
@@ -95,7 +105,7 @@ function gulpRubySass (source, options) {
 		'verbose',
 		'emitCompileError',
 		'container'
-	]).concat(compileMapping);
+	]).concat(compileMappings);
 
 	var command;
 
@@ -156,7 +166,7 @@ function gulpRubySass (source, options) {
 					var vinylFile = new gutil.File({
 						cwd: cwd,
 						base: base,
-						path: file.replace(intermediateDir, base)
+						path: replaceLocation(file, intermediateDir, base)
 					});
 
 					// sourcemap integration
@@ -200,9 +210,9 @@ function gulpRubySass (source, options) {
 }
 
 gulpRubySass.logError = function logError(err) {
-  var message = new gutil.PluginError('gulp-ruby-sass', err);
-  process.stderr.write(message + '\n');
-  this.emit('end');
+	var message = new gutil.PluginError('gulp-ruby-sass', err);
+	process.stderr.write(message + '\n');
+	this.emit('end');
 };
 
 module.exports = gulpRubySass;

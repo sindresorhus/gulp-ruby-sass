@@ -17,4 +17,11 @@ utils.uniqueIntermediateDirectory = function (tempDir, source) {
 	);
 };
 
+utils.replaceLocation = function (origPath, currentLoc, newLoc) {
+	return path.join(
+		newLoc,
+		path.relative(currentLoc, origPath)
+	);
+};
+
 module.exports = utils;

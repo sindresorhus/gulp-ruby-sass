@@ -4,6 +4,7 @@ var path = require('path');
 var rimraf = require('rimraf');
 var assert = require('assert');
 var assign = require('object-assign');
+var vinylFile = require('vinyl-file');
 
 var sass = require('../');
 var uniqueIntermediateDirectory = require('../utils').uniqueIntermediateDirectory;
@@ -13,9 +14,22 @@ var defaultOptions = {
 	unixNewlines: true // normalize compilation results on Windows systems
 };
 
+// load the expected result file from the compiled results directory
+var expectedFile = function (relativePath) {
+	var base = path.join(process.cwd(), 'result');
+	var file = path.join(base, relativePath);
+
+	return vinylFile.readSync(file, { base: base });
+};
+
+var sortByRelative = function (a, b) {
+  return a.relative.localeCompare(b.relative);
+};
+
 describe('single file source', function () {
 	this.timeout(20000);
 	var files = [];
+	var expected = expectedFile('file.css');
 
 	before(function(done) {
 		sass('source/file.scss', defaultOptions)
@@ -30,13 +44,15 @@ describe('single file source', function () {
 	});
 
 	it('creates file at correct path', function () {
-		assert.equal(files[0].relative, 'file.css');
+		assert(files.length);
+		assert.equal(files[0].relative, expected.relative);
 	});
 
 	it('creates correct file contents', function () {
+		assert(files.length);
 		assert.equal(
 			files[0].contents.toString(),
-			fs.readFileSync('result/file.css', {encoding: 'utf8'})
+			expected.contents.toString()
 		);
 	});
 });
@@ -44,13 +60,23 @@ describe('single file source', function () {
 describe('directory source', function () {
 	this.timeout(20000);
 	var files = [];
+	var expected = [
+		expectedFile('directory with spaces/file with spaces.css'),
+		expectedFile('directory/nested-file.css'),
+		expectedFile('error.css'),
+		expectedFile('file.css'),
+		expectedFile('warnings.css')
+	];
 
 	before(function(done) {
 		sass('source', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', done);
+		.on('end', function() {
+			files.sort(sortByRelative);
+			done();
+		});
 	});
 
 	it('creates correct number of files', function () {
@@ -58,16 +84,15 @@ describe('directory source', function () {
 	});
 
 	it('creates file at correct path', function () {
-		files.forEach(function (file) {
-			assert(
-				fs.statSync( path.join('result', file.relative) ).isFile(),
-				'The file doesn\'t exist in the results directory.'
-			);
+		assert(files.length);
+		files.forEach(function (file, i) {
+			assert.equal(file.relative, expected[i].relative);
 		});
 	});
 
 	it('creates correct file contents', function () {
-		files.forEach(function (file) {
+		assert(files.length);
+		files.forEach(function (file, i) {
 			// the stack trace in the error file is specific to the system it's
 			// compiled on, so we just check for the error message
 			if (file.basename === 'error.css') {
@@ -81,9 +106,50 @@ describe('directory source', function () {
 			else {
 				assert.deepEqual(
 					file.contents.toString(),
-					fs.readFileSync(path.join('result', file.relative ), {encoding: 'utf8'})
+					expected[i].contents.toString()
 				);
 			}
+		});
+	});
+});
+
+describe('glob source', function () {
+	this.timeout(20000);
+	var files = [];
+	var expected = [
+		expectedFile('directory with spaces/file with spaces.css'),
+		expectedFile('file.css')
+	];
+
+	before(function(done) {
+		sass('source/**/file*.scss', defaultOptions)
+		.on('data', function (data) {
+			files.push(data);
+		})
+		.on('end', function() {
+			files.sort(sortByRelative);
+			done();
+		});
+	});
+
+	it('creates correct number of files', function () {
+		assert.equal(files.length, 2);
+	});
+
+	it('creates file at correct path', function () {
+		assert(files.length);
+		files.forEach(function (file, i) {
+			assert.equal(file.relative, expected[i].relative);
+		});
+	});
+
+	it('creates correct file contents', function () {
+		assert(files.length);
+		files.forEach(function (file, i) {
+			assert.deepEqual(
+				file.contents.toString(),
+				expected[i].contents.toString()
+			);
 		});
 	});
 });
@@ -169,7 +235,35 @@ describe('sourcemap', function () {
 		);
 	});
 
+	describe('compiling files from glob source', function () {
+		var expected = [
+			[ 'directory with spaces/file with spaces.scss' ],
+			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
+		];
+
+		before(function(done) {
+			files = [];
+
+			sass('source/**/file*.scss', options)
+			.on('data', function (data) {
+				files.push(data);
+			})
+			.on('end', function() {
+				files.sort(sortByRelative);
+				done();
+			});
+		});
+
+		it('includes the correct sources', function () {
+			files.forEach(function (file, i) {
+				assert.deepEqual(file.sourceMap.sources, expected[i]);
+			});
+		});
+	});
+
 	describe('compiling files and directories with spaces', function () {
+		var expected = ['file with spaces.scss'];
+
 		before(function(done) {
 			files = [];
 
@@ -181,10 +275,7 @@ describe('sourcemap', function () {
 		});
 
 		it('includes the correct sources', function () {
-			assert.deepEqual(
-				files[0].sourceMap.sources,
-				['file with spaces.scss']
-			);
+			assert.deepEqual(files[0].sourceMap.sources, expected);
 		});
 	});
 });
