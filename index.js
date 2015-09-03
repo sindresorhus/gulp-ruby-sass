@@ -5,10 +5,8 @@ var Readable = require('stream').Readable;
 var glob = require('glob');
 var dargs = require('dargs');
 var rimraf = require('rimraf');
-var md5Hex = require('md5-hex');
 var spawn = require('win-spawn');
 var gutil = require('gulp-util');
-var glob2base = require('glob2base');
 var assign = require('object-assign');
 var convert = require('convert-source-map');
 var eachAsync = require('each-async');
@@ -22,7 +20,7 @@ var emitErr = utils.emitErr;
 var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 var replaceLocation = utils.replaceLocation;
 
-function gulpRubySass (source, options) {
+function gulpRubySass (sources, options) {
 	options = assign({
 		tempDir: osTmpdir(),
 		verbose: false,
@@ -54,38 +52,36 @@ function gulpRubySass (source, options) {
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 	options.update = true;
 
-	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, source);
-	var base;
+	// simplified handling of array sources, like gulp.src
+	if (!Array.isArray(sources)) { sources = [sources]; }
 
-	// glob source
-	if (glob.hasMagic(source)) {
-		base = glob2base(new glob.Glob(source));
-	}
-	// directory source
-	else if (fs.statSync(source).isDirectory()) {
-		base = source;
-	}
-	// file source
-	else {
-		base = path.dirname(source);
-	}
+	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, sources);
+	var compileMappings = [];
+	var baseMappings = {};
 
-	var compileMappings = glob.sync(source)
-		// remove _partials
+	sources.forEach(function (source) {
+		var base = utils.calculateBase(source);
+
+		// match files and remove _partials
+		var matches = glob.sync(source)
 		.filter(function (match) {
 			return path.basename(match).indexOf('_') !== 0;
-		})
-
-		// create source:destination arguments for Sass
-		.map(function (match) {
-			var dest = replaceLocation(match, base, intermediateDir);
-
-			if (path.extname(dest) !== '') {
-				dest = gutil.replaceExtension(dest, '.css');
-			}
-
-			return match + ':' + dest;
 		});
+
+		matches.forEach(function (match) {
+			var dest = gutil.replaceExtension(
+				replaceLocation(match, base, intermediateDir),
+				'.css'
+			);
+			var relative = path.relative(intermediateDir, dest);
+
+			// source:dest mappings for the Sass CLI
+			compileMappings.push(match + ':' + dest);
+
+			// store base values by relative file path
+			baseMappings[relative] = base;
+		});
+	});
 
 	var args = dargs(options, [
 		'bundleExec',
@@ -143,6 +139,9 @@ function gulpRubySass (source, options) {
 					next();
 					return;
 				}
+
+				var relative = path.relative(intermediateDir, file);
+				var base = baseMappings[relative];
 
 				fs.readFile(file, function (err, data) {
 					if (err) {

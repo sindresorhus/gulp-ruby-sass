@@ -26,7 +26,7 @@ var sortByRelative = function (a, b) {
   return a.relative.localeCompare(b.relative);
 };
 
-describe('single file source', function () {
+describe('single file', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = expectedFile('file.css');
@@ -57,7 +57,7 @@ describe('single file source', function () {
 	});
 });
 
-describe('directory source', function () {
+describe('multiple files', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
@@ -69,7 +69,7 @@ describe('directory source', function () {
 	];
 
 	before(function(done) {
-		sass('source', defaultOptions)
+		sass('source/**/*.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
@@ -109,47 +109,6 @@ describe('directory source', function () {
 					expected[i].contents.toString()
 				);
 			}
-		});
-	});
-});
-
-describe('glob source', function () {
-	this.timeout(20000);
-	var files = [];
-	var expected = [
-		expectedFile('directory with spaces/file with spaces.css'),
-		expectedFile('file.css')
-	];
-
-	before(function(done) {
-		sass('source/**/file*.scss', defaultOptions)
-		.on('data', function (data) {
-			files.push(data);
-		})
-		.on('end', function() {
-			files.sort(sortByRelative);
-			done();
-		});
-	});
-
-	it('creates correct number of files', function () {
-		assert.equal(files.length, 2);
-	});
-
-	it('creates file at correct path', function () {
-		assert(files.length);
-		files.forEach(function (file, i) {
-			assert.equal(file.relative, expected[i].relative);
-		});
-	});
-
-	it('creates correct file contents', function () {
-		assert(files.length);
-		files.forEach(function (file, i) {
-			assert.deepEqual(
-				file.contents.toString(),
-				expected[i].contents.toString()
-			);
 		});
 	});
 });
@@ -313,8 +272,11 @@ describe('options', function () {
 
 			sass(source, options)
 			.on('data', function (data) {
+				// the plugin transforms the sources argument into an array before
+				// passing to uniqueIntermediateDirectory
+				var sources = [source];
 				var expectedFileLocation = path.join(
-					uniqueIntermediateDirectory(tempDir, source),
+					uniqueIntermediateDirectory(tempDir, sources),
 					data.relative
 				);
 
