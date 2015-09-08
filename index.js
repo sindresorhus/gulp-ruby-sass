@@ -60,7 +60,7 @@ function gulpRubySass (sources, options) {
 	var baseMappings = {};
 
 	sources.forEach(function (source) {
-		var base = utils.calculateBase(source);
+		var base = options.base || utils.calculateBase(source);
 
 		// match files and remove _partials
 		var matches = glob.sync(source)
@@ -90,6 +90,7 @@ function gulpRubySass (sources, options) {
 		'tempDir',
 		'verbose',
 		'emitCompileError',
+		'base',
 		'container'
 	]).concat(compileMappings);
 

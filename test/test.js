@@ -307,6 +307,48 @@ describe('options', function () {
 		});
 	});
 
+	describe('base (for colliding sources)', function () {
+		this.timeout(20000);
+		var files = [];
+		var expected = [
+			expectedFile('directory/file.css'),
+			expectedFile('file.css')
+		];
+		var options = assign({}, defaultOptions, { base: 'source' });
+
+		before(function(done) {
+			sass(['source/file.scss', 'source/directory/file.scss'], options)
+			.on('data', function (data) {
+				files.push(data);
+			})
+			.on('end', function() {
+				files.sort(sortByRelative);
+				done();
+			});
+		});
+
+		it('creates correct number of files', function () {
+			assert.equal(files.length, 2);
+		});
+
+		it('creates file at correct path', function () {
+			assert(files.length);
+			files.forEach(function (file, i) {
+				assert.equal(file.relative, expected[i].relative);
+			});
+		});
+
+		it('creates correct file contents', function () {
+			assert(files.length);
+			files.forEach(function (file, i) {
+				assert.deepEqual(
+					file.contents.toString(),
+					expected[i].contents.toString()
+				);
+			});
+		});
+	});
+
 	describe('tempDir', function () {
 		it('compiles files to the specified directory', function (done) {
 			var source = 'source/file.scss';

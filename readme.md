@@ -76,6 +76,12 @@ gulp.task('sass', function () {
 });
 ```
 
+##### base
+
+Type: `String`
+
+Identical to `gulp.src`'s [`base` option](https://github.com/gulpjs/gulp/blob/master/docs/API.md#optionsbase).
+
 ##### tempDir
 
 Type: `String`  
