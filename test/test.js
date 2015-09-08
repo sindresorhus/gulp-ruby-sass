@@ -61,7 +61,7 @@ describe('multiple files', function () {
 	var files = [];
 	var expected = [
 		expectedFile('directory with spaces/file with spaces.css'),
-		expectedFile('directory/nested-file.css'),
+		expectedFile('directory/file.css'),
 		expectedFile('error.css'),
 		expectedFile('file.css'),
 		expectedFile('warnings.css')
@@ -116,12 +116,15 @@ describe('array sources', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		expectedFile('file.css'),
-		expectedFile('nested-file.css', 'result/directory')
+		expectedFile('file with spaces.css', 'result/directory with spaces'),
+		expectedFile('file.css')
 	];
 
 	before(function(done) {
-		sass(['source/file.scss', 'source/directory/nested-file.scss'], defaultOptions)
+		sass([
+			'source/file.scss',
+			'source/directory with spaces/file with spaces.scss'
+		], defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
@@ -173,7 +176,7 @@ describe('concurrently run tasks', function () {
 			isDone(done);
 		});
 
-		sass('source/directory/nested-file.scss', defaultOptions)
+		sass('source/directory/file.scss', defaultOptions)
 		.on('data', function (data) {
 			bFiles.push(data);
 		})
@@ -235,14 +238,14 @@ describe('sourcemap', function () {
 
 	describe('compiling files from glob source', function () {
 		var expected = [
-			[ 'directory with spaces/file with spaces.scss' ],
+			[ '_partial.scss' ],
 			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
 		];
 
 		before(function(done) {
 			files = [];
 
-			sass('source/**/file*.scss', options)
+			sass('source/**/file.scss', options)
 			.on('data', function (data) {
 				files.push(data);
 			})
