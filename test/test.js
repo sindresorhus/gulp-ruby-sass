@@ -15,10 +15,9 @@ var defaultOptions = {
 };
 
 // load the expected result file from the compiled results directory
-var expectedFile = function (relativePath) {
-	var base = path.join(process.cwd(), 'result');
+var expectedFile = function (relativePath, base) {
+	base = base || 'result';
 	var file = path.join(base, relativePath);
-
 	return vinylFile.readSync(file, { base: base });
 };
 
@@ -109,6 +108,47 @@ describe('multiple files', function () {
 					expected[i].contents.toString()
 				);
 			}
+		});
+	});
+});
+
+describe('array sources', function () {
+	this.timeout(20000);
+	var files = [];
+	var expected = [
+		expectedFile('file.css'),
+		expectedFile('nested-file.css', 'result/directory')
+	];
+
+	before(function(done) {
+		sass(['source/file.scss', 'source/directory/nested-file.scss'], defaultOptions)
+		.on('data', function (data) {
+			files.push(data);
+		})
+		.on('end', function() {
+			files.sort(sortByRelative);
+			done();
+		});
+	});
+
+	it('creates correct number of files', function () {
+		assert.equal(files.length, 2);
+	});
+
+	it('creates file at correct path', function () {
+		assert(files.length);
+		files.forEach(function (file, i) {
+			assert.equal(file.relative, expected[i].relative);
+		});
+	});
+
+	it('creates correct file contents', function () {
+		assert(files.length);
+		files.forEach(function (file, i) {
+			assert.deepEqual(
+				file.contents.toString(),
+				expected[i].contents.toString()
+			);
 		});
 	});
 });
