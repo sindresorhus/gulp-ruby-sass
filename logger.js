@@ -9,6 +9,9 @@ function prettifyDirectoryLogging (msg, intermediateDir) {
 
 var logger = {};
 
+// TODO: Now that we've standardized on --update, remove parsing that only
+// applies to single, non update compilations.
+
 logger.verbose = function (command, args) {
 	gutil.log('Running command ' + command + ' ' + args.join(' '));
 };
