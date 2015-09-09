@@ -19,7 +19,7 @@ var utils = require('./utils');
 
 var emitErr = utils.emitErr;
 var replaceLocation = utils.replaceLocation;
-var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
+var createIntermediateDir = utils.createIntermediateDir;
 
 var defaults = {
 	tempDir: osTmpdir(),
@@ -66,7 +66,7 @@ function gulpRubySass (sources, options) {
 		bases.push(options.base || utils.calculateBase(source));
 	});
 
-	var intermediateDir = uniqueIntermediateDirectory(sources, matches, options);
+	var intermediateDir = createIntermediateDir(sources, matches, options);
 	var compileMappings = [];
 	var baseMappings = {};
 

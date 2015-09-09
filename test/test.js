@@ -14,7 +14,7 @@ var defaultOptions = {
 };
 
 // load the expected result file from the compiled results directory
-var expectedFile = function (relativePath, base) {
+var loadExpectedFile = function (relativePath, base) {
 	base = base || 'result';
 	var file = path.join(base, relativePath);
 	return vinylFile.readSync(file, { base: base });
@@ -27,7 +27,7 @@ var sortByRelative = function (a, b) {
 describe('single file', function () {
 	this.timeout(20000);
 	var files = [];
-	var expected = expectedFile('file.css');
+	var expected = loadExpectedFile('file.css');
 
 	before(function (done) {
 		sass('source/file.scss', defaultOptions)
@@ -59,11 +59,11 @@ describe('multiple files', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		expectedFile('directory with spaces/file with spaces.css'),
-		expectedFile('directory/file.css'),
-		expectedFile('error.css'),
-		expectedFile('file.css'),
-		expectedFile('warnings.css')
+		loadExpectedFile('directory with spaces/file with spaces.css'),
+		loadExpectedFile('directory/file.css'),
+		loadExpectedFile('error.css'),
+		loadExpectedFile('file.css'),
+		loadExpectedFile('warnings.css')
 	];
 
 	before(function (done) {
@@ -115,8 +115,8 @@ describe('array sources', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		expectedFile('file with spaces.css', 'result/directory with spaces'),
-		expectedFile('file.css')
+		loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
+		loadExpectedFile('file.css')
 	];
 
 	before(function (done) {
@@ -310,8 +310,8 @@ describe('options', function () {
 		this.timeout(20000);
 		var files = [];
 		var expected = [
-			expectedFile('directory/file.css'),
-			expectedFile('file.css')
+			loadExpectedFile('directory/file.css'),
+			loadExpectedFile('file.css')
 		];
 		var options = assign({}, defaultOptions, { base: 'source' });
 

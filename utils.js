@@ -15,7 +15,7 @@ utils.emitErr = function (stream, err) {
 // and all matched files. Options must be checked in case the user is switching
 // tempDir or sourcemaps on or off. Sourcemap may be a bug; See
 // https://github.com/sass/sass/issues/1830
-utils.uniqueIntermediateDirectory = function (sources, matches, options) {
+utils.createIntermediateDir = function (sources, matches, options) {
 	return path.join(
 		options.tempDir,
 		'gulp-ruby-sass',
