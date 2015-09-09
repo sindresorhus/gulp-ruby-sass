@@ -15,10 +15,9 @@ var defaultOptions = {
 };
 
 // load the expected result file from the compiled results directory
-var expectedFile = function (relativePath) {
-	var base = path.join(process.cwd(), 'result');
+var expectedFile = function (relativePath, base) {
+	base = base || 'result';
 	var file = path.join(base, relativePath);
-
 	return vinylFile.readSync(file, { base: base });
 };
 
@@ -26,7 +25,7 @@ var sortByRelative = function (a, b) {
   return a.relative.localeCompare(b.relative);
 };
 
-describe('single file source', function () {
+describe('single file', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = expectedFile('file.css');
@@ -57,19 +56,19 @@ describe('single file source', function () {
 	});
 });
 
-describe('directory source', function () {
+describe('multiple files', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
 		expectedFile('directory with spaces/file with spaces.css'),
-		expectedFile('directory/nested-file.css'),
+		expectedFile('directory/file.css'),
 		expectedFile('error.css'),
 		expectedFile('file.css'),
 		expectedFile('warnings.css')
 	];
 
 	before(function(done) {
-		sass('source', defaultOptions)
+		sass('source/**/*.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
@@ -113,16 +112,19 @@ describe('directory source', function () {
 	});
 });
 
-describe('glob source', function () {
+describe('array sources', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		expectedFile('directory with spaces/file with spaces.css'),
+		expectedFile('file with spaces.css', 'result/directory with spaces'),
 		expectedFile('file.css')
 	];
 
 	before(function(done) {
-		sass('source/**/file*.scss', defaultOptions)
+		sass([
+			'source/file.scss',
+			'source/directory with spaces/file with spaces.scss'
+		], defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
@@ -174,7 +176,7 @@ describe('concurrently run tasks', function () {
 			isDone(done);
 		});
 
-		sass('source/directory/nested-file.scss', defaultOptions)
+		sass('source/directory/file.scss', defaultOptions)
 		.on('data', function (data) {
 			bFiles.push(data);
 		})
@@ -204,7 +206,6 @@ describe('sourcemap', function () {
 	var options = assign({}, defaultOptions, { sourcemap: true });
 
 	before(function(done) {
-
 		sass('source/file.scss', options)
 		.on('data', function (data) {
 			files.push(data);
@@ -237,14 +238,14 @@ describe('sourcemap', function () {
 
 	describe('compiling files from glob source', function () {
 		var expected = [
-			[ 'directory with spaces/file with spaces.scss' ],
+			[ '_partial.scss' ],
 			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
 		];
 
 		before(function(done) {
 			files = [];
 
-			sass('source/**/file*.scss', options)
+			sass('source/**/file.scss', options)
 			.on('data', function (data) {
 				files.push(data);
 			})
@@ -306,6 +307,48 @@ describe('options', function () {
 		});
 	});
 
+	describe('base (for colliding sources)', function () {
+		this.timeout(20000);
+		var files = [];
+		var expected = [
+			expectedFile('directory/file.css'),
+			expectedFile('file.css')
+		];
+		var options = assign({}, defaultOptions, { base: 'source' });
+
+		before(function(done) {
+			sass(['source/file.scss', 'source/directory/file.scss'], options)
+			.on('data', function (data) {
+				files.push(data);
+			})
+			.on('end', function() {
+				files.sort(sortByRelative);
+				done();
+			});
+		});
+
+		it('creates correct number of files', function () {
+			assert.equal(files.length, 2);
+		});
+
+		it('creates file at correct path', function () {
+			assert(files.length);
+			files.forEach(function (file, i) {
+				assert.equal(file.relative, expected[i].relative);
+			});
+		});
+
+		it('creates correct file contents', function () {
+			assert(files.length);
+			files.forEach(function (file, i) {
+				assert.deepEqual(
+					file.contents.toString(),
+					expected[i].contents.toString()
+				);
+			});
+		});
+	});
+
 	describe('tempDir', function () {
 		it('compiles files to the specified directory', function (done) {
 			var source = 'source/file.scss';
@@ -314,8 +357,11 @@ describe('options', function () {
 
 			sass(source, options)
 			.on('data', function (data) {
+				// the plugin transforms the sources argument into an array before
+				// passing to uniqueIntermediateDirectory
+				var sources = [source];
 				var expectedFileLocation = path.join(
-					uniqueIntermediateDirectory(tempDir, source),
+					uniqueIntermediateDirectory(tempDir, sources),
 					data.relative
 				);
 

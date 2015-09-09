@@ -22,7 +22,7 @@ var gulp = require('gulp');
 var sass = require('gulp-ruby-sass');
 
 gulp.task('sass', function () {
-  return sass('source/')
+  return sass('source/file.scss')
     .on('error', sass.logError)
     .pipe(gulp.dest('result'));
 });
@@ -30,9 +30,9 @@ gulp.task('sass', function () {
 
 #### source
 
-Type: `String`
+Type: `String` or `Array`
 
-A directory, file, or simple glob pattern (`source/**/*.scss`) to compile. Glob sources will ignore files prefixed with an underscore.
+A file or glob pattern (`source/**/*.scss`) to compile. Ignores files prefixed with an underscore.
 
 #### options
 
@@ -60,7 +60,7 @@ var sass = require('gulp-ruby-sass');
 var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('sass', function () {
-  return sass('source', {sourcemap: true})
+  return sass('source/file.scss', { sourcemap: true })
     .on('error', sass.logError)
 
     // For inline sourcemaps
@@ -75,6 +75,12 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('result'));
 });
 ```
+
+##### base
+
+Type: `String`
+
+Identical to `gulp.src`'s [`base` option](https://github.com/gulpjs/gulp/blob/master/docs/API.md#optionsbase).
 
 ##### tempDir
 
@@ -105,7 +111,7 @@ Run `sass -h` for a complete list of Sass options.
 
 ```js
 gulp.task('sass', function () {
-  return sass('source/', {
+  return sass('source/file.scss', {
       precision: 6,
       stopOnError: true,
       cacheLocation: './',
@@ -124,7 +130,7 @@ A convenience function for pretty error logging.
 
 This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
-gulp-ruby-sass doesn't support Sass caching or incremental builds yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
+gulp-ruby-sass doesn't support Sass caching or incremental builds... yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
 
 ## License
 
