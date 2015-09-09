@@ -36,10 +36,7 @@ function gulpRubySass (sources, options) {
 
 	// alert user that `container` is deprecated
 	if (options.container) {
-		gutil.log(gutil.colors.yellow(
-			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
-			'This will become an error in gulp-ruby-sass 2.0'
-		));
+		gutil.log(gutil.colors.yellow('The container option has been deprecated. Simultanious tasks work automatically now!'));
 	}
 
 	// error if user tries to watch their files with the Sass gem
