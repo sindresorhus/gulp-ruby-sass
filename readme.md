@@ -116,6 +116,10 @@ gulp.task('sass', function () {
 });
 ```
 
+### sass.logError(err)
+
+A convenience function for pretty error logging.
+
 ## Issues
 
 This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
