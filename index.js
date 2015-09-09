@@ -19,7 +19,7 @@ var utils = require('./utils');
 
 var emitErr = utils.emitErr;
 var replaceLocation = utils.replaceLocation;
-var createIntermediateDir = utils.createIntermediateDir;
+var createIntermediatePath = utils.createIntermediatePath;
 
 var defaults = {
 	tempDir: osTmpdir(),
@@ -36,10 +36,7 @@ function gulpRubySass (sources, options) {
 
 	// alert user that `container` is deprecated
 	if (options.container) {
-		gutil.log(gutil.colors.yellow(
-			'The container option has been deprecated. Simultanious tasks work automatically now!\n' +
-			'This will become an error in gulp-ruby-sass 2.0'
-		));
+		gutil.log(gutil.colors.yellow('The container option has been deprecated. Simultanious tasks work automatically now!'));
 	}
 
 	// error if user tries to watch their files with the Sass gem
@@ -66,7 +63,12 @@ function gulpRubySass (sources, options) {
 		bases.push(options.base || utils.calculateBase(source));
 	});
 
-	var intermediateDir = createIntermediateDir(sources, matches, options);
+	// give a good error if there are no file matches
+	if (matches[0].length < 1) {
+		emitErr(stream, '`source` does not match any files.');
+	}
+
+	var intermediateDir = createIntermediatePath(sources, matches, options);
 	var compileMappings = [];
 	var baseMappings = {};
 
@@ -74,6 +76,7 @@ function gulpRubySass (sources, options) {
 		var base = bases[i];
 
 		matchArray.filter(function (match) {
+			// remove _partials
 			return path.basename(match).indexOf('_') !== 0;
 		})
 		.forEach(function (match) {
@@ -168,22 +171,21 @@ function gulpRubySass (sources, options) {
 					});
 
 					// sourcemap integration
-					// if we are managing sourcemaps and a sourcemap exists
 					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
 						// remove sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer(convert.removeMapFileComments(data.toString()));
-						var sourcemapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
+						var sourceMapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
 
 						// create relative paths for sources
-						sourcemapObject.sources = sourcemapObject.sources.map(function (sourcemapPath) {
-							var absoluteSourcemapPath = decodeURI(path.resolve(
+						sourceMapObject.sources = sourceMapObject.sources.map(function (sourcePath) {
+							var absoluteSourcePath = decodeURI(path.resolve(
 								'/',
-								sourcemapPath.replace('file:///', '')
+								sourcePath.replace('file:///', '')
 							));
-							return path.relative(base, absoluteSourcemapPath);
+							return path.relative(base, absoluteSourcePath);
 						});
 
-						vinylFile.sourceMap = sourcemapObject;
+						vinylFile.sourceMap = sourceMapObject;
 					}
 
 					vinylFile.contents = data;

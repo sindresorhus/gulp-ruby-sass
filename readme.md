@@ -32,7 +32,7 @@ gulp.task('sass', function () {
 
 Type: `String` or `Array`
 
-A file or glob pattern (`source/**/*.scss`) to compile. Ignores files prefixed with an underscore.
+A file or glob pattern (`source/**/*.scss`) to compile. Ignores files prefixed with an underscore. Directory sources are not supported.
 
 #### options
 
@@ -133,6 +133,8 @@ In rare cases you may need to clear gulp-ruby-sass's cache. This sync function d
 ## Issues
 
 This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
+
+Before submitting an issue please read the [contributing guidelines](https://github.com/sindresorhus/gulp-ruby-sass/blob/master/contributing.md).
 
 ## License
 
