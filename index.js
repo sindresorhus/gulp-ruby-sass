@@ -174,10 +174,10 @@ function gulpRubySass (sources, options) {
 					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
 						// remove sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer(convert.removeMapFileComments(data.toString()));
-						var sourcemapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
+						var sourceMapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
 
 						// create relative paths for sources
-						sourcemapObject.sources = sourcemapObject.sources.map(function (sourcePath) {
+						sourceMapObject.sources = sourceMapObject.sources.map(function (sourcePath) {
 							var absoluteSourcePath = decodeURI(path.resolve(
 								'/',
 								sourcePath.replace('file:///', '')
@@ -185,7 +185,7 @@ function gulpRubySass (sources, options) {
 							return path.relative(base, absoluteSourcePath);
 						});
 
-						vinylFile.sourceMap = sourcemapObject;
+						vinylFile.sourceMap = sourceMapObject;
 					}
 
 					vinylFile.contents = data;
