@@ -3,11 +3,11 @@ var fs = require('fs');
 var path = require('path');
 var assert = require('assert');
 var assign = require('object-assign');
+var pathExists = require('path-exists');
 var rimraf = require('rimraf');
 var vinylFile = require('vinyl-file');
 
 var sass = require('../');
-var uniqueIntermediateDirectory = require('../utils').uniqueIntermediateDirectory;
 
 var defaultOptions = {
 	quiet: true,
@@ -355,22 +355,21 @@ describe('options', function () {
 			var tempDir = './custom-temp-dir';
 			var options = assign({}, defaultOptions, { tempDir: tempDir });
 
-			sass(source, options)
-			.on('data', function (data) {
-				// the plugin transforms the sources argument into an array before
-				// passing to uniqueIntermediateDirectory
-				var sources = [source];
-				var expectedFileLocation = path.join(
-					uniqueIntermediateDirectory(tempDir, sources),
-					data.relative
-				);
+			assert.equal(
+				pathExists.sync(tempDir),
+				false,
+				'The temporary directory already exists, and would create false positives.'
+			);
 
-				assert.equal(
-					data.contents.toString(),
-					fs.readFileSync(expectedFileLocation, {encoding: 'utf8'}),
-					'File does not exist in the custom temporary directory.'
-				);
+			sass(source, options)
+
+			.on('data', function (data) {
+				console.log('heloo');
+
+				assert( pathExists.sync(tempDir) );
 			})
+
+			// clean up if tests are run locally
 			.on('end', function () {
 				rimraf(tempDir, done);
 			});
