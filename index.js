@@ -206,13 +206,7 @@ gulpRubySass.logError = function (err) {
 	this.emit('end');
 };
 
-gulpRubySass.clearCache = function (tempDir, done) {
-	if (typeof tempDir === 'function') { done = tempDir; }
-	tempDir = tempDir || defaults.tempDir;
-	rimraf(path.join(tempDir, 'gulp-ruby-sass'), done);
-};
-
-gulpRubySass.clearCache.sync = function (tempDir) {
+gulpRubySass.clearCache = function (tempDir) {
 	tempDir = tempDir || defaults.tempDir;
 	rimraf.sync(path.join(tempDir, 'gulp-ruby-sass'));
 };

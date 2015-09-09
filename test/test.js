@@ -376,7 +376,7 @@ describe('options', function () {
 
 describe('caching', function () {
 	it('compiles an unchanged file faster the second time', function (done) {
-		sass.clearCache.sync();
+		sass.clearCache();
 
 		var startOne = new Date();
 
