@@ -171,7 +171,6 @@ function gulpRubySass (sources, options) {
 					});
 
 					// sourcemap integration
-					// if we are managing sourcemaps and a sourcemap exists
 					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
 						// remove sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer(convert.removeMapFileComments(data.toString()));
