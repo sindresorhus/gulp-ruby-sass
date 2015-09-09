@@ -1,5 +1,8 @@
 Issues with the output should be reported on the Sass [issue tracker](https://github.com/sass/sass/issues).
 
-Before posting a "this plugin can't do X" issue make sure your command works by running it with the `sass` command line tool directly. You can see the Sass command used by this plugin by running gulp with the verbose flag `gulp --verbose`.
+Before posting an issue:
 
-If a command works with the `sass` command line tool but not with this plugin you are probably missing files from your `gulp.src()` glob. You must pipe all of the files `sass` needs to compile your stylesheets into this plugin for it to work correctly.
+- Update to the latest version.
+- Check the example tasks and available options in the readme.
+- Create a reduced test case with only the gulp-ruby-sass task.
+- Try running a similar command with the Sass gem directly. To see the command gulp-ruby-sass is running, add `verbose: true` to your task options.

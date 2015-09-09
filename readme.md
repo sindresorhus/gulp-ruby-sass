@@ -134,6 +134,8 @@ In rare cases you may need to clear gulp-ruby-sass's cache. This sync function d
 
 This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
+Before submitting an issue please read the [contributing guidelines](https://github.com/sindresorhus/gulp-ruby-sass/blob/master/contributing.md).
+
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)
