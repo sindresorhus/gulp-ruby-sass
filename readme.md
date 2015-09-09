@@ -130,8 +130,6 @@ A convenience function for pretty error logging.
 
 This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
 
-gulp-ruby-sass doesn't support Sass caching or incremental builds... yet ([issue](https://github.com/sindresorhus/gulp-ruby-sass/issues/111)).
-
 ## License
 
 MIT © [Sindre Sorhus](http://sindresorhus.com)

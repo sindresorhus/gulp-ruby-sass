@@ -18,8 +18,8 @@ var logger = require('./logger');
 var utils = require('./utils');
 
 var emitErr = utils.emitErr;
-var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 var replaceLocation = utils.replaceLocation;
+var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 
 function gulpRubySass (sources, options) {
 	options = assign({
@@ -56,20 +56,25 @@ function gulpRubySass (sources, options) {
 	// simplified handling of array sources, like gulp.src
 	if (!Array.isArray(sources)) { sources = [sources]; }
 
-	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, sources);
+	var matches = [];
+	var bases = [];
+
+	sources.forEach(function (source) {
+		matches.push(glob.sync(source));
+		bases.push(options.base || utils.calculateBase(source));
+	});
+
+	var intermediateDir = uniqueIntermediateDirectory(sources, matches, options);
 	var compileMappings = [];
 	var baseMappings = {};
 
-	sources.forEach(function (source) {
-		var base = options.base || utils.calculateBase(source);
+	matches.forEach(function (matchArray, i) {
+		var base = bases[i];
 
-		// match files and remove _partials
-		var matches = glob.sync(source)
-		.filter(function (match) {
+		matchArray.filter(function (match) {
 			return path.basename(match).indexOf('_') !== 0;
-		});
-
-		matches.forEach(function (match) {
+		})
+		.forEach(function (match) {
 			var dest = gutil.replaceExtension(
 				replaceLocation(match, base, intermediateDir),
 				'.css'
@@ -163,7 +168,6 @@ function gulpRubySass (sources, options) {
 					// sourcemap integration
 					// if we are managing sourcemaps and a sourcemap exists
 					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
-
 						// remove sourcemap comment; gulp-sourcemaps will add it back in
 						data = new Buffer( convert.removeMapFileComments(data.toString()) );
 						var sourcemapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
@@ -186,13 +190,7 @@ function gulpRubySass (sources, options) {
 					return;
 				});
 			}, function () {
-				// cleanup previously generated files for next run
-				// TODO: This kills caching. Keeping will push files through that are not in
-				// the current gulp.src. We need to decide whether to use a Sass style caching
-				// strategy, or a gulp style strategy, and what each would look like.
-				rimraf(intermediateDir, function () {
-					stream.push(null);
-				});
+				stream.push(null);
 			});
 		});
 	});
