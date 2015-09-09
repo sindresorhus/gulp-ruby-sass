@@ -363,15 +363,40 @@ describe('options', function () {
 
 			sass(source, options)
 
-			.on('data', function (data) {
-				console.log('heloo');
-
+			.on('data', function () {
 				assert( pathExists.sync(tempDir) );
 			})
 
 			// clean up if tests are run locally
 			.on('end', function () {
 				rimraf(tempDir, done);
+			});
+		});
+	});
+});
+
+describe('caching', function () {
+	it('compiles an unchanged file faster the second time', function (done) {
+		sass.clearCache.sync();
+
+		var startOne = new Date();
+
+		sass('special/computational.scss', defaultOptions)
+		.on('data', function () {})
+		.on('end', function () {
+			var endOne = new Date();
+    	var runtimeOne = endOne - startOne;
+
+			sass('special/computational.scss', defaultOptions)
+			.on('data', function () {})
+			.on('end', function () {
+				var runtimeTwo = new Date() - endOne;
+
+				assert(
+					runtimeOne > runtimeTwo + 50, // pad time to avoid potential intermittents
+					'Compilation times were not decreased significantly. Caching may be broken.'
+				);
+				done();
 			});
 		});
 	});
