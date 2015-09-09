@@ -21,16 +21,18 @@ var emitErr = utils.emitErr;
 var replaceLocation = utils.replaceLocation;
 var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 
-function gulpRubySass (sources, options) {
-	options = assign({
-		tempDir: osTmpdir(),
-		verbose: false,
-		sourcemap: false,
-		emitCompileError: false
-	}, options);
+var defaults = {
+	tempDir: osTmpdir(),
+	verbose: false,
+	sourcemap: false,
+	emitCompileError: false
+};
 
+function gulpRubySass (sources, options) {
 	var stream = new Readable({objectMode: true});
 	stream._read = function () {}; 	// redundant but necessary
+
+	options = assign({}, defaults, options);
 
 	// alert user that `container` is deprecated
 	if (options.container) {
@@ -198,10 +200,21 @@ function gulpRubySass (sources, options) {
 	return stream;
 }
 
-gulpRubySass.logError = function logError(err) {
+gulpRubySass.logError = function (err) {
 	var message = new gutil.PluginError('gulp-ruby-sass', err);
 	process.stderr.write(message + '\n');
 	this.emit('end');
+};
+
+gulpRubySass.clearCache = function (tempDir, done) {
+	if (typeof tempDir === 'function') { done = tempDir; }
+	tempDir = tempDir || defaults.tempDir;
+	rimraf(path.join(tempDir, 'gulp-ruby-sass'), done);
+};
+
+gulpRubySass.clearCache.sync = function (tempDir) {
+	tempDir = tempDir || defaults.tempDir;
+	rimraf.sync(path.join(tempDir, 'gulp-ruby-sass'));
 };
 
 module.exports = gulpRubySass;
