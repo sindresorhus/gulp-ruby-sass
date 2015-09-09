@@ -4,11 +4,11 @@ var emitErr = require('./utils').emitErr;
 
 // Remove intermediate directory for more Sass-like logging
 function prettifyDirectoryLogging (msg, intermediateDir) {
-	return msg.replace(new RegExp((intermediateDir) + '/?', 'g'), './');
+	return msg.replace(new RegExp(intermediateDir + '/?', 'g'), './');
 }
 
 module.exports = {
-	verbose: function  (command, args) {
+	verbose: function (command, args) {
 		gutil.log('Running command ' + command + ' ' + args.join(' '));
 	},
 

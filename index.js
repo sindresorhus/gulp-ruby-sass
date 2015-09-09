@@ -2,34 +2,37 @@
 var fs = require('fs');
 var path = require('path');
 var Readable = require('stream').Readable;
-var glob = require('glob');
-var dargs = require('dargs');
-var rimraf = require('rimraf');
-var spawn = require('win-spawn');
-var gutil = require('gulp-util');
+
 var assign = require('object-assign');
 var convert = require('convert-source-map');
+var dargs = require('dargs');
 var eachAsync = require('each-async');
+var glob = require('glob');
+var gutil = require('gulp-util');
 var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
+var rimraf = require('rimraf');
+var spawn = require('cross-spawn-async');
 
 var logger = require('./logger');
 var utils = require('./utils');
 
 var emitErr = utils.emitErr;
-var uniqueIntermediateDirectory = utils.uniqueIntermediateDirectory;
 var replaceLocation = utils.replaceLocation;
+var createIntermediateDir = utils.createIntermediateDir;
+
+var defaults = {
+	tempDir: osTmpdir(),
+	verbose: false,
+	sourcemap: false,
+	emitCompileError: false
+};
 
 function gulpRubySass (sources, options) {
-	options = assign({
-		tempDir: osTmpdir(),
-		verbose: false,
-		sourcemap: false,
-		emitCompileError: false
-	}, options);
-
 	var stream = new Readable({objectMode: true});
 	stream._read = function () {}; 	// redundant but necessary
+
+	options = assign({}, defaults, options);
 
 	// alert user that `container` is deprecated
 	if (options.container) {
@@ -55,20 +58,25 @@ function gulpRubySass (sources, options) {
 	// simplified handling of array sources, like gulp.src
 	if (!Array.isArray(sources)) { sources = [sources]; }
 
-	var intermediateDir = uniqueIntermediateDirectory(options.tempDir, sources);
+	var matches = [];
+	var bases = [];
+
+	sources.forEach(function (source) {
+		matches.push(glob.sync(source));
+		bases.push(options.base || utils.calculateBase(source));
+	});
+
+	var intermediateDir = createIntermediateDir(sources, matches, options);
 	var compileMappings = [];
 	var baseMappings = {};
 
-	sources.forEach(function (source) {
-		var base = options.base || utils.calculateBase(source);
+	matches.forEach(function (matchArray, i) {
+		var base = bases[i];
 
-		// match files and remove _partials
-		var matches = glob.sync(source)
-		.filter(function (match) {
+		matchArray.filter(function (match) {
 			return path.basename(match).indexOf('_') !== 0;
-		});
-
-		matches.forEach(function (match) {
+		})
+		.forEach(function (match) {
 			var dest = gutil.replaceExtension(
 				replaceLocation(match, base, intermediateDir),
 				'.css'
@@ -162,9 +170,8 @@ function gulpRubySass (sources, options) {
 					// sourcemap integration
 					// if we are managing sourcemaps and a sourcemap exists
 					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
-
 						// remove sourcemap comment; gulp-sourcemaps will add it back in
-						data = new Buffer( convert.removeMapFileComments(data.toString()) );
+						data = new Buffer(convert.removeMapFileComments(data.toString()));
 						var sourcemapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
 
 						// create relative paths for sources
@@ -185,13 +192,7 @@ function gulpRubySass (sources, options) {
 					return;
 				});
 			}, function () {
-				// cleanup previously generated files for next run
-				// TODO: This kills caching. Keeping will push files through that are not in
-				// the current gulp.src. We need to decide whether to use a Sass style caching
-				// strategy, or a gulp style strategy, and what each would look like.
-				rimraf(intermediateDir, function () {
-					stream.push(null);
-				});
+				stream.push(null);
 			});
 		});
 	});
@@ -199,10 +200,15 @@ function gulpRubySass (sources, options) {
 	return stream;
 }
 
-gulpRubySass.logError = function logError(err) {
+gulpRubySass.logError = function (err) {
 	var message = new gutil.PluginError('gulp-ruby-sass', err);
 	process.stderr.write(message + '\n');
 	this.emit('end');
+};
+
+gulpRubySass.clearCache = function (tempDir) {
+	tempDir = tempDir || defaults.tempDir;
+	rimraf.sync(path.join(tempDir, 'gulp-ruby-sass'));
 };
 
 module.exports = gulpRubySass;

@@ -1,13 +1,12 @@
 'use strict';
-var fs = require('fs');
 var path = require('path');
-var rimraf = require('rimraf');
 var assert = require('assert');
 var assign = require('object-assign');
+var pathExists = require('path-exists');
+var rimraf = require('rimraf');
 var vinylFile = require('vinyl-file');
 
 var sass = require('../');
-var uniqueIntermediateDirectory = require('../utils').uniqueIntermediateDirectory;
 
 var defaultOptions = {
 	quiet: true,
@@ -15,7 +14,7 @@ var defaultOptions = {
 };
 
 // load the expected result file from the compiled results directory
-var expectedFile = function (relativePath, base) {
+var loadExpectedFile = function (relativePath, base) {
 	base = base || 'result';
 	var file = path.join(base, relativePath);
 	return vinylFile.readSync(file, { base: base });
@@ -28,9 +27,9 @@ var sortByRelative = function (a, b) {
 describe('single file', function () {
 	this.timeout(20000);
 	var files = [];
-	var expected = expectedFile('file.css');
+	var expected = loadExpectedFile('file.css');
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/file.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
@@ -60,19 +59,19 @@ describe('multiple files', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		expectedFile('directory with spaces/file with spaces.css'),
-		expectedFile('directory/file.css'),
-		expectedFile('error.css'),
-		expectedFile('file.css'),
-		expectedFile('warnings.css')
+		loadExpectedFile('directory with spaces/file with spaces.css'),
+		loadExpectedFile('directory/file.css'),
+		loadExpectedFile('error.css'),
+		loadExpectedFile('file.css'),
+		loadExpectedFile('warnings.css')
 	];
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/**/*.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', function() {
+		.on('end', function () {
 			files.sort(sortByRelative);
 			done();
 		});
@@ -116,11 +115,11 @@ describe('array sources', function () {
 	this.timeout(20000);
 	var files = [];
 	var expected = [
-		expectedFile('file with spaces.css', 'result/directory with spaces'),
-		expectedFile('file.css')
+		loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
+		loadExpectedFile('file.css')
 	];
 
-	before(function(done) {
+	before(function (done) {
 		sass([
 			'source/file.scss',
 			'source/directory with spaces/file with spaces.scss'
@@ -128,7 +127,7 @@ describe('array sources', function () {
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', function() {
+		.on('end', function () {
 			files.sort(sortByRelative);
 			done();
 		});
@@ -162,12 +161,12 @@ describe('concurrently run tasks', function () {
 	var bFiles = [];
 	var cFiles = [];
 	var counter = 0;
-	var isDone = function(done) {
+	var isDone = function (done) {
 		counter++;
 		if (counter === 3) { done(); }
 	};
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/file.scss', defaultOptions)
 		.on('data', function (data) {
 			aFiles.push(data);
@@ -205,7 +204,7 @@ describe('sourcemap', function () {
 	var files = [];
 	var options = assign({}, defaultOptions, { sourcemap: true });
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/file.scss', options)
 		.on('data', function (data) {
 			files.push(data);
@@ -238,18 +237,18 @@ describe('sourcemap', function () {
 
 	describe('compiling files from glob source', function () {
 		var expected = [
-			[ '_partial.scss' ],
-			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
+			['_partial.scss'],
+			['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
 		];
 
-		before(function(done) {
+		before(function (done) {
 			files = [];
 
 			sass('source/**/file.scss', options)
 			.on('data', function (data) {
 				files.push(data);
 			})
-			.on('end', function() {
+			.on('end', function () {
 				files.sort(sortByRelative);
 				done();
 			});
@@ -265,7 +264,7 @@ describe('sourcemap', function () {
 	describe('compiling files and directories with spaces', function () {
 		var expected = ['file with spaces.scss'];
 
-		before(function(done) {
+		before(function (done) {
 			files = [];
 
 			sass('source/directory with spaces/file with spaces.scss', options)
@@ -287,7 +286,7 @@ describe('options', function () {
 	describe('emitCompileError', function () {
 		var error;
 
-		before(function(done) {
+		before(function (done) {
 			var options = assign({}, defaultOptions, { emitCompileError: true });
 
 			sass('source/error.scss', options)
@@ -311,17 +310,17 @@ describe('options', function () {
 		this.timeout(20000);
 		var files = [];
 		var expected = [
-			expectedFile('directory/file.css'),
-			expectedFile('file.css')
+			loadExpectedFile('directory/file.css'),
+			loadExpectedFile('file.css')
 		];
 		var options = assign({}, defaultOptions, { base: 'source' });
 
-		before(function(done) {
+		before(function (done) {
 			sass(['source/file.scss', 'source/directory/file.scss'], options)
 			.on('data', function (data) {
 				files.push(data);
 			})
-			.on('end', function() {
+			.on('end', function () {
 				files.sort(sortByRelative);
 				done();
 			});
@@ -355,24 +354,48 @@ describe('options', function () {
 			var tempDir = './custom-temp-dir';
 			var options = assign({}, defaultOptions, { tempDir: tempDir });
 
-			sass(source, options)
-			.on('data', function (data) {
-				// the plugin transforms the sources argument into an array before
-				// passing to uniqueIntermediateDirectory
-				var sources = [source];
-				var expectedFileLocation = path.join(
-					uniqueIntermediateDirectory(tempDir, sources),
-					data.relative
-				);
+			assert.equal(
+				pathExists.sync(tempDir),
+				false,
+				'The temporary directory already exists, and would create false positives.'
+			);
 
-				assert.equal(
-					data.contents.toString(),
-					fs.readFileSync(expectedFileLocation, {encoding: 'utf8'}),
-					'File does not exist in the custom temporary directory.'
-				);
+			sass(source, options)
+
+			.on('data', function () {
+				assert(pathExists.sync(tempDir));
 			})
+
+			// clean up if tests are run locally
 			.on('end', function () {
 				rimraf(tempDir, done);
+			});
+		});
+	});
+});
+
+describe('caching', function () {
+	it('compiles an unchanged file faster the second time', function (done) {
+		sass.clearCache();
+
+		var startOne = new Date();
+
+		sass('special/computational.scss', defaultOptions)
+		.on('data', function () {})
+		.on('end', function () {
+			var endOne = new Date();
+			var runtimeOne = endOne - startOne;
+
+			sass('special/computational.scss', defaultOptions)
+			.on('data', function () {})
+			.on('end', function () {
+				var runtimeTwo = new Date() - endOne;
+
+				assert(
+					runtimeOne > runtimeTwo + 50, // pad time to avoid potential intermittents
+					'Compilation times were not decreased significantly. Caching may be broken.'
+				);
+				done();
 			});
 		});
 	});

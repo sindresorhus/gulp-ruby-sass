@@ -1,9 +1,9 @@
 'use strict';
 var path = require('path');
 var glob = require('glob');
-var md5Hex = require('md5-hex');
-var gutil = require('gulp-util');
 var glob2base = require('glob2base');
+var gutil = require('gulp-util');
+var md5Hex = require('md5-hex');
 
 var utils = {};
 
@@ -11,12 +11,20 @@ utils.emitErr = function (stream, err) {
 	stream.emit('error', new gutil.PluginError('gulp-ruby-sass', err));
 };
 
-// create temporary directory path for a specific task using cwd and sources
-utils.uniqueIntermediateDirectory = function (tempDir, sources) {
+// Create unique temporary directory path per task using cwd, options, sources,
+// and all matched files. Options must be checked in case the user is switching
+// tempDir or sourcemaps on or off. Sourcemap may be a bug; See
+// https://github.com/sass/sass/issues/1830
+utils.createIntermediateDir = function (sources, matches, options) {
 	return path.join(
-		tempDir,
+		options.tempDir,
 		'gulp-ruby-sass',
-		'cwd-' + md5Hex(process.cwd()) + '-sources-' + md5Hex(JSON.stringify(sources))
+		md5Hex(
+			process.cwd() +
+			JSON.stringify(sources) +
+			JSON.stringify(matches) +
+			options.sourcemap
+		)
 	);
 };
 
