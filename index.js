@@ -177,12 +177,12 @@ function gulpRubySass (sources, options) {
 						var sourcemapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
 
 						// create relative paths for sources
-						sourcemapObject.sources = sourcemapObject.sources.map(function (sourcemapPath) {
-							var absoluteSourcemapPath = decodeURI(path.resolve(
+						sourcemapObject.sources = sourcemapObject.sources.map(function (sourcePath) {
+							var absoluteSourcePath = decodeURI(path.resolve(
 								'/',
-								sourcemapPath.replace('file:///', '')
+								sourcePath.replace('file:///', '')
 							));
-							return path.relative(base, absoluteSourcemapPath);
+							return path.relative(base, absoluteSourcePath);
 						});
 
 						vinylFile.sourceMap = sourcemapObject;
