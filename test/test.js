@@ -30,7 +30,7 @@ describe('single file', function () {
 	var files = [];
 	var expected = expectedFile('file.css');
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/file.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
@@ -67,12 +67,12 @@ describe('multiple files', function () {
 		expectedFile('warnings.css')
 	];
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/**/*.scss', defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', function() {
+		.on('end', function () {
 			files.sort(sortByRelative);
 			done();
 		});
@@ -120,7 +120,7 @@ describe('array sources', function () {
 		expectedFile('file.css')
 	];
 
-	before(function(done) {
+	before(function (done) {
 		sass([
 			'source/file.scss',
 			'source/directory with spaces/file with spaces.scss'
@@ -128,7 +128,7 @@ describe('array sources', function () {
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', function() {
+		.on('end', function () {
 			files.sort(sortByRelative);
 			done();
 		});
@@ -162,12 +162,12 @@ describe('concurrently run tasks', function () {
 	var bFiles = [];
 	var cFiles = [];
 	var counter = 0;
-	var isDone = function(done) {
+	var isDone = function (done) {
 		counter++;
 		if (counter === 3) { done(); }
 	};
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/file.scss', defaultOptions)
 		.on('data', function (data) {
 			aFiles.push(data);
@@ -205,7 +205,7 @@ describe('sourcemap', function () {
 	var files = [];
 	var options = assign({}, defaultOptions, { sourcemap: true });
 
-	before(function(done) {
+	before(function (done) {
 		sass('source/file.scss', options)
 		.on('data', function (data) {
 			files.push(data);
@@ -242,14 +242,14 @@ describe('sourcemap', function () {
 			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
 		];
 
-		before(function(done) {
+		before(function (done) {
 			files = [];
 
 			sass('source/**/file.scss', options)
 			.on('data', function (data) {
 				files.push(data);
 			})
-			.on('end', function() {
+			.on('end', function () {
 				files.sort(sortByRelative);
 				done();
 			});
@@ -265,7 +265,7 @@ describe('sourcemap', function () {
 	describe('compiling files and directories with spaces', function () {
 		var expected = ['file with spaces.scss'];
 
-		before(function(done) {
+		before(function (done) {
 			files = [];
 
 			sass('source/directory with spaces/file with spaces.scss', options)
@@ -287,7 +287,7 @@ describe('options', function () {
 	describe('emitCompileError', function () {
 		var error;
 
-		before(function(done) {
+		before(function (done) {
 			var options = assign({}, defaultOptions, { emitCompileError: true });
 
 			sass('source/error.scss', options)
@@ -316,12 +316,12 @@ describe('options', function () {
 		];
 		var options = assign({}, defaultOptions, { base: 'source' });
 
-		before(function(done) {
+		before(function (done) {
 			sass(['source/file.scss', 'source/directory/file.scss'], options)
 			.on('data', function (data) {
 				files.push(data);
 			})
-			.on('end', function() {
+			.on('end', function () {
 				files.sort(sortByRelative);
 				done();
 			});
