@@ -14,7 +14,7 @@ utils.emitErr = function (stream, err) {
 // Create unique temporary directory path per task using cwd, options, sources,
 // and all matched files. Sourcemap option switching does not break Sass cache
 // so we do it ourselves. Possibly a bug: https://github.com/sass/sass/issues/1830
-utils.createIntermediateDir = function (sources, matches, options) {
+utils.createIntermediatePath = function (sources, matches, options) {
 	return path.join(
 		options.tempDir,
 		'gulp-ruby-sass',
