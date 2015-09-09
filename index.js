@@ -76,6 +76,7 @@ function gulpRubySass (sources, options) {
 		var base = bases[i];
 
 		matchArray.filter(function (match) {
+			// remove _partials
 			return path.basename(match).indexOf('_') !== 0;
 		})
 		.forEach(function (match) {
