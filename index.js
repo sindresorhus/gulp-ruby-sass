@@ -63,6 +63,11 @@ function gulpRubySass (sources, options) {
 		bases.push(options.base || utils.calculateBase(source));
 	});
 
+	// give a good error if there are no file matches
+	if (matches[0].length < 1) {
+		emitErr(stream, '`source` does not match any files.');
+	}
+
 	var intermediateDir = createIntermediateDir(sources, matches, options);
 	var compileMappings = [];
 	var baseMappings = {};
