@@ -1,5 +1,4 @@
 'use strict';
-var fs = require('fs');
 var path = require('path');
 var assert = require('assert');
 var assign = require('object-assign');
@@ -238,8 +237,8 @@ describe('sourcemap', function () {
 
 	describe('compiling files from glob source', function () {
 		var expected = [
-			[ '_partial.scss' ],
-			[ '_partial.scss', 'file.scss', 'directory/_nested-partial.scss' ]
+			['_partial.scss'],
+			['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
 		];
 
 		before(function (done) {
@@ -364,7 +363,7 @@ describe('options', function () {
 			sass(source, options)
 
 			.on('data', function () {
-				assert( pathExists.sync(tempDir) );
+				assert(pathExists.sync(tempDir));
 			})
 
 			// clean up if tests are run locally
@@ -385,7 +384,7 @@ describe('caching', function () {
 		.on('data', function () {})
 		.on('end', function () {
 			var endOne = new Date();
-    	var runtimeOne = endOne - startOne;
+			var runtimeOne = endOne - startOne;
 
 			sass('special/computational.scss', defaultOptions)
 			.on('data', function () {})
