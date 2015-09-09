@@ -2,16 +2,17 @@
 var fs = require('fs');
 var path = require('path');
 var Readable = require('stream').Readable;
-var glob = require('glob');
-var dargs = require('dargs');
-var rimraf = require('rimraf');
-var spawn = require('win-spawn');
-var gutil = require('gulp-util');
+
 var assign = require('object-assign');
 var convert = require('convert-source-map');
+var dargs = require('dargs');
 var eachAsync = require('each-async');
+var glob = require('glob');
+var gutil = require('gulp-util');
 var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
+var rimraf = require('rimraf');
+var spawn = require('win-spawn');
 
 var logger = require('./logger');
 var utils = require('./utils');

@@ -1,9 +1,9 @@
 'use strict';
 var path = require('path');
 var glob = require('glob');
-var md5Hex = require('md5-hex');
-var gutil = require('gulp-util');
 var glob2base = require('glob2base');
+var gutil = require('gulp-util');
+var md5Hex = require('md5-hex');
 
 var utils = {};
 

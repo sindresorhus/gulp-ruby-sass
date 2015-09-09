@@ -1,9 +1,9 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var rimraf = require('rimraf');
 var assert = require('assert');
 var assign = require('object-assign');
+var rimraf = require('rimraf');
 var vinylFile = require('vinyl-file');
 
 var sass = require('../');
