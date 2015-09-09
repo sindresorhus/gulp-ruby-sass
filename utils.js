@@ -12,9 +12,8 @@ utils.emitErr = function (stream, err) {
 };
 
 // Create unique temporary directory path per task using cwd, options, sources,
-// and all matched files. Options must be checked in case the user is switching
-// tempDir or sourcemaps on or off. Sourcemap may be a bug; See
-// https://github.com/sass/sass/issues/1830
+// and all matched files. Sourcemap option switching does not break Sass cache
+// so we do it ourselves. Possibly a bug: https://github.com/sass/sass/issues/1830
 utils.createIntermediateDir = function (sources, matches, options) {
 	return path.join(
 		options.tempDir,
