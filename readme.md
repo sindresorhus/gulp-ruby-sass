@@ -126,6 +126,10 @@ gulp.task('sass', function () {
 
 A convenience function for pretty error logging.
 
+### sass.clearCache([tempDir])
+
+In rare cases you may need to clear gulp-ruby-sass's cache. This sync function deletes all files used for Sass caching. If you've set a custom temporary directory in your task you must pass it to `clearCache`.
+
 ## Issues
 
 This plugin wraps the Sass gem for the gulp build system. It does not alter Sass's output in any way. Any issues with Sass output should be reported to the [Sass issue tracker](https://github.com/sass/sass/issues).
