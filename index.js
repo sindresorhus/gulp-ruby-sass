@@ -12,8 +12,8 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 var rimraf = require('rimraf');
 var spawn = require('cross-spawn-async');
-var logger = require('./logger');
-var utils = require('./utils');
+var logger = require('./lib/logger');
+var utils = require('./lib/utils');
 
 var emitErr = utils.emitErr;
 var replaceLocation = utils.replaceLocation;
