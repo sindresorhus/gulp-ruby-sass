@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 'use strict';
 var path = require('path');
 var assert = require('assert');
@@ -5,23 +6,23 @@ var assign = require('object-assign');
 var pathExists = require('path-exists');
 var rimraf = require('rimraf');
 var vinylFile = require('vinyl-file');
-
 var sass = require('../');
 
 var defaultOptions = {
 	quiet: true,
-	unixNewlines: true // normalize compilation results on Windows systems
+	// normalize compilation results on Windows systems
+	unixNewlines: true
 };
 
 // load the expected result file from the compiled results directory
 var loadExpectedFile = function (relativePath, base) {
 	base = base || 'result';
 	var file = path.join(base, relativePath);
-	return vinylFile.readSync(file, { base: base });
+	return vinylFile.readSync(file, {base: base});
 };
 
 var sortByRelative = function (a, b) {
-  return a.relative.localeCompare(b.relative);
+	return a.relative.localeCompare(b.relative);
 };
 
 describe('single file', function () {
@@ -100,8 +101,7 @@ describe('multiple files', function () {
 					file.contents.toString().indexOf(expectedError) !== -1,
 					'The error file does not contain the expected message "' + expectedError + '".'
 				);
-			}
-			else {
+			} else {
 				assert.deepEqual(
 					file.contents.toString(),
 					expected[i].contents.toString()
@@ -113,6 +113,7 @@ describe('multiple files', function () {
 
 describe('array sources', function () {
 	this.timeout(20000);
+
 	var files = [];
 	var expected = [
 		loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
@@ -161,9 +162,13 @@ describe('concurrently run tasks', function () {
 	var bFiles = [];
 	var cFiles = [];
 	var counter = 0;
+
 	var isDone = function (done) {
 		counter++;
-		if (counter === 3) { done(); }
+
+		if (counter === 3) {
+			done();
+		}
 	};
 
 	before(function (done) {
@@ -201,8 +206,9 @@ describe('concurrently run tasks', function () {
 
 describe('sourcemap', function () {
 	this.timeout(20000);
+
 	var files = [];
-	var options = assign({}, defaultOptions, { sourcemap: true });
+	var options = assign({}, defaultOptions, {sourcemap: true});
 
 	before(function (done) {
 		sass('source/file.scss', options)
@@ -287,7 +293,7 @@ describe('options', function () {
 		var error;
 
 		before(function (done) {
-			var options = assign({}, defaultOptions, { emitCompileError: true });
+			var options = assign({}, defaultOptions, {emitCompileError: true});
 
 			sass('source/error.scss', options)
 			.on('data', function () {})
@@ -313,7 +319,7 @@ describe('options', function () {
 			loadExpectedFile('directory/file.css'),
 			loadExpectedFile('file.css')
 		];
-		var options = assign({}, defaultOptions, { base: 'source' });
+		var options = assign({}, defaultOptions, {base: 'source'});
 
 		before(function (done) {
 			sass(['source/file.scss', 'source/directory/file.scss'], options)
@@ -352,7 +358,7 @@ describe('options', function () {
 		it('compiles files to the specified directory', function (done) {
 			var source = 'source/file.scss';
 			var tempDir = './custom-temp-dir';
-			var options = assign({}, defaultOptions, { tempDir: tempDir });
+			var options = assign({}, defaultOptions, {tempDir: tempDir});
 
 			assert.equal(
 				pathExists.sync(tempDir),
@@ -392,9 +398,11 @@ describe('caching', function () {
 				var runtimeTwo = new Date() - endOne;
 
 				assert(
-					runtimeOne > runtimeTwo + 50, // pad time to avoid potential intermittents
+					// pad time to avoid potential intermittents
+					runtimeOne > runtimeTwo + 50,
 					'Compilation times were not decreased significantly. Caching may be broken.'
 				);
+
 				done();
 			});
 		});

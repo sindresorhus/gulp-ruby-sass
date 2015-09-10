@@ -2,7 +2,6 @@
 var fs = require('fs');
 var path = require('path');
 var Readable = require('stream').Readable;
-
 var assign = require('object-assign');
 var convert = require('convert-source-map');
 var dargs = require('dargs');
@@ -13,7 +12,6 @@ var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 var rimraf = require('rimraf');
 var spawn = require('cross-spawn-async');
-
 var logger = require('./logger');
 var utils = require('./utils');
 
@@ -28,9 +26,11 @@ var defaults = {
 	emitCompileError: false
 };
 
-function gulpRubySass (sources, options) {
+function gulpRubySass(sources, options) {
 	var stream = new Readable({objectMode: true});
-	stream._read = function () {}; 	// redundant but necessary
+
+	// redundant but necessary
+	stream._read = function () {};
 
 	options = assign({}, defaults, options);
 
@@ -53,7 +53,9 @@ function gulpRubySass (sources, options) {
 	options.update = true;
 
 	// simplified handling of array sources, like gulp.src
-	if (!Array.isArray(sources)) { sources = [sources]; }
+	if (!Array.isArray(sources)) {
+		sources = [sources];
+	}
 
 	var matches = [];
 	var bases = [];
