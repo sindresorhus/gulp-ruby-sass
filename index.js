@@ -112,7 +112,8 @@ function gulpRubySass(sources, options) {
 	if (options.bundleExec) {
 		command = 'bundle';
 		args.unshift('exec', 'sass');
-	} else {
+	}
+	else {
 		command = 'sass';
 	}
 

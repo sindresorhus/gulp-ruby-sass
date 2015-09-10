@@ -17,17 +17,20 @@ logger.verbose = function (command, args) {
 };
 
 logger.stdout = function (stream, intermediateDir, data) {
+	// Bundler error: no Sass version found
 	if (/bundler: command not found: sass/.test(data)) {
-		// Bundler error: no Sass version found
 		emitErr(stream, 'bundler: command not found: sass');
-	} else if (/Could not locate Gemfile or .bundle\/ directory/.test(data)) {
-		// Bundler error: Gemfile not found
+	}
+	// Bundler error: Gemfile not found
+	else if (/Could not locate Gemfile or .bundle\/ directory/.test(data)) {
 		emitErr(stream, 'bundler: could not locate Gemfile or .bundle directory');
-	} else if (/No such file or directory @ rb_sysopen/.test(data)) {
-		// Sass error: directory missing
+	}
+	// Sass error: directory missing
+	else if (/No such file or directory @ rb_sysopen/.test(data)) {
 		emitErr(stream, data.trim());
-	} else {
-		// Not an error: Sass logging
+	}
+	// Not an error: Sass logging
+	else {
 		data = prettifyDirectoryLogging(data, intermediateDir);
 		data = data.trim();
 		gutil.log(data);
@@ -38,17 +41,20 @@ logger.stderr = function (stream, intermediateDir, data) {
 	var bundlerMissing = /Could not find 'bundler' \((.*?)\)/.exec(data);
 	var sassVersionMissing = /Could not find gem 'sass \((.*?)\) ruby'/.exec(data);
 
+	// Ruby error: Bundler gem not installed
 	if (bundlerMissing) {
-		// Ruby error: Bundler gem not installed
 		emitErr(stream, 'ruby: Could not find \'bundler\' (' + bundlerMissing[1] + ').');
-	} else if (sassVersionMissing) {
-		// Bundler error: no matching Sass version
+	}
+	// Bundler error: no matching Sass version
+	else if (sassVersionMissing) {
 		emitErr(stream, 'bundler: Could not find gem \'sass (' + sassVersionMissing[1] + ')\'.');
-	} else if (/No such file or directory @ rb_sysopen/.test(data)) {
-		// Sass error: file missing
+	}
+	// Sass error: file missing
+	else if (/No such file or directory @ rb_sysopen/.test(data)) {
 		emitErr(stream, data.trim());
-	} else {
-		// Not an error: Sass warnings, debug statements
+	}
+	// Not an error: Sass warnings, debug statements
+	else {
 		data = prettifyDirectoryLogging(data, intermediateDir);
 		data = data.trim();
 		gutil.log(data);
@@ -59,7 +65,8 @@ logger.error = function (stream, err) {
 	if (err.code === 'ENOENT') {
 		// Spawn error: gems not installed
 		emitErr(stream, 'Gem ' + err.path + ' is not installed.');
-	} else {
+	}
+	else {
 		// Other errors
 		emitErr(stream, err);
 	}

@@ -22,6 +22,11 @@
   "scripts": {
     "test": "xo && cd test && mocha test.js"
   },
+  "xo": {
+    "rules": {
+      "brace-style": [2, "stroustrup", {"allowSingleLine": false}]
+    }
+  },
   "files": [
     "index.js",
     "logger.js",

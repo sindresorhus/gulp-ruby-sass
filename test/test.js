@@ -101,7 +101,8 @@ describe('multiple files', function () {
 					file.contents.toString().indexOf(expectedError) !== -1,
 					'The error file does not contain the expected message "' + expectedError + '".'
 				);
-			} else {
+			}
+			else {
 				assert.deepEqual(
 					file.contents.toString(),
 					expected[i].contents.toString()
