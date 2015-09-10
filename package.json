@@ -24,7 +24,8 @@
   },
   "files": [
     "index.js",
-    "logger.js"
+    "logger.js",
+    "utils.js"
   ],
   "keywords": [
     "gulpplugin",
