@@ -28,7 +28,7 @@ var sortByRelative = function (a, b) {
 describe('single file', function () {
 	this.timeout(20000);
 	var files = [];
-	var expected = loadExpectedFile('file.css');
+	var expected = [loadExpectedFile('file.css')];
 
 	before(function (done) {
 		sass('source/file.scss', defaultOptions)
@@ -39,19 +39,19 @@ describe('single file', function () {
 	});
 
 	it('creates correct number of files', function () {
-		assert.equal(files.length, 1);
+		assert.equal(files.length, expected.length);
 	});
 
 	it('creates file at correct path', function () {
 		assert(files.length);
-		assert.equal(files[0].relative, expected.relative);
+		assert.equal(files[0].relative, expected[0].relative);
 	});
 
 	it('creates correct file contents', function () {
 		assert(files.length);
 		assert.equal(
 			files[0].contents.toString(),
-			expected.contents.toString()
+			expected[0].contents.toString()
 		);
 	});
 });
@@ -78,7 +78,7 @@ describe('multiple files', function () {
 	});
 
 	it('creates correct number of files', function () {
-		assert.equal(files.length, 4);
+		assert.equal(files.length, expected.length);
 	});
 
 	it('creates file at correct path', function () {
@@ -123,7 +123,7 @@ describe('array sources', function () {
 	});
 
 	it('creates correct number of files', function () {
-		assert.equal(files.length, 2);
+		assert.equal(files.length, expected.length);
 	});
 
 	it('creates file at correct path', function () {
@@ -321,7 +321,7 @@ describe('options', function () {
 		});
 
 		it('creates correct number of files', function () {
-			assert.equal(files.length, 2);
+			assert.equal(files.length, expected.length);
 		});
 
 		it('creates file at correct path', function () {
