@@ -146,90 +146,89 @@ describe('concurrently run tasks', function () {
 	});
 });
 
-describe('sourcemap', function () {
-	this.timeout(20000);
-	var includesCorrectSources = function (source, expected) {
-		var files = [];
-		var options = assign({}, defaultOptions, {sourcemap: true});
-
-		before(function (done) {
-			sass(source, options)
-			.on('data', function (data) {
-				files.push(data);
-			})
-			.on('end', function () {
-				files.sort(sortByRelative);
-				done();
-			});
-		});
-
-		it('includes the correct sources', function () {
-			files.forEach(function (file, i) {
-				assert.deepEqual(file.sourceMap.sources, expected[i]);
-			});
-		});
-	};
-
-	describe('replaces Sass sourcemaps with vinyl sourceMaps', function () {
-		var files = [];
-		var options = assign({}, defaultOptions, {sourcemap: true});
-
-		before(function (done) {
-			sass('source/file.scss', options)
-			.on('data', function (data) {
-				files.push(data);
-			})
-			.on('end', done);
-		});
-
-		it('doesn\'t stream Sass sourcemap files', function () {
-			assert.equal(files.length, 1);
-		});
-
-		it('removes Sass sourcemap comment', function () {
-			assert(
-				files[0].contents.toString().indexOf('sourceMap') === -1,
-				'File contains sourcemap comment'
-			);
-		});
-
-		it('adds a vinyl sourcemap', function () {
-			assert.equal(typeof files[0].sourceMap, 'object');
-			assert.equal(files[0].sourceMap.version, 3);
-		});
-	});
-
-	describe('compiling files from a single file source', function () {
-		var source = ['source/file.scss'];
-		var expected = [
-			['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
-		];
-
-		includesCorrectSources(source, expected);
-	});
-
-	describe('compiling files and directories with spaces', function () {
-		var source = ['source/directory with spaces/file with spaces.scss'];
-		var expected = [
-			['file with spaces.scss']
-		];
-
-		includesCorrectSources(source, expected);
-	});
-
-	describe('compiling files from glob source', function () {
-		var source = ['source/**/file.scss'];
-		var expected = [
-			['_partial.scss'],
-			['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
-		];
-
-		includesCorrectSources(source, expected);
-	});
-});
-
 describe('options', function () {
 	this.timeout(20000);
+
+	describe('sourcemap', function () {
+		var includesCorrectSources = function (source, expected) {
+			var files = [];
+			var options = assign({}, defaultOptions, {sourcemap: true});
+
+			before(function (done) {
+				sass(source, options)
+				.on('data', function (data) {
+					files.push(data);
+				})
+				.on('end', function () {
+					files.sort(sortByRelative);
+					done();
+				});
+			});
+
+			it('includes the correct sources', function () {
+				files.forEach(function (file, i) {
+					assert.deepEqual(file.sourceMap.sources, expected[i]);
+				});
+			});
+		};
+
+		describe('replaces Sass sourcemaps with vinyl sourceMaps', function () {
+			var files = [];
+			var options = assign({}, defaultOptions, {sourcemap: true});
+
+			before(function (done) {
+				sass('source/file.scss', options)
+				.on('data', function (data) {
+					files.push(data);
+				})
+				.on('end', done);
+			});
+
+			it('doesn\'t stream Sass sourcemap files', function () {
+				assert.equal(files.length, 1);
+			});
+
+			it('removes Sass sourcemap comment', function () {
+				assert(
+					files[0].contents.toString().indexOf('sourceMap') === -1,
+					'File contains sourcemap comment'
+				);
+			});
+
+			it('adds a vinyl sourcemap', function () {
+				assert.equal(typeof files[0].sourceMap, 'object');
+				assert.equal(files[0].sourceMap.version, 3);
+			});
+		});
+
+		describe('compiling files from a single file source', function () {
+			var source = ['source/file.scss'];
+			var expected = [
+				['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
+			];
+
+			includesCorrectSources(source, expected);
+		});
+
+		describe('compiling files and directories with spaces', function () {
+			var source = ['source/directory with spaces/file with spaces.scss'];
+			var expected = [
+				['file with spaces.scss']
+			];
+
+			includesCorrectSources(source, expected);
+		});
+
+		describe('compiling files from glob source', function () {
+			var source = ['source/**/file.scss'];
+			var expected = [
+				['_partial.scss'],
+				['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
+			];
+
+			includesCorrectSources(source, expected);
+		});
+	});
 
 	describe('emitCompileError', function () {
 		var error;
