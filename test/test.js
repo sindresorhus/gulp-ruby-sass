@@ -44,15 +44,19 @@ describe('single file', function () {
 
 	it('creates file at correct path', function () {
 		assert(files.length);
-		assert.equal(files[0].relative, expected[0].relative);
+		files.forEach(function (file, i) {
+			assert.equal(file.relative, expected[i].relative);
+		});
 	});
 
 	it('creates correct file contents', function () {
 		assert(files.length);
-		assert.equal(
-			files[0].contents.toString(),
-			expected[0].contents.toString()
-		);
+		files.forEach(function (file, i) {
+			assert.deepEqual(
+				file.contents.toString(),
+				expected[i].contents.toString()
+			);
+		});
 	});
 });
 
