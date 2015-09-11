@@ -25,11 +25,12 @@ var sortByRelative = function (a, b) {
 	return a.relative.localeCompare(b.relative);
 };
 
-var compilesSource = function (source, expected) {
+var compilesSource = function (source, expected, options) {
 	var files = [];
+	options = options || defaultOptions;
 
 	before(function (done) {
-		sass(source, defaultOptions)
+		sass(source, options)
 		.on('data', function (data) {
 			files.push(data);
 		})
@@ -256,44 +257,14 @@ describe('options', function () {
 	});
 
 	describe('base (for colliding sources)', function () {
-		var files = [];
+		var source = ['source/file.scss', 'source/directory/file.scss'];
 		var expected = [
 			loadExpectedFile('directory/file.css'),
 			loadExpectedFile('file.css')
 		];
 		var options = assign({}, defaultOptions, {base: 'source'});
 
-		before(function (done) {
-			sass(['source/file.scss', 'source/directory/file.scss'], options)
-			.on('data', function (data) {
-				files.push(data);
-			})
-			.on('end', function () {
-				files.sort(sortByRelative);
-				done();
-			});
-		});
-
-		it('creates correct number of files', function () {
-			assert.equal(files.length, expected.length);
-		});
-
-		it('creates file at correct path', function () {
-			assert(files.length);
-			files.forEach(function (file, i) {
-				assert.equal(file.relative, expected[i].relative);
-			});
-		});
-
-		it('creates correct file contents', function () {
-			assert(files.length);
-			files.forEach(function (file, i) {
-				assert.deepEqual(
-					file.contents.toString(),
-					expected[i].contents.toString()
-				);
-			});
-		});
+		compilesSource(source, expected, options);
 	});
 
 	describe('tempDir', function () {
