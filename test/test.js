@@ -25,24 +25,25 @@ var sortByRelative = function (a, b) {
 	return a.relative.localeCompare(b.relative);
 };
 
-describe('single file', function () {
-	this.timeout(20000);
+var compilesSource = function (source, expected) {
 	var files = [];
-	var expected = [loadExpectedFile('file.css')];
 
 	before(function (done) {
-		sass('source/file.scss', defaultOptions)
+		sass(source, defaultOptions)
 		.on('data', function (data) {
 			files.push(data);
 		})
-		.on('end', done);
+		.on('end', function () {
+			files.sort(sortByRelative);
+			done();
+		});
 	});
 
-	it('creates correct number of files', function () {
+	it('creates the correct number of files', function () {
 		assert.equal(files.length, expected.length);
 	});
 
-	it('creates file at correct path', function () {
+	it('creates files at the correct path', function () {
 		assert(files.length);
 		files.forEach(function (file, i) {
 			assert.equal(file.relative, expected[i].relative);
@@ -58,11 +59,19 @@ describe('single file', function () {
 			);
 		});
 	});
+};
+
+describe('single file', function () {
+	this.timeout(20000);
+	var source = 'source/file.scss';
+	var expected = [loadExpectedFile('file.css')];
+
+	compilesSource(source, expected);
 });
 
 describe('multiple files', function () {
 	this.timeout(20000);
-	var files = [];
+	var source = 'source/**/*.scss';
 	var expected = [
 		loadExpectedFile('directory with spaces/file with spaces.css'),
 		loadExpectedFile('directory/file.css'),
@@ -70,82 +79,21 @@ describe('multiple files', function () {
 		loadExpectedFile('warnings.css')
 	];
 
-	before(function (done) {
-		sass('source/**/*.scss', defaultOptions)
-		.on('data', function (data) {
-			files.push(data);
-		})
-		.on('end', function () {
-			files.sort(sortByRelative);
-			done();
-		});
-	});
-
-	it('creates correct number of files', function () {
-		assert.equal(files.length, expected.length);
-	});
-
-	it('creates file at correct path', function () {
-		assert(files.length);
-		files.forEach(function (file, i) {
-			assert.equal(file.relative, expected[i].relative);
-		});
-	});
-
-	it('creates correct file contents', function () {
-		assert(files.length);
-		files.forEach(function (file, i) {
-			assert.deepEqual(
-				file.contents.toString(),
-				expected[i].contents.toString()
-			);
-		});
-	});
+	compilesSource(source, expected);
 });
 
 describe('array sources', function () {
 	this.timeout(20000);
-
-	var files = [];
+	var source = [
+		'source/file.scss',
+		'source/directory with spaces/file with spaces.scss'
+	];
 	var expected = [
 		loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
 		loadExpectedFile('file.css')
 	];
 
-	before(function (done) {
-		sass([
-			'source/file.scss',
-			'source/directory with spaces/file with spaces.scss'
-		], defaultOptions)
-		.on('data', function (data) {
-			files.push(data);
-		})
-		.on('end', function () {
-			files.sort(sortByRelative);
-			done();
-		});
-	});
-
-	it('creates correct number of files', function () {
-		assert.equal(files.length, expected.length);
-	});
-
-	it('creates file at correct path', function () {
-		assert(files.length);
-		files.forEach(function (file, i) {
-			assert.equal(file.relative, expected[i].relative);
-		});
-	});
-
-	it('creates correct file contents', function () {
-		assert(files.length);
-		files.forEach(function (file, i) {
-			assert.deepEqual(
-				file.contents.toString(),
-				expected[i].contents.toString()
-			);
-		});
-	});
+	compilesSource(source, expected);
 });
 
 describe('concurrently run tasks', function () {
