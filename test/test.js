@@ -146,7 +146,6 @@ describe('concurrently run tasks', function () {
 
 describe('sourcemap', function () {
 	this.timeout(20000);
-
 	var files = [];
 	var options = assign({}, defaultOptions, {sourcemap: true});
 
@@ -253,7 +252,6 @@ describe('options', function () {
 	});
 
 	describe('base (for colliding sources)', function () {
-		this.timeout(20000);
 		var files = [];
 		var expected = [
 			loadExpectedFile('directory/file.css'),
@@ -321,6 +319,8 @@ describe('options', function () {
 });
 
 describe('caching', function () {
+	this.timeout(20000);
+
 	it('compiles an unchanged file faster the second time', function (done) {
 		sass.clearCache();
 
