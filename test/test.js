@@ -150,28 +150,6 @@ describe('options', function () {
 	this.timeout(20000);
 
 	describe('sourcemap', function () {
-		var includesCorrectSources = function (source, expected) {
-			var files = [];
-			var options = assign({}, defaultOptions, {sourcemap: true});
-
-			before(function (done) {
-				sass(source, options)
-				.on('data', function (data) {
-					files.push(data);
-				})
-				.on('end', function () {
-					files.sort(sortByRelative);
-					done();
-				});
-			});
-
-			it('includes the correct sources', function () {
-				files.forEach(function (file, i) {
-					assert.deepEqual(file.sourceMap.sources, expected[i]);
-				});
-			});
-		};
-
 		describe('replaces Sass sourcemaps with vinyl sourceMaps', function () {
 			var files = [];
 			var options = assign({}, defaultOptions, {sourcemap: true});
@@ -200,6 +178,28 @@ describe('options', function () {
 				assert.equal(files[0].sourceMap.version, 3);
 			});
 		});
+
+		var includesCorrectSources = function (source, expected) {
+			var files = [];
+			var options = assign({}, defaultOptions, {sourcemap: true});
+
+			before(function (done) {
+				sass(source, options)
+				.on('data', function (data) {
+					files.push(data);
+				})
+				.on('end', function () {
+					files.sort(sortByRelative);
+					done();
+				});
+			});
+
+			it('includes the correct sources', function () {
+				files.forEach(function (file, i) {
+					assert.deepEqual(file.sourceMap.sources, expected[i]);
+				});
+			});
+		};
 
 		describe('compiling files from a single file source', function () {
 			var source = ['source/file.scss'];
