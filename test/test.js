@@ -61,39 +61,42 @@ var compilesSource = function (source, expected) {
 	});
 };
 
-describe('single file', function () {
+describe('compiling', function () {
 	this.timeout(20000);
-	var source = 'source/file.scss';
-	var expected = [loadExpectedFile('file.css')];
 
-	compilesSource(source, expected);
-});
+	describe('a single file', function () {
+		var source = 'source/file.scss';
+		var expected = [loadExpectedFile('file.css')];
 
-describe('multiple files', function () {
-	this.timeout(20000);
-	var source = 'source/**/*.scss';
-	var expected = [
-		loadExpectedFile('directory with spaces/file with spaces.css'),
-		loadExpectedFile('directory/file.css'),
-		loadExpectedFile('file.css'),
-		loadExpectedFile('warnings.css')
-	];
+		compilesSource(source, expected);
+	});
 
-	compilesSource(source, expected);
-});
+	describe('multiple files', function () {
+		this.timeout(20000);
+		var source = 'source/**/*.scss';
+		var expected = [
+			loadExpectedFile('directory with spaces/file with spaces.css'),
+			loadExpectedFile('directory/file.css'),
+			loadExpectedFile('file.css'),
+			loadExpectedFile('warnings.css')
+		];
 
-describe('array sources', function () {
-	this.timeout(20000);
-	var source = [
-		'source/file.scss',
-		'source/directory with spaces/file with spaces.scss'
-	];
-	var expected = [
-		loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
-		loadExpectedFile('file.css')
-	];
+		compilesSource(source, expected);
+	});
 
-	compilesSource(source, expected);
+	describe('array sources', function () {
+		this.timeout(20000);
+		var source = [
+			'source/file.scss',
+			'source/directory with spaces/file with spaces.scss'
+		];
+		var expected = [
+			loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
+			loadExpectedFile('file.css')
+		];
+
+		compilesSource(source, expected);
+	});
 });
 
 describe('concurrently run tasks', function () {
@@ -144,30 +147,30 @@ describe('concurrently run tasks', function () {
 	});
 });
 
-var includesCorrectSources = function (source, expected) {
-	var files = [];
-	var options = assign({}, defaultOptions, {sourcemap: true});
-
-	before(function (done) {
-		sass(source, options)
-		.on('data', function (data) {
-			files.push(data);
-		})
-		.on('end', function () {
-			files.sort(sortByRelative);
-			done();
-		});
-	});
-
-	it('includes the correct sources', function () {
-		files.forEach(function (file, i) {
-			assert.deepEqual(file.sourceMap.sources, expected[i]);
-		});
-	});
-};
-
 describe('sourcemap', function () {
 	this.timeout(20000);
+	var includesCorrectSources = function (source, expected) {
+		var files = [];
+		var options = assign({}, defaultOptions, {sourcemap: true});
+
+		before(function (done) {
+			sass(source, options)
+			.on('data', function (data) {
+				files.push(data);
+			})
+			.on('end', function () {
+				files.sort(sortByRelative);
+				done();
+			});
+		});
+
+		it('includes the correct sources', function () {
+			files.forEach(function (file, i) {
+				assert.deepEqual(file.sourceMap.sources, expected[i]);
+			});
+		});
+	};
+
 	describe('replaces Sass sourcemaps with vinyl sourceMaps', function () {
 		var files = [];
 		var options = assign({}, defaultOptions, {sourcemap: true});
