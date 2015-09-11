@@ -73,7 +73,6 @@ describe('compiling', function () {
 	});
 
 	describe('multiple files', function () {
-		this.timeout(20000);
 		var source = 'source/**/*.scss';
 		var expected = [
 			loadExpectedFile('directory with spaces/file with spaces.css'),
@@ -86,7 +85,6 @@ describe('compiling', function () {
 	});
 
 	describe('array sources', function () {
-		this.timeout(20000);
 		var source = [
 			'source/file.scss',
 			'source/directory with spaces/file with spaces.scss'
