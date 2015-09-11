@@ -62,7 +62,6 @@ describe('multiple files', function () {
 	var expected = [
 		loadExpectedFile('directory with spaces/file with spaces.css'),
 		loadExpectedFile('directory/file.css'),
-		loadExpectedFile('error.css'),
 		loadExpectedFile('file.css'),
 		loadExpectedFile('warnings.css')
 	];
@@ -79,7 +78,7 @@ describe('multiple files', function () {
 	});
 
 	it('creates correct number of files', function () {
-		assert.equal(files.length, 5);
+		assert.equal(files.length, 4);
 	});
 
 	it('creates file at correct path', function () {
@@ -92,22 +91,10 @@ describe('multiple files', function () {
 	it('creates correct file contents', function () {
 		assert(files.length);
 		files.forEach(function (file, i) {
-			// the stack trace in the error file is specific to the system it's
-			// compiled on, so we just check for the error message
-			if (file.basename === 'error.css') {
-				var expectedError = 'Error: File to import not found or unreadable: i-dont-exist.';
-
-				assert(
-					file.contents.toString().indexOf(expectedError) !== -1,
-					'The error file does not contain the expected message "' + expectedError + '".'
-				);
-			}
-			else {
-				assert.deepEqual(
-					file.contents.toString(),
-					expected[i].contents.toString()
-				);
-			}
+			assert.deepEqual(
+				file.contents.toString(),
+				expected[i].contents.toString()
+			);
 		});
 	});
 });
@@ -296,7 +283,7 @@ describe('options', function () {
 		before(function (done) {
 			var options = assign({}, defaultOptions, {emitCompileError: true});
 
-			sass('source/error.scss', options)
+			sass('special/error.scss', options)
 			.on('data', function () {})
 			.on('error', function (err) {
 				error = err;
