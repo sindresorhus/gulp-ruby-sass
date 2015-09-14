@@ -32,7 +32,7 @@ gulp.task('sass', function () {
 
 Type: `String` or `Array`
 
-A file or glob pattern (`source/**/*.scss`) to compile. Ignores files prefixed with an underscore. Directory sources are not supported.
+A file or glob pattern (`source/**/*.scss`) to compile. Ignores files prefixed with an underscore. **Directory sources are not supported.**
 
 #### options
 
