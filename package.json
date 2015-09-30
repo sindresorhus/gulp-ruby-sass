@@ -24,7 +24,13 @@
   },
   "xo": {
     "rules": {
-      "brace-style": [2, "stroustrup", {"allowSingleLine": false}]
+      "brace-style": [
+        2,
+        "stroustrup",
+        {
+          "allowSingleLine": false
+        }
+      ]
     }
   },
   "files": [
