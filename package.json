@@ -56,6 +56,7 @@
     "cross-spawn-async": "^2.0.0",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",
+    "escape-string-regexp": "^1.0.3",
     "glob": "^5.0.5",
     "glob2base": "0.0.12",
     "gulp-util": "^3.0.4",
