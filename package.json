@@ -1,6 +1,6 @@
 {
   "name": "gulp-ruby-sass",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Compile Sass to CSS with Ruby Sass",
   "license": "MIT",
   "repository": "sindresorhus/gulp-ruby-sass",
