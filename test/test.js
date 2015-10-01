@@ -7,6 +7,7 @@ var pathExists = require('path-exists');
 var rimraf = require('rimraf');
 var vinylFile = require('vinyl-file');
 var sass = require('../');
+var logger = require('../lib/logger');
 
 var defaultOptions = {
 	quiet: true,
@@ -317,5 +318,19 @@ describe('caching', function () {
 				done();
 			});
 		});
+	});
+});
+
+describe('logging', function () {
+	this.timeout(20000);
+
+	it('correctly processes paths with special characters', function () {
+		var dir = 'foo/bar/++/__/(a|f)';
+		var msg = 'dir: ' + dir + '/some/directory, Gettin\' Sassy!';
+
+		assert(
+			logger.prettifyDirectoryLogging(msg, dir),
+			'dir: some/directory, Gettin\' Sassy!'
+		);
 	});
 });
