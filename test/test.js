@@ -97,6 +97,23 @@ describe('compiling', function () {
 
 		compilesSource(source, expected);
 	});
+
+	describe('nonexistent sources', function () {
+		it('does not error when no files match source', function (done) {
+			var source = 'source/does-not-exist.scss';
+			var error;
+
+			sass(source, defaultOptions)
+			.on('data', function () {})
+			.on('error', function (err) {
+				error = err;
+			})
+			.on('end', function () {
+				assert.equal(error, undefined);
+				done();
+			});
+		});
+	});
 });
 
 describe('concurrently run tasks', function () {

@@ -65,9 +65,11 @@ function gulpRubySass(sources, options) {
 		bases.push(options.base || utils.calculateBase(source));
 	});
 
-	// give a good error if there are no file matches
+	// log and return stream if there are no file matches
 	if (matches[0].length < 1) {
-		emitErr(stream, '`source` does not match any files.');
+		gutil.log('No files matched your Sass source.');
+		stream.push(null);
+		return stream;
 	}
 
 	var intermediateDir = createIntermediatePath(sources, matches, options);
