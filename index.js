@@ -215,7 +215,7 @@ gulpRubySass.logError = function (err) {
 
 gulpRubySass.clearCache = function (tempDir) {
 	tempDir = tempDir || defaults.tempDir;
-	rimraf.sync(path.join(tempDir, 'gulp-ruby-sass'));
+	rimraf.sync(path.join(tempDir, defaults.tempSubDir));
 };
 
 module.exports = gulpRubySass;
