@@ -20,11 +20,15 @@ var replaceLocation = utils.replaceLocation;
 var createIntermediatePath = utils.createIntermediatePath;
 
 var defaults = {
-	tempDir: osTmpdir(),
+	tempDir: path.join(osTmpdir(), 'gulp-ruby-sass'),
 	verbose: false,
 	sourcemap: false,
 	emitCompileError: false
 };
+
+if (typeof process.getuid === 'function') {
+	defaults.tempDir += '-' + process.getuid();
+}
 
 function gulpRubySass(sources, options) {
 	var stream = new Readable({objectMode: true});
@@ -215,7 +219,7 @@ gulpRubySass.logError = function (err) {
 
 gulpRubySass.clearCache = function (tempDir) {
 	tempDir = tempDir || defaults.tempDir;
-	rimraf.sync(path.join(tempDir, 'gulp-ruby-sass'));
+	rimraf.sync(tempDir);
 };
 
 module.exports = gulpRubySass;
