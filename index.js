@@ -11,7 +11,7 @@ var gutil = require('gulp-util');
 var osTmpdir = require('os-tmpdir');
 var pathExists = require('path-exists');
 var rimraf = require('rimraf');
-var spawn = require('cross-spawn-async');
+var spawn = require('cross-spawn');
 var logger = require('./lib/logger');
 var utils = require('./lib/utils');
 
