@@ -42,7 +42,7 @@
   ],
   "dependencies": {
     "convert-source-map": "^1.0.0",
-    "cross-spawn-async": "^2.0.0",
+    "cross-spawn": "^4.0.2",
     "dargs": "^2.0.3",
     "each-async": "^1.0.0",
     "escape-string-regexp": "^1.0.3",
