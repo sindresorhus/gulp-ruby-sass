@@ -42,8 +42,8 @@
   ],
   "dependencies": {
     "convert-source-map": "^1.0.0",
-    "cross-spawn": "^4.0.2",
     "dargs": "^2.0.3",
+    "cross-spawn": "^5.0.0",
     "each-async": "^1.0.0",
     "escape-string-regexp": "^1.0.3",
     "glob": "^7.0.3",
@@ -57,10 +57,10 @@
   },
   "devDependencies": {
     "gulp": "^3.8.11",
-    "gulp-sourcemaps": "^1.2.7",
+    "gulp-sourcemaps": "^2.2.0",
     "mocha": "*",
     "vinyl-file": "^2.0.0",
-    "xo": "*"
+    "xo": "^0.16.0"
   },
   "xo": {
     "rules": {
