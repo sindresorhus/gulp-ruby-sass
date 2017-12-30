@@ -1,60 +1,59 @@
 /* eslint-env mocha */
 'use strict';
-var path = require('path');
-var assert = require('assert');
-var assign = require('object-assign');
-var pathExists = require('path-exists');
-var rimraf = require('rimraf');
-var vinylFile = require('vinyl-file');
-var sass = require('../');
-var logger = require('../lib/logger');
+const path = require('path');
+const assert = require('assert');
+const pathExists = require('path-exists');
+const rimraf = require('rimraf');
+const vinylFile = require('vinyl-file');
+const sass = require('../');
+const logger = require('../lib/logger');
 
-var defaultOptions = {
+const defaultOptions = {
 	quiet: true,
-	// normalize compilation results on Windows systems
+	// Normalize compilation results on Windows systems
 	unixNewlines: true
 };
 
-// load the expected result file from the compiled results directory
-var loadExpectedFile = function (relativePath, base) {
+// Load the expected result file from the compiled results directory
+const loadExpectedFile = function (relativePath, base) {
 	base = base || 'result';
-	var file = path.join(base, relativePath);
-	return vinylFile.readSync(file, {base: base});
+	const file = path.join(base, relativePath);
+	return vinylFile.readSync(file, {base});
 };
 
-var sortByRelative = function (a, b) {
+const sortByRelative = function (a, b) {
 	return a.relative.localeCompare(b.relative);
 };
 
-var compilesSource = function (source, expected, options) {
-	var files = [];
+const compilesSource = function (source, expected, options) {
+	const files = [];
 	options = options || defaultOptions;
 
-	before(function (done) {
+	before(done => {
 		sass(source, options)
-		.on('data', function (data) {
+		.on('data', data => {
 			files.push(data);
 		})
-		.on('end', function () {
+		.on('end', () => {
 			files.sort(sortByRelative);
 			done();
 		});
 	});
 
-	it('creates the correct number of files', function () {
+	it('creates the correct number of files', () => {
 		assert.equal(files.length, expected.length);
 	});
 
-	it('creates files at the correct path', function () {
+	it('creates files at the correct path', () => {
 		assert(files.length);
-		files.forEach(function (file, i) {
+		files.forEach((file, i) => {
 			assert.equal(file.relative, expected[i].relative);
 		});
 	});
 
-	it('creates correct file contents', function () {
+	it('creates correct file contents', () => {
 		assert(files.length);
-		files.forEach(function (file, i) {
+		files.forEach((file, i) => {
 			assert.deepEqual(
 				file.contents.toString(),
 				expected[i].contents.toString()
@@ -66,16 +65,16 @@ var compilesSource = function (source, expected, options) {
 describe('compiling', function () {
 	this.timeout(20000);
 
-	describe('a single file', function () {
-		var source = 'source/file.scss';
-		var expected = [loadExpectedFile('file.css')];
+	describe('a single file', () => {
+		const source = 'source/file.scss';
+		const expected = [loadExpectedFile('file.css')];
 
 		compilesSource(source, expected);
 	});
 
-	describe('multiple files', function () {
-		var source = 'source/**/*.scss';
-		var expected = [
+	describe('multiple files', () => {
+		const source = 'source/**/*.scss';
+		const expected = [
 			loadExpectedFile('directory with spaces/file with spaces.css'),
 			loadExpectedFile('directory/file.css'),
 			loadExpectedFile('file.css'),
@@ -85,12 +84,12 @@ describe('compiling', function () {
 		compilesSource(source, expected);
 	});
 
-	describe('array sources', function () {
-		var source = [
+	describe('array sources', () => {
+		const source = [
 			'source/file.scss',
 			'source/directory with spaces/file with spaces.scss'
 		];
-		var expected = [
+		const expected = [
 			loadExpectedFile('file with spaces.css', 'result/directory with spaces'),
 			loadExpectedFile('file.css')
 		];
@@ -98,17 +97,17 @@ describe('compiling', function () {
 		compilesSource(source, expected);
 	});
 
-	describe('nonexistent sources', function () {
-		it('does not error when no files match source', function (done) {
-			var source = 'source/does-not-exist.scss';
-			var error;
+	describe('nonexistent sources', () => {
+		it('does not error when no files match source', done => {
+			const source = 'source/does-not-exist.scss';
+			let error;
 
 			sass(source, defaultOptions)
-			.on('data', function () {})
-			.on('error', function (err) {
+			.on('data', () => {})
+			.on('error', err => {
 				error = err;
 			})
-			.on('end', function () {
+			.on('end', () => {
 				assert.equal(error, undefined);
 				done();
 			});
@@ -118,12 +117,12 @@ describe('compiling', function () {
 
 describe('concurrently run tasks', function () {
 	this.timeout(20000);
-	var aFiles = [];
-	var bFiles = [];
-	var cFiles = [];
-	var counter = 0;
+	const aFiles = [];
+	const bFiles = [];
+	const cFiles = [];
+	let counter = 0;
 
-	var isDone = function (done) {
+	const isDone = function (done) {
 		counter++;
 
 		if (counter === 3) {
@@ -131,33 +130,33 @@ describe('concurrently run tasks', function () {
 		}
 	};
 
-	before(function (done) {
+	before(done => {
 		sass('source/file.scss', defaultOptions)
-		.on('data', function (data) {
+		.on('data', data => {
 			aFiles.push(data);
 		})
-		.on('end', function () {
+		.on('end', () => {
 			isDone(done);
 		});
 
 		sass('source/directory/file.scss', defaultOptions)
-		.on('data', function (data) {
+		.on('data', data => {
 			bFiles.push(data);
 		})
-		.on('end', function () {
+		.on('end', () => {
 			isDone(done);
 		});
 
 		sass('source/directory with spaces/file with spaces.scss', defaultOptions)
-		.on('data', function (data) {
+		.on('data', data => {
 			cFiles.push(data);
 		})
-		.on('end', function () {
+		.on('end', () => {
 			isDone(done);
 		});
 	});
 
-	it('don\'t intermix result files', function () {
+	it('don\'t intermix result files', () => {
 		assert.equal(aFiles.length, 1);
 		assert.equal(bFiles.length, 1);
 		assert.equal(cFiles.length, 1);
@@ -167,79 +166,79 @@ describe('concurrently run tasks', function () {
 describe('options', function () {
 	this.timeout(20000);
 
-	describe('sourcemap', function () {
-		describe('replaces Sass sourcemaps with vinyl sourceMaps', function () {
-			var files = [];
-			var options = assign({}, defaultOptions, {sourcemap: true});
+	describe('sourcemap', () => {
+		describe('replaces Sass sourcemaps with vinyl sourceMaps', () => {
+			const files = [];
+			const options = Object.assign({}, defaultOptions, {sourcemap: true});
 
-			before(function (done) {
+			before(done => {
 				sass('source/file.scss', options)
-				.on('data', function (data) {
+				.on('data', data => {
 					files.push(data);
 				})
 				.on('end', done);
 			});
 
-			it('doesn\'t stream Sass sourcemap files', function () {
+			it('doesn\'t stream Sass sourcemap files', () => {
 				assert.equal(files.length, 1);
 			});
 
-			it('removes Sass sourcemap comment', function () {
+			it('removes Sass sourcemap comment', () => {
 				assert(
 					files[0].contents.toString().indexOf('sourceMap') === -1,
 					'File contains sourcemap comment'
 				);
 			});
 
-			it('adds a vinyl sourcemap', function () {
+			it('adds a vinyl sourcemap', () => {
 				assert.equal(typeof files[0].sourceMap, 'object');
 				assert.equal(files[0].sourceMap.version, 3);
 			});
 		});
 
-		var includesCorrectSources = function (source, expected) {
-			var files = [];
-			var options = assign({}, defaultOptions, {sourcemap: true});
+		const includesCorrectSources = function (source, expected) {
+			const files = [];
+			const options = Object.assign({}, defaultOptions, {sourcemap: true});
 
-			before(function (done) {
+			before(done => {
 				sass(source, options)
-				.on('data', function (data) {
+				.on('data', data => {
 					files.push(data);
 				})
-				.on('end', function () {
+				.on('end', () => {
 					files.sort(sortByRelative);
 					done();
 				});
 			});
 
-			it('includes the correct sources', function () {
-				files.forEach(function (file, i) {
+			it('includes the correct sources', () => {
+				files.forEach((file, i) => {
 					assert.deepEqual(file.sourceMap.sources, expected[i]);
 				});
 			});
 		};
 
-		describe('compiling files from a single file source', function () {
-			var source = ['source/file.scss'];
-			var expected = [
+		describe('compiling files from a single file source', () => {
+			const source = ['source/file.scss'];
+			const expected = [
 				['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
 			];
 
 			includesCorrectSources(source, expected);
 		});
 
-		describe('compiling files and directories with spaces', function () {
-			var source = ['source/directory with spaces/file with spaces.scss'];
-			var expected = [
+		describe('compiling files and directories with spaces', () => {
+			const source = ['source/directory with spaces/file with spaces.scss'];
+			const expected = [
 				['file with spaces.scss']
 			];
 
 			includesCorrectSources(source, expected);
 		});
 
-		describe('compiling files from glob source', function () {
-			var source = ['source/**/file.scss'];
-			var expected = [
+		describe('compiling files from glob source', () => {
+			const source = ['source/**/file.scss'];
+			const expected = [
 				['_partial.scss'],
 				['_partial.scss', 'file.scss', 'directory/_nested-partial.scss']
 			];
@@ -248,21 +247,21 @@ describe('options', function () {
 		});
 	});
 
-	describe('emitCompileError', function () {
-		var error;
+	describe('emitCompileError', () => {
+		let error;
 
-		before(function (done) {
-			var options = assign({}, defaultOptions, {emitCompileError: true});
+		before(done => {
+			const options = Object.assign({}, defaultOptions, {emitCompileError: true});
 
 			sass('special/error.scss', options)
-			.on('data', function () {})
-			.on('error', function (err) {
+			.on('data', () => {})
+			.on('error', err => {
 				error = err;
 			})
 			.on('end', done);
 		});
 
-		it('emits a gulp error when Sass compilation fails', function () {
+		it('emits a gulp error when Sass compilation fails', () => {
 			assert(error instanceof Error);
 			assert.equal(
 				error.message,
@@ -271,22 +270,22 @@ describe('options', function () {
 		});
 	});
 
-	describe('base (for colliding sources)', function () {
-		var source = ['source/file.scss', 'source/directory/file.scss'];
-		var expected = [
+	describe('base (for colliding sources)', () => {
+		const source = ['source/file.scss', 'source/directory/file.scss'];
+		const expected = [
 			loadExpectedFile('directory/file.css'),
 			loadExpectedFile('file.css')
 		];
-		var options = assign({}, defaultOptions, {base: 'source'});
+		const options = Object.assign({}, defaultOptions, {base: 'source'});
 
 		compilesSource(source, expected, options);
 	});
 
-	describe('tempDir', function () {
-		it('compiles files to the specified directory', function (done) {
-			var source = 'source/file.scss';
-			var tempDir = './custom-temp-dir';
-			var options = assign({}, defaultOptions, {tempDir: tempDir});
+	describe('tempDir', () => {
+		it('compiles files to the specified directory', done => {
+			const source = 'source/file.scss';
+			const tempDir = './custom-temp-dir';
+			const options = Object.assign({}, defaultOptions, {tempDir});
 
 			assert.equal(
 				pathExists.sync(tempDir),
@@ -296,12 +295,12 @@ describe('options', function () {
 
 			sass(source, options)
 
-			.on('data', function () {
+			.on('data', () => {
 				assert(pathExists.sync(tempDir));
 			})
 
-			// clean up if tests are run locally
-			.on('end', function () {
+			// Clean up if tests are run locally
+			.on('end', () => {
 				rimraf(tempDir, done);
 			});
 		});
@@ -311,23 +310,23 @@ describe('options', function () {
 describe('caching', function () {
 	this.timeout(20000);
 
-	it('compiles an unchanged file faster the second time', function (done) {
+	it('compiles an unchanged file faster the second time', done => {
 		sass.clearCache();
-		var startOne = new Date();
+		const startOne = new Date();
 
 		sass('special/computational.scss', defaultOptions)
-		.on('data', function () {})
-		.on('end', function () {
-			var endOne = new Date();
-			var runtimeOne = endOne - startOne;
+		.on('data', () => {})
+		.on('end', () => {
+			const endOne = new Date();
+			const runtimeOne = endOne - startOne;
 
 			sass('special/computational.scss', defaultOptions)
-			.on('data', function () {})
-			.on('end', function () {
-				var runtimeTwo = new Date() - endOne;
+			.on('data', () => {})
+			.on('end', () => {
+				const runtimeTwo = new Date() - endOne;
 
 				assert(
-					// pad time to avoid potential intermittents
+					// Pad time to avoid potential intermittents
 					runtimeOne > runtimeTwo + 50,
 					'Compilation times were not decreased significantly. Caching may be broken.'
 				);
@@ -341,9 +340,9 @@ describe('caching', function () {
 describe('logging', function () {
 	this.timeout(20000);
 
-	it('correctly processes paths with special characters', function () {
-		var dir = 'foo/bar/++/__/(a|f)';
-		var msg = 'dir: ' + dir + '/some/directory, Gettin\' Sassy!';
+	it('correctly processes paths with special characters', () => {
+		const dir = 'foo/bar/++/__/(a|f)';
+		const msg = 'dir: ' + dir + '/some/directory, Gettin\' Sassy!';
 
 		assert(
 			logger.prettifyDirectoryLogging(msg, dir),

@@ -1,9 +1,9 @@
 'use strict';
-var gulp = require('gulp');
-var sourcemaps = require('gulp-sourcemaps');
-var sass = require('../');
+const gulp = require('gulp');
+const sourcemaps = require('gulp-sourcemaps');
+const sass = require('../');
 
-gulp.task('sass', function () {
+gulp.task('sass', () => {
 	return sass('source/**/*.scss', {verbose: true})
 		.on('error', sass.logError)
 		.pipe(sourcemaps.write())
