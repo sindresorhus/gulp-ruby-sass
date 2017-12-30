@@ -26,14 +26,14 @@ const defaults = {
 };
 
 if (typeof process.getuid === 'function') {
-	defaults.tempDir += '-' + process.getuid();
+	defaults.tempDir += `-${process.getuid()}`;
 }
 
 function gulpRubySass(sources, options) {
 	const stream = new Readable({objectMode: true});
 
 	// Redundant but necessary
-	stream._read = function () {};
+	stream._read = () => {};
 
 	options = Object.assign({}, defaults, options);
 
@@ -63,10 +63,10 @@ function gulpRubySass(sources, options) {
 	const matches = [];
 	const bases = [];
 
-	sources.forEach(source => {
+	for (const source of sources) {
 		matches.push(glob.sync(source));
 		bases.push(options.base || utils.calculateBase(source));
-	});
+	}
 
 	// Log and return stream if there are no file matches
 	if (matches[0].length < 1) {
@@ -94,7 +94,7 @@ function gulpRubySass(sources, options) {
 			const relative = path.relative(intermediateDir, dest);
 
 			// Source:dest mappings for the Sass CLI
-			compileMappings.push(match + ':' + dest);
+			compileMappings.push(`${match}:${dest}`);
 
 			// Store base values by relative file path
 			baseMappings[relative] = base;
@@ -117,8 +117,7 @@ function gulpRubySass(sources, options) {
 	if (options.bundleExec) {
 		command = 'bundle';
 		args.unshift('exec', 'sass');
-	}
-	else {
+	}	else {
 		command = 'sass';
 	}
 
@@ -149,7 +148,7 @@ function gulpRubySass(sources, options) {
 			emitErr(stream, 'Sass compilation failed. See console output for more information.');
 		}
 
-		glob(path.join(intermediateDir, '**', '*'), (err, files) => {
+		glob(path.join(intermediateDir, '**/*'), (err, files) => {
 			if (err) {
 				emitErr(stream, err);
 			}
@@ -209,13 +208,13 @@ function gulpRubySass(sources, options) {
 	return stream;
 }
 
-gulpRubySass.logError = function (err) {
+gulpRubySass.logError = err => {
 	const message = new gutil.PluginError('gulp-ruby-sass', err);
-	process.stderr.write(message + '\n');
+	process.stderr.write(`${message}\n`);
 	this.emit('end');
 };
 
-gulpRubySass.clearCache = function (tempDir) {
+gulpRubySass.clearCache = tempDir => {
 	tempDir = tempDir || defaults.tempDir;
 	rimraf.sync(tempDir);
 };

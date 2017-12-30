@@ -60,16 +60,5 @@
 		"mocha": "*",
 		"vinyl-file": "^2.0.0",
 		"xo": "*"
-	},
-	"xo": {
-		"rules": {
-			"brace-style": [
-				"error",
-				"stroustrup",
-				{
-					"allowSingleLine": false
-				}
-			]
-		}
 	}
 }

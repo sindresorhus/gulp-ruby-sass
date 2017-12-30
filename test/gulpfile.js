@@ -1,11 +1,11 @@
 'use strict';
 const gulp = require('gulp');
 const sourcemaps = require('gulp-sourcemaps');
-const sass = require('../');
+const sass = require('..');
 
-gulp.task('sass', () => {
-	return sass('source/**/*.scss', {verbose: true})
+gulp.task('sass', () =>
+	sass('source/**/*.scss', {verbose: true})
 		.on('error', sass.logError)
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('result'));
-});
+		.pipe(gulp.dest('result'))
+);

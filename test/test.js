@@ -15,17 +15,15 @@ const defaultOptions = {
 };
 
 // Load the expected result file from the compiled results directory
-const loadExpectedFile = function (relativePath, base) {
+const loadExpectedFile = (relativePath, base) => {
 	base = base || 'result';
 	const file = path.join(base, relativePath);
 	return vinylFile.readSync(file, {base});
 };
 
-const sortByRelative = function (a, b) {
-	return a.relative.localeCompare(b.relative);
-};
+const sortByRelative = (a, b) => a.relative.localeCompare(b.relative);
 
-const compilesSource = function (source, expected, options) {
+const compilesSource = (source, expected, options) => {
 	const files = [];
 	options = options || defaultOptions;
 
@@ -122,7 +120,7 @@ describe('concurrently run tasks', function () {
 	const cFiles = [];
 	let counter = 0;
 
-	const isDone = function (done) {
+	const isDone = done => {
 		counter++;
 
 		if (counter === 3) {
@@ -196,7 +194,7 @@ describe('options', function () {
 			});
 		});
 
-		const includesCorrectSources = function (source, expected) {
+		const includesCorrectSources = (source, expected) => {
 			const files = [];
 			const options = Object.assign({}, defaultOptions, {sourcemap: true});
 

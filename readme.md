@@ -3,6 +3,7 @@
 Compiles Sass with the [Sass gem](http://sass-lang.com/install) and pipes the results into a gulp stream.<br>
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
+
 ---
 
 <p align="center"><b>⚛ Learn React in just a couple of afternoons with this awesome <a href="https://ReactForBeginners.com/friend/AWESOME">React course</a> by Wes Bos</b></p>
@@ -38,13 +39,13 @@ gulp.task('sass', () =>
 
 #### source
 
-Type: `string`, `array`
+Type: `string` `string[]`
 
 File or glob pattern (`source/**/*.scss`) to compile. Ignores files prefixed with an underscore. **Directory sources are not supported.**
 
 #### options
 
-Type: `object`
+Type: `Object`
 
 Object containing plugin and Sass options.
 
