@@ -1,4 +1,5 @@
 'use strict';
+const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const Readable = require('stream').Readable;
@@ -6,11 +7,14 @@ const convert = require('convert-source-map');
 const dargs = require('dargs');
 const eachAsync = require('each-async');
 const glob = require('glob');
-const gutil = require('gulp-util');
-const osTmpdir = require('os-tmpdir');
 const pathExists = require('path-exists');
 const rimraf = require('rimraf');
 const spawn = require('cross-spawn');
+const PluginError = require('plugin-error');
+const fancyLog = require('fancy-log');
+const Vinyl = require('vinyl');
+const chalk = require('chalk');
+const replaceExt = require('replace-ext');
 const logger = require('./lib/logger');
 const utils = require('./lib/utils');
 
@@ -19,7 +23,7 @@ const replaceLocation = utils.replaceLocation;
 const createIntermediatePath = utils.createIntermediatePath;
 
 const defaults = {
-	tempDir: path.join(osTmpdir(), 'gulp-ruby-sass'),
+	tempDir: path.join(os.tmpdir(), 'gulp-ruby-sass'),
 	verbose: false,
 	sourcemap: false,
 	emitCompileError: false
@@ -39,7 +43,7 @@ function gulpRubySass(sources, options) {
 
 	// Alert user that `container` is deprecated
 	if (options.container) {
-		gutil.log(gutil.colors.yellow('The container option has been deprecated. Simultaneous tasks work automatically now!'));
+		fancyLog(chalk.yellow('The container option has been deprecated. Simultaneous tasks work automatically now!'));
 	}
 
 	// Error if user tries to watch their files with the Sass gem
@@ -70,7 +74,7 @@ function gulpRubySass(sources, options) {
 
 	// Log and return stream if there are no file matches
 	if (matches[0].length < 1) {
-		gutil.log('No files matched your Sass source.');
+		fancyLog('No files matched your Sass source.');
 		stream.push(null);
 		return stream;
 	}
@@ -87,7 +91,7 @@ function gulpRubySass(sources, options) {
 			return path.basename(match).indexOf('_') !== 0;
 		})
 		.forEach(match => {
-			const dest = gutil.replaceExtension(
+			const dest = replaceExt(
 				replaceLocation(match, base, intermediateDir),
 				'.css'
 			);
@@ -171,7 +175,7 @@ function gulpRubySass(sources, options) {
 
 					// Rewrite file paths so gulp thinks the file came from cwd, not the
 					// intermediate directory
-					const vinylFile = new gutil.File({
+					const vinylFile = new Vinyl({
 						cwd: process.cwd(),
 						base,
 						path: replaceLocation(file, intermediateDir, base)
@@ -209,7 +213,7 @@ function gulpRubySass(sources, options) {
 }
 
 gulpRubySass.logError = err => {
-	const message = new gutil.PluginError('gulp-ruby-sass', err);
+	const message = new PluginError('gulp-ruby-sass', err);
 	process.stderr.write(`${message}\n`);
 	this.emit('end');
 };
