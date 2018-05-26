@@ -59,7 +59,7 @@ function gulpRubySass(sources, options) {
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
 	if (!options.watch) {
 		options.update = true;
-    }
+	}
 
 	// Simplified handling of array sources, like gulp.src
 	if (!Array.isArray(sources)) {
