@@ -46,9 +46,9 @@ function gulpRubySass(sources, options) {
 		fancyLog(chalk.yellow('The container option has been deprecated. Simultaneous tasks work automatically now!'));
 	}
 
-	// Error if user tries to watch their files with the Sass gem
-	if (options.watch || options.poll) {
-		emitErr(stream, '`watch` and `poll` are not valid options for gulp-ruby-sass. Use `gulp.watch` to rebuild your files on change.');
+	// Error if user tries to use poll option
+	if (options.poll) {
+		emitErr(stream, '`poll` is not a valid option for gulp-ruby-sass.');
 	}
 
 	// Error if user tries to pass a Sass option to sourcemap
@@ -57,7 +57,9 @@ function gulpRubySass(sources, options) {
 	}
 
 	options.sourcemap = options.sourcemap === true ? 'file' : 'none';
-	options.update = true;
+	if (!options.watch) {
+		options.update = true;
+    }
 
 	// Simplified handling of array sources, like gulp.src
 	if (!Array.isArray(sources)) {
@@ -107,7 +109,6 @@ function gulpRubySass(sources, options) {
 
 	const args = dargs(options, [
 		'bundleExec',
-		'watch',
 		'poll',
 		'tempDir',
 		'verbose',
