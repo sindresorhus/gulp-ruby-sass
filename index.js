@@ -138,6 +138,10 @@ function gulpRubySass(sources, options) {
 
 	sass.stdout.on('data', data => {
 		logger.stdout(stream, intermediateDir, data);
+		let filePath = data.match(/write\s+(\/.*)/);
+		if (filePath && filePath.length && filePath.length > 1) {
+			pushVinylFile(filePath[1], intermediateDir);
+		}
 	});
 
 	sass.stderr.on('data', data => {
@@ -164,46 +168,8 @@ function gulpRubySass(sources, options) {
 					return;
 				}
 
-				const relative = path.relative(intermediateDir, file);
-				const base = baseMappings[relative];
-
-				fs.readFile(file, (err, data) => {
-					if (err) {
-						emitErr(stream, err);
-						next();
-						return;
-					}
-
-					// Rewrite file paths so gulp thinks the file came from cwd, not the
-					// intermediate directory
-					const vinylFile = new Vinyl({
-						cwd: process.cwd(),
-						base,
-						path: replaceLocation(file, intermediateDir, base)
-					});
-
-					// Sourcemap integration
-					if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
-						// Remove sourcemap comment; gulp-sourcemaps will add it back in
-						data = Buffer.from(convert.removeMapFileComments(data.toString()));
-						const sourceMapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
-
-						// Create relative paths for sources
-						sourceMapObject.sources = sourceMapObject.sources.map(sourcePath => {
-							const absoluteSourcePath = decodeURI(path.resolve(
-								'/',
-								sourcePath.replace('file:///', '')
-							));
-							return path.relative(base, absoluteSourcePath);
-						});
-
-						vinylFile.sourceMap = sourceMapObject;
-					}
-
-					vinylFile.contents = data;
-					stream.push(vinylFile);
-					next();
-				});
+				pushVinylFile(file, intermediateDir);
+				next();
 			}, () => {
 				stream.push(null);
 			});
@@ -211,6 +177,50 @@ function gulpRubySass(sources, options) {
 	});
 
 	return stream;
+
+	function pushVinylFile(file, intermediateDir) {
+		// Rewrite file paths so gulp thinks the file came from cwd, not the
+		// intermediate directory
+		const relative = path.relative(intermediateDir, file);
+		const base = baseMappings[relative];
+
+		fs.readFile(file, (err, data) => {
+			if (err) {
+				emitErr(stream, err);
+				next();
+				return;
+			}
+
+			const vinylFile = new Vinyl({
+				cwd: process.cwd(),
+				base,
+				path: replaceLocation(file, intermediateDir, base)
+			});
+
+			// Sourcemap integration
+			if (options.sourcemap === 'file' && pathExists.sync(file + '.map')) {
+				// Remove sourcemap comment; gulp-sourcemaps will add it back in
+				data = Buffer.from(convert.removeMapFileComments(data.toString()));
+				const sourceMapObject = JSON.parse(fs.readFileSync(file + '.map', 'utf8'));
+
+				// Create relative paths for sources
+				sourceMapObject.sources = sourceMapObject.sources.map(sourcePath => {
+					const absoluteSourcePath = decodeURI(path.resolve(
+						'/',
+						sourcePath.replace('file:///', '')
+					));
+					return path.relative(base, absoluteSourcePath);
+				});
+
+				vinylFile.sourceMap = sourceMapObject;
+			}
+
+			vinylFile.contents = data;
+
+			stream.push(vinylFile);
+		});
+
+	}
 }
 
 gulpRubySass.logError = err => {
