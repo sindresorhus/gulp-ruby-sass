@@ -223,7 +223,7 @@ function gulpRubySass(sources, options) {
 	}
 }
 
-gulpRubySass.logError = err => {
+gulpRubySass.logError = function(err) {
 	const message = new PluginError('gulp-ruby-sass', err);
 	process.stderr.write(`${message}\n`);
 	this.emit('end');
