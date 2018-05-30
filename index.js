@@ -179,7 +179,7 @@ function gulpRubySass(sources, options) {
 
 	return stream;
 
-	function pushVinylFile(file) {
+	function pushVinylFile(file, callback) {
 		// Rewrite file paths so gulp thinks the file came from cwd, not the
 		// intermediate directory
 		const relative = path.relative(intermediateDir, file.replace('.map', ''));
