@@ -140,7 +140,7 @@ function gulpRubySass(sources, options) {
 		logger.stdout(stream, intermediateDir, data);
 		let filePath = data.match(/write\s+(\/.*)/);
 		if (filePath && filePath.length && filePath.length > 1) {
-			pushVinylFile(filePath[1], intermediateDir);
+			pushVinylFile(filePath[1]);
 		}
 	});
 
@@ -168,8 +168,9 @@ function gulpRubySass(sources, options) {
 					return;
 				}
 
-				pushVinylFile(file, intermediateDir);
-				next();
+				pushVinylFile(file, function() {
+					next();
+				})
 			}, () => {
 				stream.push(null);
 			});
@@ -178,7 +179,7 @@ function gulpRubySass(sources, options) {
 
 	return stream;
 
-	function pushVinylFile(file, intermediateDir) {
+	function pushVinylFile(file) {
 		// Rewrite file paths so gulp thinks the file came from cwd, not the
 		// intermediate directory
 		const relative = path.relative(intermediateDir, file.replace('.map', ''));
@@ -187,7 +188,7 @@ function gulpRubySass(sources, options) {
 		fs.readFile(file, (err, data) => {
 			if (err) {
 				emitErr(stream, err);
-				next();
+				callback && callback();
 				return;
 			}
 
@@ -216,10 +217,9 @@ function gulpRubySass(sources, options) {
 			}
 
 			vinylFile.contents = data;
-
 			stream.push(vinylFile);
+			callback && callback();
 		});
-
 	}
 }
 
