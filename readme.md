@@ -1,14 +1,14 @@
+# Deprecated
+
+This project is deprecated because [Ruby Sass is deprecated](http://sass.logdown.com/posts/7081811). Switch to [`gulp-sass`](https://github.com/dlmanning/gulp-sass).
+
+---
+
 # gulp-ruby-sass [![Build Status](https://travis-ci.org/sindresorhus/gulp-ruby-sass.svg?branch=master)](https://travis-ci.org/sindresorhus/gulp-ruby-sass)
 
 Compiles Sass with the [Sass gem](http://sass-lang.com/install) and pipes the results into a gulp stream.<br>
 To compile Sass with [libsass](http://libsass.org/), use [gulp-sass](https://github.com/dlmanning/gulp-sass)
 
-
----
-
-<p align="center"><b>⚛ Learn React in just a couple of afternoons with this awesome <a href="https://ReactForBeginners.com/friend/AWESOME">React course</a> by Wes Bos</b></p>
-
----
 
 
 ## Install
